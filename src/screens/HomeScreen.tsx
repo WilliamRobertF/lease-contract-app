@@ -1,32 +1,52 @@
 import React, { useState, useEffect } from "react";
 import { View, StyleSheet } from "react-native";
-import { Text, Button } from "react-native-paper";
+import { Text, Menu, IconButton } from "react-native-paper";
 import { useTranslation } from "react-i18next";
 
 export default function HomeScreen() {
   const { t, i18n } = useTranslation();
+  const [menuVisible, setMenuVisible] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState(i18n.language);
 
   useEffect(() => {
     setCurrentLanguage(i18n.language || "pt");
   }, [i18n.language]);
 
-  const toggleLanguage = () => {
-    const newLanguage = currentLanguage === "en" ? "pt" : "en";
-    i18n.changeLanguage(newLanguage);
-    setCurrentLanguage(newLanguage);
+  const openMenu = () => setMenuVisible(true);
+  const changeLanguage = (lang: string) => {
+    i18n.changeLanguage(lang);
+    setCurrentLanguage(lang);
+    setMenuVisible(false);
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{t("welcome")}</Text>
-      <Button
-        mode="contained"
-        onPress={toggleLanguage}
-        style={styles.languageButton}
+      <Menu
+        visible={menuVisible}
+        onDismiss={() => setMenuVisible(false)}
+        anchor={
+          <IconButton
+            icon="translate"
+            size={28}
+            onPress={openMenu}
+            mode="outlined"
+            style={styles.languageIcon}
+          />
+        }
+        contentStyle={styles.menuContent}
       >
-        {t("change_language")}
-      </Button>
+        <Menu.Item
+          onPress={() => changeLanguage("en")}
+          title={t("english")}
+          {...(currentLanguage === "en" ? { leadingIcon: "check" } : {})}
+        />
+        <Menu.Item
+          onPress={() => changeLanguage("pt")}
+          title={t("portuguese")}
+          {...(currentLanguage === "pt" ? { leadingIcon: "check" } : {})}
+        />
+      </Menu>
     </View>
   );
 }
@@ -39,5 +59,10 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   title: { fontSize: 20, fontWeight: "bold" },
-  languageButton: { marginTop: 10 },
+  languageIcon: {
+    marginTop: 10,
+  },
+  menuContent: {
+    backgroundColor: "#fff",
+  },
 });

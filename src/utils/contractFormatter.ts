@@ -71,11 +71,8 @@ export function formatContract(data: ContractDataForFormat, allClauses: Clause[]
   values['START_DATE'] = data.startDate ? format(data.startDate, 'dd/MM/yyyy') : '';
   values['END_DATE'] = data.endDate ? format(data.endDate, 'dd/MM/yyyy') : '';
 
-  // Always include clauses marked as obligatory, then add the ones from template
-  const obligatoryClauses = allClauses.filter(c => c.category === 'obligatory').map(c => c.id);
-  const allClauseIds = [...new Set([...obligatoryClauses, ...data.template.clauseIds])];
-  
-  const selectedClauses: Clause[] = allClauseIds
+  // Use clauses from template
+  const selectedClauses: Clause[] = data.template.clauseIds
     .map((id) => allClauses.find((c) => c.id === id))
     .filter(Boolean) as Clause[];
 

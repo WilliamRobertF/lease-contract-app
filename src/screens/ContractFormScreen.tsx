@@ -284,23 +284,20 @@ export default function ContractFormScreen() {
 
                 <View style={styles.section}>
                   <Text style={styles.sectionTitle}>{t('monthlyRent')}</Text>
-                  <View style={styles.inputWithPrefix}>
-                    <Text style={styles.inputPrefix}>R$</Text>
-                    <TextInput
-                      style={[
-                        styles.input,
-                        styles.inputWithValue,
-                        touched.monthlyRent && errors.monthlyRent
-                          ? styles.inputError
-                          : undefined,
-                      ]}
-                      placeholder="0,00"
-                      value={values.monthlyRent}
-                      onChangeText={(text) => {
-                        setFieldValue('monthlyRent', text || '0,00');
-                      }}
-                    />
-                  </View>
+                  <TextInput
+                    style={[
+                      styles.input,
+                      touched.monthlyRent && errors.monthlyRent
+                        ? styles.inputError
+                        : undefined,
+                    ]}
+                    placeholder="0,00"
+                    value={values.monthlyRent}
+                    onChangeText={(text) => {
+                      setFieldValue('monthlyRent', text || '0,00');
+                    }}
+                    keyboardType="default"
+                  />
                   {touched.monthlyRent && errors.monthlyRent && (
                     <Text style={styles.errorText}>{errors.monthlyRent}</Text>
                   )}

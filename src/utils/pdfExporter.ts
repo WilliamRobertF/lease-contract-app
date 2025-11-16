@@ -59,16 +59,16 @@ function generateContractHTML(contractText: string, contractData?: any): string 
   const city = contractData?.property?.data?.city || '';
   const state = contractData?.property?.data?.state || '';
 
-  // Parse clauses from contractText - they come formatted as "CLÁUSULA PRIMEIRA: content"
-  const clauseRegex = /CLÁUSULA\s+([A-ZÁÉÍÓÚàáéíóú\s]+):\s*([\s\S]*?)(?=CLÁUSULA\s+|$)/gi;
+  // Convert contractText lines to bold paragraphs
+  const textLines = contractText.split('\n').filter((line: string) => line.trim().length > 0);
   let clausesHtml = '';
-  let match;
   
-  while ((match = clauseRegex.exec(contractText)) !== null) {
-    const clauseTitle = match[1].trim();
-    const clauseContent = match[2].trim();
-    clausesHtml += `<p style="text-align: justify; margin-bottom: 12pt;"><strong>CLÁUSULA ${clauseTitle}:</strong> ${clauseContent}</p>`;
-  }
+  textLines.forEach((line: string) => {
+    const trimmedLine = line.trim();
+    if (trimmedLine.length > 0) {
+      clausesHtml += `<p style="text-align: justify; margin-bottom: 12pt;"><strong>${trimmedLine}</strong></p>`;
+    }
+  });
 
   return `
     <!DOCTYPE html>

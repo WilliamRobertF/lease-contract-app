@@ -1,5 +1,6 @@
 {
-  "home": "Home",
+{  "home": "Home",
+  "appTitle": "Rental Contracts",
   "welcome": "Welcome to the Rental Contracts App!",
   "contractForm": "New Contract",
   "landlordProfiles": "Landlord Profiles",
@@ -130,5 +131,6 @@
   "guarantorNameRequired": "Guarantor name is required",
   "details": "Details",
   "next": "Next",
-  "contractLocation": "Contract City/Location"
+  "contractLocation": "Contract City/Location",
+  "manageContracts": "Manage your rental contracts efficiently"
 }

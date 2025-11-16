@@ -1,5 +1,6 @@
 {
-  "home": "Início",
+{  "home": "Início",
+  "appTitle": "Contratos de Locação",
   "welcome": "Bem-vindo ao App de Contratos de Locação!",
   "contractForm": "Novo Contrato",
   "landlordProfiles": "Proprietários",
@@ -130,5 +131,6 @@
   "guarantorNameRequired": "Nome do fiador é obrigatório",
   "details": "Detalhes",
   "next": "Próximo",
-  "contractLocation": "Cidade/Local do Contrato"
+  "contractLocation": "Cidade/Local do Contrato",
+  "manageContracts": "Gerencie seus contratos de locação com eficiência"
 }

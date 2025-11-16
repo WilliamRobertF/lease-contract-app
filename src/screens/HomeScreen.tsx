@@ -33,8 +33,8 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <ScrollView style={styles.content}>
         <View style={styles.header}>
-          <Text style={styles.welcomeTitle}>{t('welcome')}</Text>
-          <Text style={styles.subtitle}>Manage your rental contracts efficiently</Text>
+          <Text style={styles.welcomeTitle}>{t('appTitle')}</Text>
+          <Text style={styles.subtitle}>{t('manageContracts')}</Text>
         </View>
 
         <View style={styles.section}>
@@ -110,6 +110,7 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: 24,
+    alignItems: 'center',
   },
   welcomeTitle: {
     fontSize: 24,

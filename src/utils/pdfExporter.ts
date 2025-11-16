@@ -136,6 +136,12 @@ function generateContractHTML(
       text-align: justify;
     }
 
+    .date-location {
+      text-align: center;
+      margin-bottom: 40pt;
+      font-weight: bold;
+    }
+
     .signature-section {
       margin-top: 40pt;
       text-align: center;
@@ -186,14 +192,13 @@ function generateContractHTML(
 
 <h1>CONTRATO DE LOCAÇÃO RESIDENCIAL</h1>
 
-<div class="parties">
-  ${contractHtml}
+${contractHtml}
+
+<div class="date-location">
+  <p><strong>${city.toUpperCase()} – ${state.toUpperCase()}, _____ de _________________ de ${year}</strong></p>
 </div>
 
 <div class="signature-section">
-  <p><strong>${city.toUpperCase()} – ${state.toUpperCase()}, _____ de _________________ de ${year}</strong></p>
-
-  <div class="signature-block">
     <div class="signature-title">LOCADOR:</div>
     <div class="signature-line"></div>
     <div class="signature-name"><strong>${landlordName.toUpperCase()}</strong></div>

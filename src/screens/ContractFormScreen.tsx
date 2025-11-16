@@ -121,7 +121,7 @@ export default function ContractFormScreen() {
             {({ values, errors, touched, handleChange, handleSubmit, setFieldValue }) => (
               <View style={styles.formContainer}>
                 <View style={styles.section}>
-                  <Text style={styles.sectionTitle}>Landlord</Text>
+                  <Text style={styles.sectionTitle}>{t('landlord')}</Text>
                   <TextInput
                     style={[
                       styles.input,
@@ -129,7 +129,7 @@ export default function ContractFormScreen() {
                         ? styles.inputError
                         : undefined,
                     ]}
-                    placeholder="Landlord Name"
+                    placeholder={t('landlordName')}
                     value={values.landlord.name}
                     onChangeText={(text) =>
                       setFieldValue('landlord.name', text)
@@ -141,7 +141,7 @@ export default function ContractFormScreen() {
                 </View>
 
                 <View style={styles.section}>
-                  <Text style={styles.sectionTitle}>Tenant</Text>
+                  <Text style={styles.sectionTitle}>{t('tenant')}</Text>
                   <TextInput
                     style={[
                       styles.input,
@@ -149,7 +149,7 @@ export default function ContractFormScreen() {
                         ? styles.inputError
                         : undefined,
                     ]}
-                    placeholder="Tenant Name"
+                    placeholder={t('tenantName')}
                     value={values.tenant.name}
                     onChangeText={(text) => setFieldValue('tenant.name', text)}
                   />
@@ -159,7 +159,7 @@ export default function ContractFormScreen() {
                 </View>
 
                 <View style={styles.section}>
-                  <Text style={styles.sectionTitle}>Property</Text>
+                  <Text style={styles.sectionTitle}>{t('property')}</Text>
                   <TextInput
                     style={[
                       styles.input,
@@ -167,7 +167,7 @@ export default function ContractFormScreen() {
                         ? styles.inputError
                         : undefined,
                     ]}
-                    placeholder="Property Description"
+                    placeholder={t('propertyDescription')}
                     value={values.property.description}
                     onChangeText={(text) =>
                       setFieldValue('property.description', text)
@@ -181,7 +181,7 @@ export default function ContractFormScreen() {
                 </View>
 
                 <View style={styles.section}>
-                  <Text style={styles.sectionTitle}>Contract Dates</Text>
+                  <Text style={styles.sectionTitle}>{t('contractDates')}</Text>
                   
                   <TouchableOpacity
                     style={[
@@ -193,7 +193,7 @@ export default function ContractFormScreen() {
                     onPress={() => setShowStartDatePicker(true)}
                   >
                     <Text style={styles.dateButtonText}>
-                      Start Date: {format(values.startDate, 'MM/dd/yyyy')}
+                      {t('startDate')}: {format(values.startDate, 'MM/dd/yyyy')}
                     </Text>
                   </TouchableOpacity>
                   {showStartDatePicker && (
@@ -228,7 +228,7 @@ export default function ContractFormScreen() {
                     onPress={() => setShowEndDatePicker(true)}
                   >
                     <Text style={styles.dateButtonText}>
-                      End Date: {format(values.endDate, 'MM/dd/yyyy')}
+                      {t('endDate')}: {format(values.endDate, 'MM/dd/yyyy')}
                     </Text>
                   </TouchableOpacity>
                   {showEndDatePicker && (
@@ -255,7 +255,7 @@ export default function ContractFormScreen() {
                 </View>
 
                 <View style={styles.section}>
-                  <Text style={styles.sectionTitle}>Monthly Rent</Text>
+                  <Text style={styles.sectionTitle}>{t('monthlyRent')}</Text>
                   <TextInput
                     style={[
                       styles.input,
@@ -279,7 +279,7 @@ export default function ContractFormScreen() {
                   style={styles.submitButton}
                   onPress={() => handleSubmit()}
                 >
-                  <Text style={styles.submitButtonText}>Generate Contract</Text>
+                  <Text style={styles.submitButtonText}>{t('generateContract')}</Text>
                 </TouchableOpacity>
               </View>
             )}

@@ -246,12 +246,12 @@ export default function SettingsScreen() {
       >
         <SafeAreaView style={styles.modalContainer}>
           <View style={styles.modalHeader}>
-            <TouchableOpacity onPress={() => setSelectedClause(null)}>
+            <TouchableOpacity onPress={() => setSelectedClause(null)} style={styles.modalButton}>
               <MaterialCommunityIcons name="close" size={24} color="#333" />
             </TouchableOpacity>
             <Text style={styles.modalTitle}>{t('clauseContent')}</Text>
             {selectedClause && (
-              <TouchableOpacity onPress={() => handleEditClause(selectedClause)}>
+              <TouchableOpacity onPress={() => handleEditClause(selectedClause)} style={styles.modalButton}>
                 <MaterialCommunityIcons name="pencil" size={24} color="#1976d2" />
               </TouchableOpacity>
             )}
@@ -263,11 +263,12 @@ export default function SettingsScreen() {
                 <Text style={styles.detailTitle}>{selectedClause.title}</Text>
                 <Text style={styles.detailCategory}>
                   {selectedClause.category === 'obligatory'
-                    ? '📌 Mandatory Clause'
-                    : '⭐ Optional Clause'}
+                    ? '📌 ' + t('mandatoryCl')
+                    : '⭐ ' + t('optionalCl')}
                 </Text>
                 <Text style={styles.detailContent}>{selectedClause.content}</Text>
               </View>
+              <View style={{ height: 20 }} />
             </ScrollView>
           )}
         </SafeAreaView>
@@ -281,11 +282,11 @@ export default function SettingsScreen() {
       >
         <SafeAreaView style={styles.modalContainer}>
           <View style={styles.modalHeader}>
-            <TouchableOpacity onPress={() => setShowEditModal(false)}>
+            <TouchableOpacity onPress={() => setShowEditModal(false)} style={styles.modalButton}>
               <MaterialCommunityIcons name="close" size={24} color="#333" />
             </TouchableOpacity>
             <Text style={styles.modalTitle}>{t('editClause')}</Text>
-            <TouchableOpacity onPress={handleSaveClause}>
+            <TouchableOpacity onPress={handleSaveClause} style={styles.modalButton}>
               <MaterialCommunityIcons name="check" size={24} color="#4caf50" />
             </TouchableOpacity>
           </View>
@@ -293,7 +294,7 @@ export default function SettingsScreen() {
           {editingClause && (
             <ScrollView style={styles.modalContent}>
               <View style={styles.editForm}>
-                <Text style={styles.label}>Title</Text>
+                <Text style={styles.label}>{t('clauseTitle')}</Text>
                 <TextInput
                   style={styles.input}
                   value={editingClause.title}
@@ -316,9 +317,10 @@ export default function SettingsScreen() {
                 />
 
                 <Text style={[styles.hint, { marginTop: 12 }]}>
-                  Use variable names like: PROPERTY, LANDLORD, TENANT, RENT, DUE_DAY
+                  {t('useVariableNames')}
                 </Text>
               </View>
+              <View style={{ height: 20 }} />
             </ScrollView>
           )}
         </SafeAreaView>
@@ -496,6 +498,13 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
+  },
+  modalButton: {
+    padding: 8,
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   modalTitle: {
     fontSize: 16,

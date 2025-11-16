@@ -5,12 +5,15 @@ import { useTranslation } from 'react-i18next';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LandlordProfile } from '../types/contractTypes';
-import { getLandlords } from '../utils/storageManager';
+import { getLandlords, getProperties, getTemplates } from '../utils/storageManager';
 
 export default function HomeScreen() {
   const { t } = useTranslation();
   const navigation = useNavigation();
   const [landlordCount, setLandlordCount] = useState(0);
+  const [propertyCount, setPropertyCount] = useState(0);
+  const [templateCount, setTemplateCount] = useState(0);
+  const [activeContractCount, setActiveContractCount] = useState(0);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -20,7 +23,20 @@ export default function HomeScreen() {
 
   const loadCounts = async () => {
     const landlords = await getLandlords();
+    const properties = await getProperties();
+    const templates = await getTemplates();
+    
     setLandlordCount(landlords.length);
+    setPropertyCount(properties.length);
+    setTemplateCount(templates.length);
+    
+    // Count active contracts (where end date is after today)
+    const today = new Date();
+    const activeCount = landlords.reduce((acc) => {
+      // Placeholder for now - would need to track generated contracts
+      return acc;
+    }, 0);
+    setActiveContractCount(activeCount);
   };
 
   const QuickActionButton = ({
@@ -85,12 +101,22 @@ export default function HomeScreen() {
 
         {/* STATS */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Overview</Text>
+          <Text style={styles.sectionTitle}>{t('overview')}</Text>
           <View style={styles.statsContainer}>
             <View style={styles.statCard}>
               <MaterialCommunityIcons name="account" size={32} color="#4caf50" />
               <Text style={styles.statValue}>{landlordCount}</Text>
-              <Text style={styles.statLabel}>{t('landlordProfiles')}</Text>
+              <Text style={styles.statLabel}>{t('activeLandlords')}</Text>
+            </View>
+            <View style={styles.statCard}>
+              <MaterialCommunityIcons name="home" size={32} color="#ff9800" />
+              <Text style={styles.statValue}>{propertyCount}</Text>
+              <Text style={styles.statLabel}>{t('properties')}</Text>
+            </View>
+            <View style={styles.statCard}>
+              <MaterialCommunityIcons name="file-document" size={32} color="#1976d2" />
+              <Text style={styles.statValue}>{templateCount}</Text>
+              <Text style={styles.statLabel}>{t('activeTemplates')}</Text>
             </View>
           </View>
         </View>
@@ -203,6 +229,7 @@ const styles = StyleSheet.create({
   statsContainer: {
     flexDirection: 'row',
     gap: 12,
+    justifyContent: 'space-between',
   },
   statCard: {
     flex: 1,

@@ -98,5 +98,12 @@
   "errorSelectAtLeastOneClause": "Select at least one clause",
   "noLandlordsYetInGeneration": "No landlords yet",
   "fillTenantDataSubtitle": "Fill out tenant information",
-  "useVariableNames": "Use variable names like: PROPERTY, LANDLORD, TENANT, RENT, DUE_DAY"
+  "useVariableNames": "Use variable names like: PROPERTY, LANDLORD, TENANT, RENT, DUE_DAY",
+  "mandatoryCl": "Mandatory Clause",
+  "optionalCl": "Optional Clause",
+  "clauseTitle": "Clause Title",
+  "overview": "Overview",
+  "activeLandlords": "Active Landlords",
+  "activeTemplates": "Active Templates",
+  "activeContracts": "Active Contracts"
 }

@@ -2,5 +2,9 @@
   "welcome": "Welcome to the Rental Contracts App!",
   "languageMenu": "Language",
   "english": "English",
-  "portuguese": "Portuguese"
+  "portuguese": "Portuguese",
+  "menuTitle": "Menu",
+  "changeLanguage": "Change Language",
+  "about": "About",
+  "settings": "Settings"
 }

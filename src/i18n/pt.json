@@ -2,5 +2,9 @@
   "welcome": "Bem-vindo ao App de Contratos de Locação!",
   "languageMenu": "Idioma",
   "english": "Inglês",
-  "portuguese": "Português"
+  "portuguese": "Português",
+  "menuTitle": "Menu",
+  "changeLanguage": "Mudar Idioma",
+  "about": "Sobre",
+  "settings": "Configurações"
 }

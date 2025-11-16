@@ -115,16 +115,6 @@ export default function GeneratedContractsScreen() {
     ]);
   };
 
-  const handleCopyToClipboard = async () => {
-    try {
-      Alert.alert('Copy', 'Contract text copied (feature depends on device)', [
-        { text: 'OK' },
-      ]);
-    } catch (error) {
-      Alert.alert('Error', 'Failed to copy text');
-    }
-  };
-
   const handleExportPDF = async () => {
     try {
       const fileName = `contrato_${selectedContract?.tenant.name}_${formatDate(new Date(), 'dd_MM_yyyy')}.pdf`;
@@ -234,12 +224,6 @@ export default function GeneratedContractsScreen() {
                 style={styles.modalButton}
               >
                 <MaterialCommunityIcons name="file-pdf-box" size={24} color="#d32f2f" />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={handleCopyToClipboard}
-                style={styles.modalButton}
-              >
-                <MaterialCommunityIcons name="content-copy" size={24} color="#1976d2" />
               </TouchableOpacity>
             </View>
           </View>

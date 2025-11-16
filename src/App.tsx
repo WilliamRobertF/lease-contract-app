@@ -8,6 +8,7 @@ import { useTranslation, I18nextProvider } from 'react-i18next';
 import i18n from './i18n/i18n';
 import HomeScreen from './screens/HomeScreen';
 import ContractFormScreen from './screens/ContractFormScreen';
+import LandlordProfilesScreen from './screens/LandlordProfilesScreen';
 import DrawerMenu from './components/DrawerMenu';
 
 const Stack = createNativeStackNavigator();
@@ -34,6 +35,11 @@ function RootStackNavigator() {
         name="ContractForm" 
         component={ContractFormScreen} 
         options={{ title: t('contractForm') }} 
+      />
+      <Stack.Screen 
+        name="LandlordProfiles" 
+        component={LandlordProfilesScreen} 
+        options={{ title: t('landlordProfiles') }} 
       />
     </Stack.Navigator>
   );

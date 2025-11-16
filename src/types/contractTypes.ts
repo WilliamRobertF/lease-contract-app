@@ -29,3 +29,42 @@ export interface ContractData {
     lateFeePercentage: number;
     monthlyInterestPercentage: number;
 }
+
+export interface LandlordProfile {
+    id: string;
+    createdAt: Date;
+    data: PersonData;
+}
+
+export interface Clause {
+    id: string;
+    title: string;
+    content: string;
+    category: 'obligatory' | 'optional';
+}
+
+export interface ContractTemplate {
+    id: string;
+    name: string;
+    clauseIds: string[];
+    hasGuarantor: boolean;
+    createdAt: Date;
+}
+
+export interface GeneratedContract {
+    id: string;
+    templateId: string;
+    landlordId: string;
+    tenant: PersonData;
+    guarantor?: PersonData;
+    property: PropertyData;
+    startDate: Date;
+    endDate: Date;
+    monthlyRent: number;
+    dueDay: number;
+    guaranteeInstallments: number;
+    adjustmentIndex: string;
+    lateFeePercentage: number;
+    monthlyInterestPercentage: number;
+    generatedAt: Date;
+}

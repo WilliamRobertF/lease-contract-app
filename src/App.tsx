@@ -9,6 +9,7 @@ import i18n from './i18n/i18n';
 import HomeScreen from './screens/HomeScreen';
 import ContractFormScreen from './screens/ContractFormScreen';
 import LandlordProfilesScreen from './screens/LandlordProfilesScreen';
+import SettingsScreen from './screens/SettingsScreen';
 import DrawerMenu from './components/DrawerMenu';
 
 const Stack = createNativeStackNavigator();
@@ -40,6 +41,11 @@ function RootStackNavigator() {
         name="LandlordProfiles" 
         component={LandlordProfilesScreen} 
         options={{ title: t('landlordProfiles') }} 
+      />
+      <Stack.Screen 
+        name="Settings" 
+        component={SettingsScreen} 
+        options={{ title: t('settings') }} 
       />
     </Stack.Navigator>
   );

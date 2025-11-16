@@ -74,7 +74,10 @@ export default function DrawerMenu({ navigation }: DrawerMenuProps) {
       id: "settings",
       label: t("settings"),
       icon: "cog-outline" as keyof typeof MaterialCommunityIcons.glyphMap,
-      onPress: () => {},
+      onPress: () => {
+        setVisible(false);
+        navigation?.navigate("Settings");
+      },
     },
     {
       id: "about",

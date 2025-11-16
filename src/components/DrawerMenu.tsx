@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Modal,
@@ -7,9 +7,9 @@ import {
   SafeAreaView,
   FlatList,
   Text,
-} from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useTranslation } from 'react-i18next';
+} from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 
 interface MenuItem {
   id: string;
@@ -19,7 +19,11 @@ interface MenuItem {
   isSubItem?: boolean;
 }
 
-export default function DrawerMenu() {
+interface DrawerMenuProps {
+  navigation?: any;
+}
+
+export default function DrawerMenu({ navigation }: DrawerMenuProps) {
   const { t, i18n } = useTranslation();
   const [visible, setVisible] = useState(false);
   const [languageExpanded, setLanguageExpanded] = useState(true);
@@ -34,54 +38,64 @@ export default function DrawerMenu() {
 
   const menuItems: MenuItem[] = [
     {
-      id: 'language-header',
-      label: languageExpanded ? t('languageMenu') : `${t('languageMenu')} ▼`,
-      icon: 'translate',
+      id: "language-header",
+      label: languageExpanded ? t("languageMenu") : `${t("languageMenu")} ▼`,
+      icon: "translate",
       onPress: () => setLanguageExpanded(!languageExpanded),
     },
     ...(languageExpanded
       ? [
           {
-            id: 'english',
-            label: t('english'),
-            icon: 'circle-outline' as keyof typeof MaterialCommunityIcons.glyphMap,
-            onPress: () => handleLanguageChange('en'),
+            id: "english",
+            label: t("english"),
+            icon: "circle-outline" as keyof typeof MaterialCommunityIcons.glyphMap,
+            onPress: () => handleLanguageChange("en"),
             isSubItem: true,
           },
           {
-            id: 'portuguese',
-            label: t('portuguese'),
-            icon: 'circle-outline' as keyof typeof MaterialCommunityIcons.glyphMap,
-            onPress: () => handleLanguageChange('pt'),
+            id: "portuguese",
+            label: t("portuguese"),
+            icon: "circle-outline" as keyof typeof MaterialCommunityIcons.glyphMap,
+            onPress: () => handleLanguageChange("pt"),
             isSubItem: true,
           },
         ]
       : []),
     {
-      id: 'settings',
-      label: t('settings'),
-      icon: 'cog-outline' as keyof typeof MaterialCommunityIcons.glyphMap,
+      id: "newContract",
+      label: t("contractForm"),
+      icon: "file-document-plus-outline" as keyof typeof MaterialCommunityIcons.glyphMap,
+      onPress: () => {
+        setVisible(false);
+        navigation?.navigate("ContractForm");
+      },
+    },
+    {
+      id: "settings",
+      label: t("settings"),
+      icon: "cog-outline" as keyof typeof MaterialCommunityIcons.glyphMap,
       onPress: () => {},
     },
     {
-      id: 'about',
-      label: t('about'),
-      icon: 'help-circle-outline' as keyof typeof MaterialCommunityIcons.glyphMap,
+      id: "about",
+      label: t("about"),
+      icon: "help-circle-outline" as keyof typeof MaterialCommunityIcons.glyphMap,
       onPress: () => {},
     },
   ];
 
   const renderMenuItem = ({ item }: { item: MenuItem }) => {
     const isLanguageActive =
-      (item.id === 'english' && i18n.language === 'en') ||
-      (item.id === 'portuguese' && i18n.language === 'pt');
+      (item.id === "english" && i18n.language === "en") ||
+      (item.id === "portuguese" && i18n.language === "pt");
 
     // Use different icon based on whether it's the active language
-    const iconName = isLanguageActive && item.isSubItem
-      ? 'check-circle'
-      : item.isSubItem
-      ? 'circle-outline'
-      : item.icon;
+    const iconName =
+      isLanguageActive && item.isSubItem
+        ? "check-circle"
+        : item.isSubItem
+        ? "circle-outline"
+        : item.icon;
 
     return (
       <TouchableOpacity
@@ -92,7 +106,7 @@ export default function DrawerMenu() {
         ]}
         onPress={() => {
           item.onPress();
-          if (!item.isSubItem && item.id !== 'language-header') {
+          if (!item.isSubItem && item.id !== "language-header") {
             setVisible(false);
           }
         }}
@@ -100,14 +114,11 @@ export default function DrawerMenu() {
         <MaterialCommunityIcons
           name={iconName as keyof typeof MaterialCommunityIcons.glyphMap}
           size={24}
-          color={isLanguageActive ? '#1976d2' : '#333'}
+          color={isLanguageActive ? "#1976d2" : "#333"}
           style={styles.icon}
         />
         <Text
-          style={[
-            styles.label,
-            isLanguageActive && styles.activeLabelText,
-          ]}
+          style={[styles.label, isLanguageActive && styles.activeLabelText]}
         >
           {item.label}
         </Text>
@@ -132,9 +143,7 @@ export default function DrawerMenu() {
           activeOpacity={1}
           onPress={toggleMenu}
         >
-          <SafeAreaView
-            style={styles.drawer}
-          >
+          <SafeAreaView style={styles.drawer}>
             <View style={styles.menuContainer}>
               <FlatList
                 data={menuItems}
@@ -154,19 +163,19 @@ const styles = StyleSheet.create({
   hamburger: {
     paddingHorizontal: 16,
     paddingVertical: 8,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    backgroundColor: "rgba(0, 0, 0, 0.4)",
   },
   drawer: {
-    position: 'absolute',
+    position: "absolute",
     left: 0,
     top: 0,
     bottom: 0,
     width: 280,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   menuContainer: {
     flex: 1,
@@ -175,26 +184,26 @@ const styles = StyleSheet.create({
   menuItem: {
     paddingHorizontal: 16,
     paddingVertical: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   subMenuItem: {
     paddingLeft: 56,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
   },
   activeLanguage: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: "#f0f0f0",
   },
   icon: {
     marginRight: 12,
   },
   label: {
     fontSize: 16,
-    color: '#333',
+    color: "#333",
     flex: 1,
   },
   activeLabelText: {
-    fontWeight: '600',
-    color: '#1976d2',
+    fontWeight: "600",
+    color: "#1976d2",
   },
 });

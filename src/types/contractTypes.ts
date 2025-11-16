@@ -29,6 +29,7 @@ export interface ContractData {
     landlord: PersonData;
     tenant: PersonData;
     guarantor?: PersonData;
+    hasGuarantor: boolean;
     property: PropertyData;
     startDate: Date;
     endDate: Date;

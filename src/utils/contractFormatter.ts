@@ -66,6 +66,11 @@ export function formatContract(data: ContractDataForFormat, allClauses: Clause[]
   values['TENANT_RG'] = safe(data.tenant?.rg);
   values['TENANT_CPF'] = safe(data.tenant?.cpf);
   values['TENANT_BIRTHPLACE'] = safe(data.tenant?.birthplace);
+  values['GUARANTOR'] = safe(data.guarantor?.name);
+  values['GUARANTOR_NATIONALITY'] = safe(data.guarantor?.nationality);
+  values['GUARANTOR_RG'] = safe(data.guarantor?.rg);
+  values['GUARANTOR_CPF'] = safe(data.guarantor?.cpf);
+  values['GUARANTOR_BIRTHPLACE'] = safe(data.guarantor?.birthplace);
   values['RENT'] = safe(data.monthlyRent);
   values['DUE_DAY'] = safe(data.dueDay);
   values['START_DATE'] = data.startDate ? format(data.startDate, 'dd/MM/yyyy') : '';
@@ -86,6 +91,10 @@ export function formatContract(data: ContractDataForFormat, allClauses: Clause[]
 
   if (values['TENANT']) {
     headerParts.push(`LOCATÁRIO(A): Senhor(a) ${values['TENANT']}, ${values['TENANT_NATIONALITY'] || ''}, portador(a) do RG nº ${values['TENANT_RG'] || ''} e inscrito(a) no CPF nº ${values['TENANT_CPF'] || ''}, nascido(a) em ${values['TENANT_BIRTHPLACE'] || ''}.`);
+  }
+
+  if (data.guarantor?.name) {
+    headerParts.push(`FIADOR(A): ${values['GUARANTOR']}, ${values['GUARANTOR_NATIONALITY'] || ''}, portador(a) do RG nº ${values['GUARANTOR_RG'] || ''} e inscrito(a) no CPF nº ${values['GUARANTOR_CPF'] || ''}.`);
   }
 
   if (data.tenant?.nationality) {

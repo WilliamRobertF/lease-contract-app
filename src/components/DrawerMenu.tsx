@@ -44,14 +44,14 @@ export default function DrawerMenu() {
           {
             id: 'english',
             label: t('english'),
-            icon: 'check-circle-outline' as keyof typeof MaterialCommunityIcons.glyphMap,
+            icon: 'circle-outline' as keyof typeof MaterialCommunityIcons.glyphMap,
             onPress: () => handleLanguageChange('en'),
             isSubItem: true,
           },
           {
             id: 'portuguese',
             label: t('portuguese'),
-            icon: 'check-circle-outline' as keyof typeof MaterialCommunityIcons.glyphMap,
+            icon: 'circle-outline' as keyof typeof MaterialCommunityIcons.glyphMap,
             onPress: () => handleLanguageChange('pt'),
             isSubItem: true,
           },
@@ -76,6 +76,13 @@ export default function DrawerMenu() {
       (item.id === 'english' && i18n.language === 'en') ||
       (item.id === 'portuguese' && i18n.language === 'pt');
 
+    // Use different icon based on whether it's the active language
+    const iconName = isLanguageActive && item.isSubItem
+      ? 'check-circle'
+      : item.isSubItem
+      ? 'circle-outline'
+      : item.icon;
+
     return (
       <TouchableOpacity
         style={[
@@ -91,7 +98,7 @@ export default function DrawerMenu() {
         }}
       >
         <MaterialCommunityIcons
-          name={item.icon}
+          name={iconName as keyof typeof MaterialCommunityIcons.glyphMap}
           size={24}
           color={isLanguageActive ? '#1976d2' : '#333'}
           style={styles.icon}

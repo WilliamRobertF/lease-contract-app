@@ -16,7 +16,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { formatDate } from 'date-fns';
 import { GeneratedContract } from '../types/contractTypes';
 import { getGeneratedContracts, deleteGeneratedContract, getClauses, getLandlords } from '../utils/storageManager';
-import { formatContract } from '../utils/contractFormatter';
+import { formatContract, removeClauseTitles } from '../utils/contractFormatter';
 import { exportToPDF } from '../utils/pdfExporter';
 
 export default function GeneratedContractsScreen() {
@@ -47,7 +47,8 @@ export default function GeneratedContractsScreen() {
     try {
       // Se tem formattedContent salvo, usa; senão tenta formatar novamente
       if (contract.formattedContent) {
-        setFormattedText(contract.formattedContent);
+        const cleaned = removeClauseTitles(contract.formattedContent);
+        setFormattedText(cleaned);
       } else {
         const clauses = await getClauses();
         const landlords = await getLandlords();
@@ -76,12 +77,15 @@ export default function GeneratedContractsScreen() {
             },
             startDate: contract.startDate,
             endDate: contract.endDate,
-            monthlyRent: contract.monthlyRent,
+            monthlyRent: typeof contract.monthlyRent === 'string' 
+              ? parseFloat(contract.monthlyRent.replace(',', '.'))
+              : contract.monthlyRent,
             dueDay: contract.dueDay,
           },
           clauses
         );
-        setFormattedText(formattedOutput);
+        const cleaned = removeClauseTitles(formattedOutput);
+        setFormattedText(cleaned);
       }
     } catch (error) {
       console.error('Error formatting contract:', error);
@@ -213,58 +217,58 @@ export default function GeneratedContractsScreen() {
         }}
       >
         <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom']}>
-            <View style={styles.modalHeader}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity
+              onPress={() => {
+                setSelectedContract(null);
+                setFormattedText('');
+              }}
+              style={styles.modalButton}
+            >
+              <MaterialCommunityIcons name="close" size={24} color="#333" />
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>{t('contractPreview')}</Text>
+            <View style={styles.headerRightButtons}>
               <TouchableOpacity
-                onPress={() => {
-                  setSelectedContract(null);
-                  setFormattedText('');
-                }}
+                onPress={handleExportPDF}
                 style={styles.modalButton}
               >
-                <MaterialCommunityIcons name="close" size={24} color="#333" />
+                <MaterialCommunityIcons name="file-pdf-box" size={24} color="#d32f2f" />
               </TouchableOpacity>
-              <Text style={styles.modalTitle}>{t('contractPreview')}</Text>
-              <View style={styles.headerRightButtons}>
-                <TouchableOpacity
-                  onPress={handleExportPDF}
-                  style={styles.modalButton}
-                >
-                  <MaterialCommunityIcons name="file-pdf-box" size={24} color="#d32f2f" />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={handleCopyToClipboard}
-                  style={styles.modalButton}
-                >
-                  <MaterialCommunityIcons name="content-copy" size={24} color="#1976d2" />
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            {loading ? (
-              <View style={styles.loadingContainer}>
-                <Text style={styles.loadingText}>Loading contract...</Text>
-              </View>
-            ) : (
-              <ScrollView 
-                style={styles.modalContent}
-                scrollEnabled={true}
-                keyboardShouldPersistTaps="handled"
-              >
-                <Text style={styles.formattedContractText}>{formattedText}</Text>
-                <View style={{ height: 20 }} />
-              </ScrollView>
-            )}
-
-            {selectedContract && (
               <TouchableOpacity
-                style={styles.deleteModalButton}
-                onPress={() => handleDeleteContract(selectedContract.id)}
+                onPress={handleCopyToClipboard}
+                style={styles.modalButton}
               >
-                <MaterialCommunityIcons name="trash-can" size={20} color="#fff" />
-                <Text style={styles.deleteModalButtonText}>Delete Contract</Text>
+                <MaterialCommunityIcons name="content-copy" size={24} color="#1976d2" />
               </TouchableOpacity>
-            )}
-          </SafeAreaView>
+            </View>
+          </View>
+
+          {loading ? (
+            <View style={styles.loadingContainer}>
+              <Text style={styles.loadingText}>Loading contract...</Text>
+            </View>
+          ) : (
+            <ScrollView 
+              style={styles.modalContent}
+              scrollEnabled={true}
+              keyboardShouldPersistTaps="handled"
+            >
+              <Text style={styles.formattedContractText}>{formattedText}</Text>
+              <View style={{ height: 20 }} />
+            </ScrollView>
+          )}
+
+          {selectedContract && (
+            <TouchableOpacity
+              style={styles.deleteModalButton}
+              onPress={() => handleDeleteContract(selectedContract.id)}
+            >
+              <MaterialCommunityIcons name="trash-can" size={20} color="#fff" />
+              <Text style={styles.deleteModalButtonText}>Delete Contract</Text>
+            </TouchableOpacity>
+          )}
+        </SafeAreaView>
       </Modal>
     </SafeAreaView>
   );

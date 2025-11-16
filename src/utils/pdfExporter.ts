@@ -93,7 +93,7 @@ function generateContractHTML(
   const textLines = contractText
     .split("\n")
     .filter((line: string) => line.trim().length > 0)
-    .filter((line: string) => !line.match(/^(São partes|LOCADOR|LOCATÁRIO|FIADOR)/));
+    .filter((line: string) => !line.match(/^(São partes|LOCADOR|LOCATÁRIO|FIADOR|CLÁUSULA\s+)/));
   let clausesHtml = "";
 
   textLines.forEach((line: string) => {

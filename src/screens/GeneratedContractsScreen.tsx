@@ -145,7 +145,7 @@ export default function GeneratedContractsScreen() {
         <View style={styles.cardContent}>
           <View style={styles.cardHeaderTop}>
             <View style={styles.cardTitleSection}>
-              <Text style={styles.contractTitle}>{item.tenant.name}</Text>
+              <Text style={styles.contractTitle}>{item.tenant.name.toUpperCase()}</Text>
               <Text style={styles.contractProperty}>{item.property.description}</Text>
             </View>
             {isActive ? (
@@ -171,7 +171,7 @@ export default function GeneratedContractsScreen() {
             <View style={styles.detailRow}>
               <MaterialCommunityIcons name="currency-brl" size={16} color="#666" />
               <Text style={styles.contractDetail}>
-                R$ {item.monthlyRent.toFixed(2).replace('.', ',')}
+                R$ {typeof item.monthlyRent === 'string' ? item.monthlyRent : item.monthlyRent.toFixed(2).replace('.', ',')}
               </Text>
             </View>
           </View>

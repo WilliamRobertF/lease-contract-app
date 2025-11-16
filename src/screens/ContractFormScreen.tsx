@@ -37,9 +37,13 @@ const validationSchema = Yup.object().shape({
       Yup.ref('startDate'),
       'End date must be after start date'
     ),
-  monthlyRent: Yup.number()
+  monthlyRent: Yup.string()
     .required('Monthly rent is required')
-    .positive('Monthly rent must be greater than 0'),
+    .test('positive', 'Monthly rent must be greater than 0', function(value) {
+      if (!value) return false;
+      const num = parseFloat(value.replace(',', '.'));
+      return num > 0;
+    }),
 });
 
 const initialValues: ContractData = {
@@ -68,7 +72,7 @@ const initialValues: ContractData = {
   },
   startDate: new Date(),
   endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
-  monthlyRent: 0,
+  monthlyRent: '0,00',
   dueDay: 1,
   guaranteeInstallments: 0,
   adjustmentIndex: '',
@@ -265,10 +269,20 @@ export default function ContractFormScreen() {
                       ]}
                       placeholder="0,00"
                       keyboardType="decimal-pad"
-                      value={typeof values.monthlyRent === 'number' ? String(values.monthlyRent).replace('.', ',') : String(values.monthlyRent)}
+                      value={String(values.monthlyRent || '0,00')}
                       onChangeText={(text) => {
-                        // Keep as string with comma for display
-                        const cleaned = text.replace(/[^0-9,]/g, '');
+                        // Allow only digits and comma
+                        let cleaned = '';
+                        for (let i = 0; i < text.length; i++) {
+                          const char = text[i];
+                          if (/[0-9,]/.test(char)) {
+                            // Allow only one comma
+                            if (char === ',' && cleaned.includes(',')) {
+                              continue;
+                            }
+                            cleaned += char;
+                          }
+                        }
                         setFieldValue('monthlyRent', cleaned || '0,00');
                       }}
                     />

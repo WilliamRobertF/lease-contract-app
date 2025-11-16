@@ -89,11 +89,21 @@ function generateContractHTML(
   const monthlyRentFormatted = monthlyRent.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   // Convert contractText lines to bold paragraphs
-  // Remove lines that contain only clause titles (CLÁUSULA PRIMEIRA:, etc)
+  // Process lines: keep "CLÁUSULA X:" but remove clause titles that follow it
   const textLines = contractText
     .split("\n")
     .filter((line: string) => line.trim().length > 0)
-    .filter((line: string) => !line.match(/^(São partes|LOCADOR|LOCATÁRIO|FIADOR|CLÁUSULA\s+)/));
+    .filter((line: string) => !line.match(/^(São partes|LOCADOR|LOCATÁRIO|FIADOR)/))
+    .map((line: string) => {
+      const trimmed = line.trim();
+      // Check if line matches "CLÁUSULA PRIMEIRA: title" pattern and extract just "CLÁUSULA PRIMEIRA:"
+      const clauseMatch = trimmed.match(/^(CLÁUSULA\s+[A-ZÁÉÍÓÚ\s]+):\s+.+/);
+      if (clauseMatch) {
+        // Return just "CLÁUSULA PRIMEIRA:" without the title
+        return clauseMatch[1] + ':';
+      }
+      return trimmed;
+    });
   let clausesHtml = "";
 
   textLines.forEach((line: string) => {

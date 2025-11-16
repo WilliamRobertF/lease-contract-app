@@ -33,7 +33,7 @@ interface ContractData {
   template: ContractTemplate;
   startDate: Date;
   endDate: Date;
-  monthlyRent: number;
+  monthlyRent: string;
   dueDay: number;
 }
 
@@ -51,7 +51,7 @@ export default function ContractGenerationScreen() {
   const [contractData, setContractData] = useState<Partial<ContractData>>({
     startDate: new Date(),
     endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
-    monthlyRent: 0,
+    monthlyRent: '0,00',
     dueDay: 1,
   });
 
@@ -115,7 +115,7 @@ export default function ContractGenerationScreen() {
         property: contractData.property.data,
         startDate: contractData.startDate || new Date(),
         endDate: contractData.endDate || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
-        monthlyRent: contractData.monthlyRent || 0,
+        monthlyRent: String(contractData.monthlyRent || '0,00'),
         dueDay: contractData.dueDay || 1,
         guaranteeInstallments: 0,
         adjustmentIndex: '',
@@ -146,7 +146,7 @@ export default function ContractGenerationScreen() {
     setContractData({
       startDate: new Date(),
       endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
-      monthlyRent: 0,
+      monthlyRent: '0,00',
       dueDay: 1,
     });
   };
@@ -348,14 +348,31 @@ export default function ContractGenerationScreen() {
 
             <FormField
               label={t('monthlyRent')}
-              value={String(contractData.monthlyRent || '')}
+              value={String(contractData.monthlyRent || '0,00')}
               onChangeText={(text) =>
                 setContractData({
                   ...contractData,
-                  monthlyRent: parseFloat(text) || 0,
+                  monthlyRent: text || '0,00',
                 })
               }
-              keyboardType="decimal-pad"
+              keyboardType="default"
+              placeholder="0,00"
+            />
+
+            <FormField
+              label={t('dueDay') || 'Vencimento do Aluguel'}
+              value={String(contractData.dueDay || '1')}
+              onChangeText={(text) => {
+                const num = parseInt(text) || 1;
+                if (num >= 1 && num <= 31) {
+                  setContractData({
+                    ...contractData,
+                    dueDay: num,
+                  });
+                }
+              }}
+              keyboardType="number-pad"
+              placeholder="1-31"
             />
 
             <View style={styles.buttonGroup}>

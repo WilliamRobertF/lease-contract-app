@@ -72,13 +72,6 @@ export function formatContract(data: ContractDataForFormat, allClauses: Clause[]
     .map((id) => allClauses.find((c) => c.id === id))
     .filter(Boolean) as Clause[];
 
-  const headerParts: string[] = [];
-  if (values['LANDLORD']) headerParts.push(`LOCADOR: ${values['LANDLORD']} ${values['LANDLORD_CPF'] ? '- CPF: ' + values['LANDLORD_CPF'] : ''}`);
-  if (values['TENANT']) headerParts.push(`LOCATÁRIO: ${values['TENANT']} ${values['TENANT_CPF'] ? '- CPF: ' + values['TENANT_CPF'] : ''}`);
-  if (values['START_DATE'] || values['END_DATE']) headerParts.push(`PRAZO: ${values['START_DATE']} a ${values['END_DATE']}`);
-  if (values['RENT']) headerParts.push(`ALUGUEL: R$ ${values['RENT']} (vencimento dia ${values['DUE_DAY'] || ''})`);
-  
-  headerParts.push(`São partes neste instrumento:`);
   const clausesText = selectedClauses
     .map((c, idx) => {
       let content = c.content;
@@ -98,8 +91,7 @@ export function formatContract(data: ContractDataForFormat, allClauses: Clause[]
     })
     .join('\n\n');
 
-  const full = [...headerParts, '', clausesText].join('\n\n');
-  return full;
+  return clausesText;
 }
 
 // Remove clause titles from formatted contract text, keeping only "CLÁUSULA X:"

@@ -8,6 +8,7 @@ import {
   FlatList,
   Alert,
   TextInput,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -16,8 +17,9 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { formatDate } from 'date-fns';
-import { LandlordProfile, PropertyProfile, ContractTemplate, PersonData } from '../types/contractTypes';
-import { getLandlords, getProperties, getTemplates, getClauses } from '../utils/storageManager';
+import { LandlordProfile, PropertyProfile, ContractTemplate, PersonData, GeneratedContract } from '../types/contractTypes';
+import { getLandlords, getProperties, getTemplates, getClauses, saveGeneratedContract } from '../utils/storageManager';
+import { formatContract } from '../utils/contractFormatter';
 
 type Step = 'landlord' | 'property' | 'tenant' | 'template' | 'preview' | 'complete';
 
@@ -39,6 +41,7 @@ export default function ContractGenerationScreen() {
   const [properties, setProperties] = useState<PropertyProfile[]>([]);
   const [templates, setTemplates] = useState<ContractTemplate[]>([]);
   const [clauses, setClauses] = useState<any[]>([]);
+  const [formattedContract, setFormattedContract] = useState<string>('');
   const [contractData, setContractData] = useState<Partial<ContractData>>({
     startDate: new Date(),
     endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
@@ -79,19 +82,56 @@ export default function ContractGenerationScreen() {
   };
 
   const handleTemplateSelect = (template: ContractTemplate) => {
-    setContractData({ ...contractData, template });
+    const next = { ...contractData, template } as Partial<ContractData>;
+    setContractData(next);
+    // prepare formatted contract text
+    try {
+      const full = formatContract(next, clauses);
+      setFormattedContract(full);
+    } catch (e) {
+      setFormattedContract('');
+    }
     setStep('preview');
   };
 
-  const handleGenerateContract = () => {
-    Alert.alert('Success', 'Contract generated successfully!', [
-      {
-        text: 'OK',
-        onPress: () => {
-          setStep('complete');
+  const handleGenerateContract = async () => {
+    if (!contractData.landlord || !contractData.property || !contractData.tenant || !contractData.template) {
+      Alert.alert('Error', 'Missing contract data');
+      return;
+    }
+
+    try {
+      const generatedContract: GeneratedContract = {
+        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        templateId: contractData.template.id,
+        landlordId: contractData.landlord.id,
+        tenant: contractData.tenant,
+        property: contractData.property.data,
+        startDate: contractData.startDate || new Date(),
+        endDate: contractData.endDate || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+        monthlyRent: contractData.monthlyRent || 0,
+        dueDay: contractData.dueDay || 1,
+        guaranteeInstallments: 0,
+        adjustmentIndex: '',
+        lateFeePercentage: 0,
+        monthlyInterestPercentage: 0,
+        generatedAt: new Date(),
+      };
+
+      await saveGeneratedContract(generatedContract);
+      
+      Alert.alert(t('contractGenerated'), t('contractSuccess'), [
+        {
+          text: 'OK',
+          onPress: () => {
+            setStep('complete');
+          },
         },
-      },
-    ]);
+      ]);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to save contract');
+      console.error('Error generating contract:', error);
+    }
   };
 
   const handleStartOver = () => {
@@ -330,15 +370,21 @@ export default function ContractGenerationScreen() {
         <PreviewSection title={t('monthlyRent')} value={`R$ ${contractData.monthlyRent}`} />
 
         <View style={styles.previewSection}>
-          <Text style={styles.previewLabel}>Clauses ({contractData.template?.clauseIds.length})</Text>
-          {contractData.template?.clauseIds.map((clauseId) => {
-            const clause = clauses.find((c) => c.id === clauseId);
-            return clause ? (
-              <View key={clauseId} style={styles.clausePreview}>
-                <Text style={styles.clauseTitle}>{clause.title}</Text>
-              </View>
-            ) : null;
-          })}
+          <Text style={styles.previewLabel}>{t('clauses')}</Text>
+          {formattedContract ? (
+            <View style={styles.formattedContainer}>
+              <Text style={styles.formattedText}>{formattedContract}</Text>
+            </View>
+          ) : (
+            contractData.template?.clauseIds.map((clauseId) => {
+              const clause = clauses.find((c) => c.id === clauseId);
+              return clause ? (
+                <View key={clauseId} style={styles.clausePreview}>
+                  <Text style={styles.clauseTitle}>{clause.title}</Text>
+                </View>
+              ) : null;
+            })
+          )}
         </View>
       </ScrollView>
 
@@ -550,6 +596,18 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     color: '#333',
+  },
+  formattedContainer: {
+    backgroundColor: '#fafafa',
+    borderRadius: 6,
+    padding: 12,
+    marginTop: 8,
+  },
+  formattedText: {
+    fontSize: 13,
+    color: '#222',
+    lineHeight: 20,
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
   },
   buttonGroup: {
     flexDirection: 'row',

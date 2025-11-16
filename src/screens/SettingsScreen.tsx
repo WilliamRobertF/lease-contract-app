@@ -43,6 +43,7 @@ export default function SettingsScreen() {
   const handleEditClause = (clause: Clause) => {
     setEditingClause({ ...clause });
     setShowEditModal(true);
+    setSelectedClause(null);
   };
 
   const handleSaveClause = async () => {
@@ -242,11 +243,17 @@ export default function SettingsScreen() {
         visible={selectedClause !== null}
         transparent
         animationType="slide"
-        onRequestClose={() => setSelectedClause(null)}
+        onRequestClose={() => {
+          setSelectedClause(null);
+          setEditingClause(null);
+        }}
       >
         <SafeAreaView style={styles.modalContainer}>
           <View style={styles.modalHeader}>
-            <TouchableOpacity onPress={() => setSelectedClause(null)} style={styles.modalButton}>
+            <TouchableOpacity onPress={() => {
+              setSelectedClause(null);
+              setEditingClause(null);
+            }} style={styles.modalButton}>
               <MaterialCommunityIcons name="close" size={24} color="#333" />
             </TouchableOpacity>
             <Text style={styles.modalTitle}>{t('clauseContent')}</Text>

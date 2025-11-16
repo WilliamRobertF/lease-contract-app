@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LandlordProfile } from '../types/contractTypes';
-import { getLandlords, getProperties, getTemplates } from '../utils/storageManager';
+import { getLandlords, getProperties, getTemplates, getGeneratedContracts } from '../utils/storageManager';
 
 export default function HomeScreen() {
   const { t } = useTranslation();
@@ -25,6 +25,7 @@ export default function HomeScreen() {
     const landlords = await getLandlords();
     const properties = await getProperties();
     const templates = await getTemplates();
+    const generatedContracts = await getGeneratedContracts();
     
     setLandlordCount(landlords.length);
     setPropertyCount(properties.length);
@@ -32,10 +33,7 @@ export default function HomeScreen() {
     
     // Count active contracts (where end date is after today)
     const today = new Date();
-    const activeCount = landlords.reduce((acc) => {
-      // Placeholder for now - would need to track generated contracts
-      return acc;
-    }, 0);
+    const activeCount = generatedContracts.filter(contract => contract.endDate > today).length;
     setActiveContractCount(activeCount);
   };
 
@@ -117,6 +115,13 @@ export default function HomeScreen() {
               <MaterialCommunityIcons name="file-document" size={32} color="#1976d2" />
               <Text style={styles.statValue}>{templateCount}</Text>
               <Text style={styles.statLabel}>{t('activeTemplates')}</Text>
+            </View>
+          </View>
+          <View style={styles.statsContainer}>
+            <View style={[styles.statCard, { flex: 1 }]}>
+              <MaterialCommunityIcons name="file-check" size={32} color="#9c27b0" />
+              <Text style={styles.statValue}>{activeContractCount}</Text>
+              <Text style={styles.statLabel}>{t('activeContracts')}</Text>
             </View>
           </View>
         </View>

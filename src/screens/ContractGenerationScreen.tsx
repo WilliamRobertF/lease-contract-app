@@ -21,7 +21,7 @@ import * as Yup from 'yup';
 import { formatDate } from 'date-fns';
 import { LandlordProfile, PropertyProfile, ContractTemplate, PersonData, GeneratedContract } from '../types/contractTypes';
 import { getLandlords, getProperties, getTemplates, getClauses, saveGeneratedContract } from '../utils/storageManager';
-import { formatContract } from '../utils/contractFormatter';
+import { formatContract, removeClauseTitles } from '../utils/contractFormatter';
 import { exportToPDF } from '../utils/pdfExporter';
 
 type Step = 'landlord' | 'property' | 'tenant' | 'template' | 'preview' | 'complete';
@@ -92,7 +92,8 @@ export default function ContractGenerationScreen() {
     setContractData(next);
     try {
       const full = formatContract(next, clauses);
-      setFormattedContract(full);
+      const cleaned = removeClauseTitles(full);
+      setFormattedContract(cleaned);
     } catch (e) {
       setFormattedContract('');
     }

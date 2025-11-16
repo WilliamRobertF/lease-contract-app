@@ -294,7 +294,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingTop: 12,
   },
   title: {
     fontSize: 18,
@@ -349,7 +348,7 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 0,
     gap: 8,
   },
   propertyCard: {

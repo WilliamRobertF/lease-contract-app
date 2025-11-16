@@ -98,3 +98,20 @@ export function formatContract(data: ContractDataForFormat, allClauses: Clause[]
   const full = [...headerParts, '', clausesText].join('\n\n');
   return full;
 }
+
+// Remove clause titles from formatted contract text, keeping only "CLÁUSULA X:"
+export function removeClauseTitles(formattedText: string): string {
+  return formattedText
+    .split('\n')
+    .map((line: string) => {
+      const trimmed = line.trim();
+      // Match lines like "CLÁUSULA PRIMEIRA: SEÚNGA - PRAZO DE LOCAÇÃO"
+      const match = trimmed.match(/^(CLÁUSULA\s+[A-ZÁÉÍÓÚ\s]+):\s+.+/);
+      if (match) {
+        // Return just "CLÁUSULA PRIMEIRA:"
+        return match[1] + ':';
+      }
+      return line;
+    })
+    .join('\n');
+}

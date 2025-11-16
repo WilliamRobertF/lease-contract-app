@@ -67,7 +67,7 @@ export default function DrawerMenu({ navigation }: DrawerMenuProps) {
       icon: "file-document-plus-outline" as keyof typeof MaterialCommunityIcons.glyphMap,
       onPress: () => {
         setVisible(false);
-        navigation?.navigate("ContractForm");
+        navigation?.navigate("ContractGeneration");
       },
     },
     {

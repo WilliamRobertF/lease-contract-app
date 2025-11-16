@@ -143,7 +143,7 @@ export default function GeneratedContractsScreen() {
         onPress={() => handleViewContract(item)}
       >
         <View style={styles.cardContent}>
-          <View style={styles.cardHeader}>
+          <View style={styles.cardHeaderTop}>
             <View style={styles.cardTitleSection}>
               <Text style={styles.contractTitle}>{item.tenant.name}</Text>
               <Text style={styles.contractProperty}>{item.property.description}</Text>
@@ -293,11 +293,11 @@ const styles = StyleSheet.create({
   cardContent: {
     flex: 1,
   },
-  cardHeader: {
+  cardHeaderTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 8,
+    alignItems: 'center',
+    marginBottom: 12,
     gap: 12,
   },
   cardTitleSection: {

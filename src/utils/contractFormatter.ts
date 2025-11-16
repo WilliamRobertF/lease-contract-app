@@ -17,6 +17,33 @@ function safe(val: any) {
   return val === undefined || val === null ? '' : String(val);
 }
 
+// Convert number to Portuguese ordinal in words
+export function numberToPortugueseOrdinal(n: number): string {
+  const ordinals: { [key: number]: string } = {
+    1: 'PRIMEIRA',
+    2: 'SEGUNDA',
+    3: 'TERCEIRA',
+    4: 'QUARTA',
+    5: 'QUINTA',
+    6: 'SEXTA',
+    7: 'SÉTIMA',
+    8: 'OITAVA',
+    9: 'NONA',
+    10: 'DÉCIMA',
+    11: 'DÉCIMA PRIMEIRA',
+    12: 'DÉCIMA SEGUNDA',
+    13: 'DÉCIMA TERCEIRA',
+    14: 'DÉCIMA QUARTA',
+    15: 'DÉCIMA QUINTA',
+    16: 'DÉCIMA SEXTA',
+    17: 'DÉCIMA SÉTIMA',
+    18: 'DÉCIMA OITAVA',
+    19: 'DÉCIMA NONA',
+    20: 'VIGÉSIMA',
+  };
+  return ordinals[n] || `${n}ª`;
+}
+
 export function formatContract(data: ContractDataForFormat, allClauses: Clause[]): string {
   if (!data.template) return '';
 
@@ -63,7 +90,8 @@ export function formatContract(data: ContractDataForFormat, allClauses: Clause[]
         content = content.replace(re3, values[key]);
         // do not aggressively replace bare KEY to avoid accidental replacement, skip re4
       });
-      return `${idx + 1}. ${c.title}\n${content}`;
+      const clauseNumber = numberToPortugueseOrdinal(idx + 1);
+      return `CLÁUSULA ${clauseNumber}: ${c.title}\n${content}`;
     })
     .join('\n\n');
 

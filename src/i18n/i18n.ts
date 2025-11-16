@@ -1,5 +1,6 @@
 import i18n, { t } from "i18next";
 import { initReactI18next } from "react-i18next";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import en from "./en.json";
 import pt from "./pt.json";
 
@@ -8,17 +9,21 @@ const resources = {
   pt: { translation: pt },
 };
 
+const LANGUAGE_STORAGE_KEY = '@lease_app_language';
 
 let deviceLanguage = 'pt';
 
-try {
-  const RNLocalize = require('react-native-localize');
-  if (RNLocalize && RNLocalize.getLocales) {
-    const locale = RNLocalize.getLocales()[0];
-    deviceLanguage = locale?.languageCode || 'pt';
+const initializeLanguage = async () => {
+  try {
+    const savedLanguage = await AsyncStorage.getItem(LANGUAGE_STORAGE_KEY);
+    if (savedLanguage) {
+      deviceLanguage = savedLanguage;
+      return;
+    }
+  } catch (error) {
+    console.error('Error reading saved language:', error);
   }
-} catch (error) {
-  // RNLocalize not available (web or not properly installed)
+
   try {
     const navLang = (typeof navigator !== 'undefined' && (navigator as any).language) ||
       (typeof Intl !== 'undefined' && Intl?.DateTimeFormat()?.resolvedOptions()?.locale);
@@ -26,10 +31,9 @@ try {
       deviceLanguage = String(navLang).split('-')[0];
     }
   } catch {
-    // ignore
+    deviceLanguage = 'pt';
   }
-  console.warn('RNLocalize not available, using default locale', deviceLanguage);
-}
+};
 
 i18n.use(initReactI18next).init({
   resources,
@@ -39,5 +43,16 @@ i18n.use(initReactI18next).init({
     escapeValue: false,
   },
 });
+
+export const saveLanguage = async (lang: string) => {
+  try {
+    await AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
+    await i18n.changeLanguage(lang);
+  } catch (error) {
+    console.error('Error saving language:', error);
+  }
+};
+
+initializeLanguage();
 
 export default i18n;

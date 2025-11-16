@@ -56,9 +56,16 @@ export function formatContract(data: ContractDataForFormat, allClauses: Clause[]
   values['CITY'] = safe(data.property?.data.city);
   values['STATE'] = safe(data.property?.data.state);
   values['LANDLORD'] = safe(data.landlord?.data.name);
+  values['LANDLORD_NATIONALITY'] = safe(data.landlord?.data.nationality);
+  values['LANDLORD_MARITAL_STATUS'] = safe(data.landlord?.data.maitalStatus);
+  values['LANDLORD_RG'] = safe(data.landlord?.data.rg);
   values['LANDLORD_CPF'] = safe(data.landlord?.data.cpf);
+  values['LANDLORD_BIRTHPLACE'] = safe(data.landlord?.data.birthplace);
   values['TENANT'] = safe(data.tenant?.name);
+  values['TENANT_NATIONALITY'] = safe(data.tenant?.nationality);
+  values['TENANT_RG'] = safe(data.tenant?.rg);
   values['TENANT_CPF'] = safe(data.tenant?.cpf);
+  values['TENANT_BIRTHPLACE'] = safe(data.tenant?.birthplace);
   values['RENT'] = safe(data.monthlyRent);
   values['DUE_DAY'] = safe(data.dueDay);
   values['START_DATE'] = data.startDate ? format(data.startDate, 'dd/MM/yyyy') : '';
@@ -71,6 +78,22 @@ export function formatContract(data: ContractDataForFormat, allClauses: Clause[]
   const selectedClauses: Clause[] = allClauseIds
     .map((id) => allClauses.find((c) => c.id === id))
     .filter(Boolean) as Clause[];
+
+  // Build header with parties information
+  const headerParts: string[] = [];
+  headerParts.push(`São partes neste instrumento:`);
+  
+  if (values['LANDLORD']) {
+    headerParts.push(`LOCADOR(A): ${values['LANDLORD']}, ${values['LANDLORD_NATIONALITY'] || ''}, ${values['LANDLORD_MARITAL_STATUS'] || ''}, portador(a) do RG nº ${values['LANDLORD_RG'] || ''} e inscrito(a) no CPF/MF nº ${values['LANDLORD_CPF'] || ''}, nascido(a) em ${values['LANDLORD_BIRTHPLACE'] || ''}.`);
+  }
+
+  if (values['TENANT']) {
+    headerParts.push(`LOCATÁRIO(A): Senhor(a) ${values['TENANT']}, ${values['TENANT_NATIONALITY'] || ''}, portador(a) do RG nº ${values['TENANT_RG'] || ''} e inscrito(a) no CPF nº ${values['TENANT_CPF'] || ''}, nascido(a) em ${values['TENANT_BIRTHPLACE'] || ''}.`);
+  }
+
+  if (data.tenant?.nationality) {
+    headerParts.push(''); // empty line for spacing
+  }
 
   const clausesText = selectedClauses
     .map((c, idx) => {
@@ -91,7 +114,8 @@ export function formatContract(data: ContractDataForFormat, allClauses: Clause[]
     })
     .join('\n\n');
 
-  return clausesText;
+  const full = [...headerParts, clausesText].join('\n\n');
+  return full;
 }
 
 // This function is kept for backward compatibility but is now a no-op

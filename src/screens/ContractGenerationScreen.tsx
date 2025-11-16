@@ -435,7 +435,7 @@ export default function ContractGenerationScreen() {
 
         <ScrollView style={styles.previewContent} scrollEnabled={true} keyboardShouldPersistTaps="handled">
           <View style={styles.previewSection}>
-            <Text style={styles.previewLabel}>{t('clauses')}</Text>
+            <Text style={styles.previewLabel}>{t('contractPreview')}</Text>
             {formattedContract ? (
               <View style={styles.formattedContainer}>
                 <Text style={styles.formattedText}>{formattedContract}</Text>

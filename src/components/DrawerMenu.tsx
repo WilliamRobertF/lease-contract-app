@@ -80,6 +80,15 @@ export default function DrawerMenu({ navigation }: DrawerMenuProps) {
       },
     },
     {
+      id: "generatedContracts",
+      label: "Generated Contracts",
+      icon: "file-document-outline" as keyof typeof MaterialCommunityIcons.glyphMap,
+      onPress: () => {
+        setVisible(false);
+        navigation?.navigate("GeneratedContracts");
+      },
+    },
+    {
       id: "settings",
       label: t("settings"),
       icon: "cog-outline" as keyof typeof MaterialCommunityIcons.glyphMap,

@@ -89,9 +89,15 @@ export default function HomeScreen() {
               onPress={() => navigation.navigate('ContractGeneration' as never)}
             />
             <QuickActionButton
+              icon="file-check"
+              label="My Contracts"
+              color="#9c27b0"
+              onPress={() => navigation.navigate('GeneratedContracts' as never)}
+            />
+            <QuickActionButton
               icon="cog"
               label={t('settings')}
-              color="#9c27b0"
+              color="#f44336"
               onPress={() => navigation.navigate('Settings' as never)}
             />
           </View>

@@ -12,6 +12,7 @@ import LandlordProfilesScreen from './screens/LandlordProfilesScreen';
 import PropertyProfilesScreen from './screens/PropertyProfilesScreen';
 import ContractGenerationScreen from './screens/ContractGenerationScreen';
 import SettingsScreen from './screens/SettingsScreen';
+import GeneratedContractsScreen from './screens/GeneratedContractsScreen';
 import DrawerMenu from './components/DrawerMenu';
 
 const Stack = createNativeStackNavigator();
@@ -58,6 +59,11 @@ function RootStackNavigator() {
         name="ContractGeneration" 
         component={ContractGenerationScreen} 
         options={{ title: t('newContract') }} 
+      />
+      <Stack.Screen 
+        name="GeneratedContracts" 
+        component={GeneratedContractsScreen} 
+        options={{ title: 'Generated Contracts' }} 
       />
     </Stack.Navigator>
   );

@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTranslation } from 'react-i18next';
+import { useNavigation } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
@@ -36,6 +37,7 @@ interface ContractData {
 
 export default function ContractGenerationScreen() {
   const { t } = useTranslation();
+  const navigation = useNavigation();
   const [step, setStep] = useState<Step>('landlord');
   const [landlords, setLandlords] = useState<LandlordProfile[]>([]);
   const [properties, setProperties] = useState<PropertyProfile[]>([]);
@@ -408,9 +410,17 @@ export default function ContractGenerationScreen() {
         <Text style={styles.completeMessage}>{t('contractSuccess')}</Text>
       </View>
 
-      <TouchableOpacity style={styles.submitButton} onPress={handleStartOver}>
-        <Text style={styles.submitButtonText}>{t('createAnother')}</Text>
-      </TouchableOpacity>
+      <View style={styles.buttonGroup}>
+        <TouchableOpacity style={styles.submitButton} onPress={() => {
+          navigation.navigate('GeneratedContracts' as never);
+        }}>
+          <MaterialCommunityIcons name="file-check" size={20} color="#fff" />
+          <Text style={styles.submitButtonText}>View My Contracts</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.backButton} onPress={handleStartOver}>
+          <Text style={styles.backButtonText}>{t('createAnother')}</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 

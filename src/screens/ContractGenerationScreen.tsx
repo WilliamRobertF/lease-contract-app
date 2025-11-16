@@ -9,6 +9,7 @@ import {
   Alert,
   TextInput,
   Platform,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -22,6 +23,7 @@ import { LandlordProfile, PropertyProfile, ContractTemplate, PersonData, Generat
 import { getLandlords, getProperties, getTemplates, getClauses, saveGeneratedContract } from '../utils/storageManager';
 import { formatContract } from '../utils/contractFormatter';
 import { exportToPDF } from '../utils/pdfExporter';
+import { exportToDOCX } from '../utils/docxExporter';
 
 type Step = 'landlord' | 'property' | 'tenant' | 'template' | 'preview' | 'complete';
 
@@ -45,6 +47,8 @@ export default function ContractGenerationScreen() {
   const [templates, setTemplates] = useState<ContractTemplate[]>([]);
   const [clauses, setClauses] = useState<any[]>([]);
   const [formattedContract, setFormattedContract] = useState<string>('');
+  const [showStartDatePicker, setShowStartDatePicker] = useState(false);
+  const [showEndDatePicker, setShowEndDatePicker] = useState(false);
   const [contractData, setContractData] = useState<Partial<ContractData>>({
     startDate: new Date(),
     endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
@@ -87,7 +91,6 @@ export default function ContractGenerationScreen() {
   const handleTemplateSelect = (template: ContractTemplate) => {
     const next = { ...contractData, template } as Partial<ContractData>;
     setContractData(next);
-    // prepare formatted contract text
     try {
       const full = formatContract(next, clauses);
       setFormattedContract(full);
@@ -234,6 +237,10 @@ export default function ContractGenerationScreen() {
         validationSchema={Yup.object().shape({
           name: Yup.string().required(t('tenantNameRequired')),
           cpf: Yup.string().required(t('cpfRequired')),
+          rg: Yup.string().required(t('rgRequired')),
+          nationality: Yup.string().required(t('nationalityRequired')),
+          maitalStatus: Yup.string().required(t('maritalStatusRequired')),
+          birthplace: Yup.string().required(t('birthplaceRequired')),
         })}
         onSubmit={(values) => handleTenantSubmit(values)}
       >
@@ -246,50 +253,96 @@ export default function ContractGenerationScreen() {
               error={touched.name && errors.name}
             />
             <FormField
-              label="CPF"
+              label={t('cpf')}
               value={values.cpf}
               onChangeText={(text) => setFieldValue('cpf', text)}
               error={touched.cpf && errors.cpf}
             />
             <FormField
-              label="RG"
+              label={t('rg')}
               value={values.rg}
               onChangeText={(text) => setFieldValue('rg', text)}
+              error={touched.rg && errors.rg}
             />
             <FormField
-              label="Nationality"
+              label={t('nationality')}
               value={values.nationality}
               onChangeText={(text) => setFieldValue('nationality', text)}
+              error={touched.nationality && errors.nationality}
+            />
+            <FormField
+              label={t('maritalStatus')}
+              value={values.maitalStatus}
+              onChangeText={(text) => setFieldValue('maitalStatus', text)}
+              error={touched.maitalStatus && errors.maitalStatus}
+            />
+            <FormField
+              label={t('birthplace')}
+              value={values.birthplace}
+              onChangeText={(text) => setFieldValue('birthplace', text)}
+              error={touched.birthplace && errors.birthplace}
             />
 
             <View style={styles.formField}>
               <Text style={styles.label}>{t('startDate')}</Text>
               <TouchableOpacity
                 style={styles.dateButton}
-                onPress={() => {
-                  // Date picker would go here
-                }}
+                onPress={() => setShowStartDatePicker(true)}
               >
                 <MaterialCommunityIcons name="calendar" size={20} color="#1976d2" />
                 <Text style={styles.dateButtonText}>
                   {formatDate(contractData.startDate || new Date(), 'dd/MM/yyyy')}
                 </Text>
               </TouchableOpacity>
+              {showStartDatePicker && (
+                <DateTimePicker
+                  value={contractData.startDate || new Date()}
+                  mode="date"
+                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                  onChange={(event, selectedDate) => {
+                    if (Platform.OS === 'android') {
+                      setShowStartDatePicker(false);
+                    }
+                    if (selectedDate) {
+                      setContractData({
+                        ...contractData,
+                        startDate: selectedDate,
+                      });
+                    }
+                  }}
+                />
+              )}
             </View>
 
             <View style={styles.formField}>
               <Text style={styles.label}>{t('endDate')}</Text>
               <TouchableOpacity
                 style={styles.dateButton}
-                onPress={() => {
-                  // Date picker would go here
-                }}
+                onPress={() => setShowEndDatePicker(true)}
               >
                 <MaterialCommunityIcons name="calendar" size={20} color="#1976d2" />
                 <Text style={styles.dateButtonText}>
                   {formatDate(contractData.endDate || new Date(), 'dd/MM/yyyy')}
                 </Text>
               </TouchableOpacity>
+              {showEndDatePicker && (
+                <DateTimePicker
+                  value={contractData.endDate || new Date()}
+                  mode="date"
+                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                  onChange={(event, selectedDate) => {
+                    if (Platform.OS === 'android') {
+                      setShowEndDatePicker(false);
+                    }
+                    if (selectedDate) {
+                      setContractData({
+                        ...contractData,
+                        endDate: selectedDate,
+                      });
+                    }
+                  }}
+                />
+              )}
             </View>
 
             <FormField
@@ -355,64 +408,81 @@ export default function ContractGenerationScreen() {
   );
 
   const renderPreview = () => (
-    <View style={styles.stepContainer}>
-      <Text style={styles.stepTitle}>{t('preview')}</Text>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ flex: 1 }}
+    >
+      <View style={styles.stepContainer}>
+        <Text style={styles.stepTitle}>{t('preview')}</Text>
 
-      <ScrollView style={styles.previewContent}>
-        <PreviewSection title={t('landlord')} value={contractData.landlord?.data.name} />
-        <PreviewSection title={t('property')} value={contractData.property?.data.description} />
-        <PreviewSection title={t('tenantName')} value={contractData.tenant?.name} />
-        <PreviewSection
-          title={t('startDate')}
-          value={formatDate(contractData.startDate || new Date(), 'dd/MM/yyyy')}
-        />
-        <PreviewSection
-          title={t('endDate')}
-          value={formatDate(contractData.endDate || new Date(), 'dd/MM/yyyy')}
-        />
-        <PreviewSection title={t('monthlyRent')} value={`R$ ${contractData.monthlyRent}`} />
+        <ScrollView style={styles.previewContent} scrollEnabled={true} keyboardShouldPersistTaps="handled">
+          <PreviewSection title={t('landlord')} value={contractData.landlord?.data.name} />
+          <PreviewSection title={t('property')} value={contractData.property?.data.description} />
+          <PreviewSection title={t('tenantName')} value={contractData.tenant?.name} />
+          <PreviewSection
+            title={t('startDate')}
+            value={formatDate(contractData.startDate || new Date(), 'dd/MM/yyyy')}
+          />
+          <PreviewSection
+            title={t('endDate')}
+            value={formatDate(contractData.endDate || new Date(), 'dd/MM/yyyy')}
+          />
+          <PreviewSection title={t('monthlyRent')} value={`R$ ${contractData.monthlyRent}`} />
 
-        <View style={styles.previewSection}>
-          <Text style={styles.previewLabel}>{t('clauses')}</Text>
-          {formattedContract ? (
-            <View style={styles.formattedContainer}>
-              <Text style={styles.formattedText}>{formattedContract}</Text>
-            </View>
-          ) : (
-            contractData.template?.clauseIds.map((clauseId) => {
-              const clause = clauses.find((c) => c.id === clauseId);
-              return clause ? (
-                <View key={clauseId} style={styles.clausePreview}>
-                  <Text style={styles.clauseTitle}>{clause.title}</Text>
-                </View>
-              ) : null;
-            })
-          )}
+          <View style={styles.previewSection}>
+            <Text style={styles.previewLabel}>{t('clauses')}</Text>
+            {formattedContract ? (
+              <View style={styles.formattedContainer}>
+                <Text style={styles.formattedText}>{formattedContract}</Text>
+              </View>
+            ) : (
+              contractData.template?.clauseIds.map((clauseId) => {
+                const clause = clauses.find((c) => c.id === clauseId);
+                return clause ? (
+                  <View key={clauseId} style={styles.clausePreview}>
+                    <Text style={styles.clauseTitle}>{clause.title}</Text>
+                  </View>
+                ) : null;
+              })
+            )}
+          </View>
+        </ScrollView>
+
+        <View style={styles.buttonGroup}>
+          <TouchableOpacity style={styles.backButton} onPress={() => setStep('template')}>
+            <Text style={styles.backButtonText}>{t('back')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.exportButton}
+            onPress={() => {
+              if (formattedContract) {
+                const fileName = `contrato_${contractData.tenant?.name}_${formatDate(new Date(), 'dd_MM_yyyy')}.pdf`;
+                exportToPDF(formattedContract, fileName, contractData);
+              }
+            }}
+          >
+            <MaterialCommunityIcons name="file-pdf-box" size={20} color="#fff" />
+            <Text style={styles.submitButtonText}>{t('exportPDF')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.docxButton}
+            onPress={() => {
+              if (formattedContract) {
+                const fileName = `contrato_${contractData.tenant?.name}_${formatDate(new Date(), 'dd_MM_yyyy')}.docx`;
+                exportToDOCX(formattedContract, fileName, contractData);
+              }
+            }}
+          >
+            <MaterialCommunityIcons name="file-word-box" size={20} color="#fff" />
+            <Text style={styles.submitButtonText}>{t('exportDOCX') || 'Export DOCX'}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.submitButton} onPress={handleGenerateContract}>
+            <MaterialCommunityIcons name="file-export" size={20} color="#fff" />
+            <Text style={styles.submitButtonText}>{t('generate')}</Text>
+          </TouchableOpacity>
         </View>
-      </ScrollView>
-
-      <View style={styles.buttonGroup}>
-        <TouchableOpacity style={styles.backButton} onPress={() => setStep('template')}>
-          <Text style={styles.backButtonText}>{t('back')}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={styles.exportButton}
-          onPress={() => {
-            if (formattedContract) {
-              const fileName = `contrato_${contractData.tenant?.name}_${formatDate(new Date(), 'dd_MM_yyyy')}.pdf`;
-              exportToPDF(formattedContract, fileName);
-            }
-          }}
-        >
-          <MaterialCommunityIcons name="file-pdf-box" size={20} color="#fff" />
-          <Text style={styles.submitButtonText}>Export PDF</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.submitButton} onPress={handleGenerateContract}>
-          <MaterialCommunityIcons name="file-export" size={20} color="#fff" />
-          <Text style={styles.submitButtonText}>{t('generate')}</Text>
-        </TouchableOpacity>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 
   const renderComplete = () => (
@@ -428,7 +498,7 @@ export default function ContractGenerationScreen() {
           navigation.navigate('GeneratedContracts' as never);
         }}>
           <MaterialCommunityIcons name="file-check" size={20} color="#fff" />
-          <Text style={styles.submitButtonText}>View My Contracts</Text>
+          <Text style={styles.submitButtonText}>{t('viewMyContracts')}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.backButton} onPress={handleStartOver}>
           <Text style={styles.backButtonText}>{t('createAnother')}</Text>
@@ -438,7 +508,7 @@ export default function ContractGenerationScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       <ScrollView style={styles.content}>
         {step === 'landlord' && renderLandlordSelection()}
         {step === 'property' && renderPropertySelection()}
@@ -654,6 +724,16 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     backgroundColor: '#d32f2f',
+    borderRadius: 6,
+    paddingVertical: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 6,
+  },
+  docxButton: {
+    flex: 1,
+    flexDirection: 'row',
+    backgroundColor: '#2196f3',
     borderRadius: 6,
     paddingVertical: 12,
     alignItems: 'center',

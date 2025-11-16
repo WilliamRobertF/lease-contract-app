@@ -477,6 +477,7 @@ export default function ContractGenerationScreen() {
           </View>
         )}
       </Formik>
+    </View>
     );
   };
 

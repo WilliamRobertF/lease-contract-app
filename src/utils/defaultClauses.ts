@@ -103,4 +103,10 @@ export const DEFAULT_CLAUSES: Clause[] = [
     category: 'optional',
     content: `O FIADOR acima qualificado assume a posição de devedor solidário do LOCATÁRIO, respondendo com todos os seus bens presentes e futuros pelo cumprimento integral das obrigações assumidas neste contrato.`,
   },
+  {
+    id: 'clause-18',
+    title: 'Décima Oitava - Responsabilidade por Fenômenos Naturais',
+    category: 'optional',
+    content: `O(a) LOCADOR(a) não será responsabilizado(a) por danos ao imóvel ou aos pertences do(a) LOCATÁRIO(a) causados por fenômenos da natureza, como enchentes, tempestades, vendavais ou raios. O(a) LOCATÁRIO(a) deverá comunicar qualquer ocorrência imediatamente.`,
+  },
 ];

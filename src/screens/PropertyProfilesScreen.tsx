@@ -16,6 +16,8 @@ import { useTranslation } from 'react-i18next';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { PropertyProfile, PropertyData } from '../types/contractTypes';
 import { getProperties, saveProperty, deleteProperty } from '../utils/storageManager';
+import PrimaryButton from '../components/PrimaryButton';
+import SecondaryButton from '../components/SecondaryButton';
 
 function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -121,7 +123,7 @@ export default function PropertyProfilesScreen() {
 
   if (editingId || editingData) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['bottom']}>
         <ScrollView style={styles.scrollView}>
           <Formik
             initialValues={editingData || initialValues}
@@ -222,22 +224,23 @@ export default function PropertyProfilesScreen() {
                   </View>
                 </View>
 
-                <TouchableOpacity
-                  style={styles.submitButton}
-                  onPress={() => handleSubmit()}
-                >
-                  <Text style={styles.submitButtonText}>{t('save')}</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.cancelButton}
-                  onPress={() => {
-                    setEditingId(null);
-                    setEditingData(null);
-                  }}
-                >
-                  <Text style={styles.cancelButtonText}>{t('cancel')}</Text>
-                </TouchableOpacity>
+                <View style={styles.buttonGroup}>
+                  <PrimaryButton
+                    label={t('save')}
+                    onPress={() => handleSubmit()}
+                    icon="check"
+                    style={{ flex: 1 }}
+                  />
+                  <SecondaryButton
+                    label={t('cancel')}
+                    onPress={() => {
+                      setEditingId(null);
+                      setEditingData(null);
+                    }}
+                    icon="close"
+                    style={{ flex: 1, marginLeft: 12 }}
+                  />
+                </View>
               </View>
             )}
           </Formik>
@@ -249,30 +252,43 @@ export default function PropertyProfilesScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>{t('propertyProfiles')}</Text>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => {
-            setEditingId('new');
-            setEditingData(null);
-          }}
-        >
-          <MaterialCommunityIcons name="plus" size={24} color="#fff" />
-        </TouchableOpacity>
+        <Text style={styles.headerTitle}>{t('propertyProfiles')}</Text>
       </View>
 
       {properties.length === 0 ? (
         <View style={styles.emptyContainer}>
           <MaterialCommunityIcons name="home-outline" size={48} color="#ccc" />
           <Text style={styles.emptyText}>{t('noProfiles')}</Text>
+          <PrimaryButton
+            label={t('addProperty')}
+            onPress={() => {
+              setEditingId('new');
+              setEditingData(null);
+            }}
+            icon="home-plus"
+            style={{ marginTop: 16 }}
+          />
         </View>
       ) : (
-        <FlatList
-          data={properties}
-          renderItem={renderPropertyItem}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.listContent}
-        />
+        <>
+          <FlatList
+            data={properties}
+            renderItem={renderPropertyItem}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.listContent}
+          />
+          <View style={styles.addButtonContainer}>
+            <PrimaryButton
+              label={t('addProperty')}
+              onPress={() => {
+                setEditingId('new');
+                setEditingData(null);
+              }}
+              icon="home-plus"
+              style={{ width: '100%' }}
+            />
+          </View>
+        </>
       )}
     </SafeAreaView>
   );
@@ -284,26 +300,21 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },
-  title: {
+  headerTitle: {
     fontSize: 18,
     fontWeight: '600',
     color: '#333',
   },
-  addButton: {
-    backgroundColor: '#1976d2',
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+  title: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 8,
   },
   scrollView: {
     flex: 1,
@@ -311,6 +322,11 @@ const styles = StyleSheet.create({
   formContainer: {
     padding: 16,
     gap: 16,
+  },
+  buttonGroup: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 8,
   },
   section: {
     gap: 8,
@@ -339,29 +355,11 @@ const styles = StyleSheet.create({
     color: '#d32f2f',
     fontSize: 12,
   },
-  submitButton: {
-    backgroundColor: '#1976d2',
-    borderRadius: 8,
+  addButtonContainer: {
+    paddingHorizontal: 16,
     paddingVertical: 12,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  submitButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  cancelButton: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
-  cancelButtonText: {
-    color: '#666',
-    fontSize: 16,
-    fontWeight: '600',
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
   },
   listContent: {
     paddingHorizontal: 16,
@@ -397,6 +395,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 16,
   },
   emptyText: {
     fontSize: 16,

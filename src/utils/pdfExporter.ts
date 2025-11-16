@@ -65,7 +65,8 @@ function generateContractHTML(
   const propertyDescription = contractData?.property?.data?.description || "";
 
   // Contract financial and date information
-  const monthlyRent = parseFloat((contractData?.monthlyRent || '0').replace(',', '.'));
+  const monthlyRentStr = String(contractData?.monthlyRent || '0');
+  const monthlyRent = parseFloat(monthlyRentStr.replace(',', '.'));
   
   const dueDay = contractData?.dueDay || 1;
   const startDate = contractData?.startDate ? new Date(contractData.startDate) : new Date();

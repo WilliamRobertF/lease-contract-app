@@ -77,4 +77,5 @@ export interface GeneratedContract {
     lateFeePercentage: number;
     monthlyInterestPercentage: number;
     generatedAt: Date;
+    formattedContent?: string;
 }

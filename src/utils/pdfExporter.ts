@@ -56,6 +56,7 @@ function generateContractHTML(contractText: string, contractData?: any): string 
     <html>
     <head>
       <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <style>
         * {
           margin: 0;
@@ -65,110 +66,113 @@ function generateContractHTML(contractText: string, contractData?: any): string 
         
         @page {
           size: A4;
-          margin: 20mm;
+          margin: 14pt 14pt;
         }
         
         body {
           font-family: 'Arial', sans-serif;
           color: #000;
-          font-size: 11px;
-          line-height: 1.4;
-          text-align: left;
+          font-size: 14pt;
+          line-height: 1.5;
+          text-align: justify;
         }
         
         .container {
-          max-width: 170mm;
-          margin: 0 auto;
+          width: 100%;
+          margin: 0;
+          padding: 0;
         }
         
         .header {
-          text-align: left;
-          margin-bottom: 15px;
-          padding-bottom: 10px;
+          text-align: center;
+          margin-bottom: 14pt;
+          padding-bottom: 10pt;
         }
         
         .header h1 {
-          font-size: 14px;
+          font-size: 16pt;
           font-weight: bold;
-          margin-bottom: 2px;
+          margin-bottom: 4pt;
           text-transform: uppercase;
-        }
-        
-        .header p {
-          font-size: 10pt;
-          color: #333;
+          letter-spacing: 0.5pt;
         }
         
         .content {
-          margin-bottom: 40pt;
+          margin-bottom: 24pt;
+          text-align: justify;
         }
         
         .clause {
-          margin-bottom: 12px;
-          text-align: left;
+          margin-bottom: 10pt;
+          text-align: justify;
           page-break-inside: avoid;
         }
         
         .clause-title {
           font-weight: bold;
-          margin-bottom: 4px;
-          text-decoration: underline;
-          font-size: 11px;
+          margin-bottom: 4pt;
+          font-size: 14pt;
+          text-transform: uppercase;
+          text-align: justify;
         }
         
         .clause-text {
-          margin-bottom: 8px;
-          font-size: 11px;
+          margin-bottom: 6pt;
+          font-size: 14pt;
+          line-height: 1.5;
+          text-align: justify;
         }
         
         .signatures {
-          margin-top: 30px;
-          font-size: 10px;
+          margin-top: 24pt;
+          font-size: 14pt;
         }
         
         .signature-location {
           text-align: center;
-          font-weight: bold;
-          margin-bottom: 20px;
-          margin-top: 20px;
-          font-size: 11px;
+          font-weight: normal;
+          margin-bottom: 16pt;
+          margin-top: 14pt;
+          font-size: 12pt;
+          line-height: 1.4;
         }
         
         .signature-block {
-          margin-bottom: 25px;
+          margin-bottom: 20pt;
           page-break-inside: avoid;
         }
         
         .signature-title {
           font-weight: bold;
-          margin-bottom: 8px;
+          margin-bottom: 6pt;
           text-transform: uppercase;
-          font-size: 10px;
+          font-size: 12pt;
+          letter-spacing: 0.3pt;
         }
         
         .signature-line {
-          margin-top: 25px;
-          margin-bottom: 3px;
-          border-bottom: 1px solid #000;
-          min-height: 15px;
+          margin-top: 24pt;
+          margin-bottom: 3pt;
+          border-bottom: 1pt solid #000;
+          min-height: 10pt;
         }
         
         .signature-name {
-          margin-top: 2px;
-          font-weight: 600;
-          font-size: 10px;
+          margin-top: 2pt;
+          font-weight: bold;
+          font-size: 12pt;
         }
         
         .signature-cpf {
-          font-size: 9px;
-          color: #333;
+          font-size: 11pt;
+          color: #000;
         }
         
         .witness-container {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 30pt;
-          margin-top: 20pt;
+          gap: 20pt;
+          margin-top: 14pt;
         }
         
         .witness-block {
@@ -176,27 +180,27 @@ function generateContractHTML(contractText: string, contractData?: any): string 
         }
         
         .witness-line {
-          margin-top: 30pt;
-          margin-bottom: 5pt;
+          margin-top: 24pt;
+          margin-bottom: 3pt;
           border-bottom: 1pt solid #000;
-          min-height: 20pt;
+          min-height: 10pt;
         }
         
         .witness-label {
-          font-size: 9pt;
-          color: #333;
+          font-size: 11pt;
+          color: #000;
         }
         
         table {
           width: 100%;
           border-collapse: collapse;
-          margin: 15pt 0;
+          margin: 12pt 0;
+          font-size: 14pt;
         }
         
         td {
-          padding: 8pt;
+          padding: 6pt;
           border: 1pt solid #ddd;
-          font-size: 10pt;
         }
         
         .page-break {
@@ -207,7 +211,7 @@ function generateContractHTML(contractText: string, contractData?: any): string 
     <body>
       <div class="container">
         <div class="header">
-          <h1>CONTRATO DE LOCAÇÃO RESIDENCIAL</h1>
+          <h1>Contrato de Locação</h1>
         </div>
         
         <div class="content">
@@ -224,7 +228,7 @@ function generateContractHTML(contractText: string, contractData?: any): string 
         <div class="signatures">
           <div class="signature-location">
             ${city.toUpperCase()} – ${state.toUpperCase()}<br/>
-            _____ DE _________________ DE ${today.getFullYear()}
+            _____ de _________________ de ${today.getFullYear()}
           </div>
           
           <div class="signature-block">

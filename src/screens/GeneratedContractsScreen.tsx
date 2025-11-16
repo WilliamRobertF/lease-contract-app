@@ -18,7 +18,6 @@ import { GeneratedContract } from '../types/contractTypes';
 import { getGeneratedContracts, deleteGeneratedContract, getClauses, getLandlords } from '../utils/storageManager';
 import { formatContract } from '../utils/contractFormatter';
 import { exportToPDF } from '../utils/pdfExporter';
-import { exportToDOCX } from '../utils/docxExporter';
 
 export default function GeneratedContractsScreen() {
   const { t } = useTranslation();
@@ -46,39 +45,44 @@ export default function GeneratedContractsScreen() {
     setSelectedContract(contract);
     setLoading(true);
     try {
-      const clauses = await getClauses();
-      const landlords = await getLandlords();
-      const landlord = landlords.find(l => l.id === contract.landlordId);
-      
-      if (!landlord) {
-        setFormattedText('Landlord not found');
-        return;
-      }
+      // Se tem formattedContent salvo, usa; senão tenta formatar novamente
+      if (contract.formattedContent) {
+        setFormattedText(contract.formattedContent);
+      } else {
+        const clauses = await getClauses();
+        const landlords = await getLandlords();
+        const landlord = landlords.find(l => l.id === contract.landlordId);
+        
+        if (!landlord) {
+          setFormattedText('Landlord not found');
+          return;
+        }
 
-      const formattedOutput = formatContract(
-        {
-          landlord,
-          property: {
-            id: '',
-            createdAt: new Date(),
-            data: contract.property,
+        const formattedOutput = formatContract(
+          {
+            landlord,
+            property: {
+              id: '',
+              createdAt: new Date(),
+              data: contract.property,
+            },
+            tenant: contract.tenant,
+            template: {
+              id: contract.templateId,
+              name: '',
+              clauseIds: [],
+              hasGuarantor: false,
+              createdAt: new Date(),
+            },
+            startDate: contract.startDate,
+            endDate: contract.endDate,
+            monthlyRent: contract.monthlyRent,
+            dueDay: contract.dueDay,
           },
-          tenant: contract.tenant,
-          template: {
-            id: contract.templateId,
-            name: '',
-            clauseIds: [],
-            hasGuarantor: false,
-            createdAt: new Date(),
-          },
-          startDate: contract.startDate,
-          endDate: contract.endDate,
-          monthlyRent: contract.monthlyRent,
-          dueDay: contract.dueDay,
-        },
-        clauses
-      );
-      setFormattedText(formattedOutput);
+          clauses
+        );
+        setFormattedText(formattedOutput);
+      }
     } catch (error) {
       console.error('Error formatting contract:', error);
       setFormattedText('Error loading contract');
@@ -127,15 +131,7 @@ export default function GeneratedContractsScreen() {
     }
   };
 
-  const handleExportDOCX = async () => {
-    try {
-      const fileName = `contrato_${selectedContract?.tenant.name}_${formatDate(new Date(), 'dd_MM_yyyy')}.docx`;
-      await exportToDOCX(formattedText, fileName, selectedContract);
-    } catch (error) {
-      Alert.alert('Error', 'Failed to export DOCX');
-      console.error('Error exporting DOCX:', error);
-    }
-  };
+
 
     const renderContractItem = ({ item }: { item: GeneratedContract }) => {
     const today = new Date();
@@ -214,13 +210,13 @@ export default function GeneratedContractsScreen() {
       <Modal
         visible={selectedContract !== null}
         transparent
-        animationType="slide"
+        animationType="fade"
         onRequestClose={() => {
           setSelectedContract(null);
           setFormattedText('');
         }}
       >
-        <SafeAreaView style={styles.modalContainer}>
+        <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom']}>
             <View style={styles.modalHeader}>
               <TouchableOpacity
                 onPress={() => {
@@ -238,12 +234,6 @@ export default function GeneratedContractsScreen() {
                   style={styles.modalButton}
                 >
                   <MaterialCommunityIcons name="file-pdf-box" size={24} color="#d32f2f" />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={handleExportDOCX}
-                  style={styles.modalButton}
-                >
-                  <MaterialCommunityIcons name="file-word-box" size={24} color="#2196f3" />
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={handleCopyToClipboard}
@@ -291,7 +281,7 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 16,
-    paddingVertical: 6,
+    paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },

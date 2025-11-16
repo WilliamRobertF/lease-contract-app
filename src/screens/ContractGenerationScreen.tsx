@@ -23,7 +23,6 @@ import { LandlordProfile, PropertyProfile, ContractTemplate, PersonData, Generat
 import { getLandlords, getProperties, getTemplates, getClauses, saveGeneratedContract } from '../utils/storageManager';
 import { formatContract } from '../utils/contractFormatter';
 import { exportToPDF } from '../utils/pdfExporter';
-import { exportToDOCX } from '../utils/docxExporter';
 
 type Step = 'landlord' | 'property' | 'tenant' | 'template' | 'preview' | 'complete';
 
@@ -122,6 +121,7 @@ export default function ContractGenerationScreen() {
         lateFeePercentage: 0,
         monthlyInterestPercentage: 0,
         generatedAt: new Date(),
+        formattedContent: formattedContract,
       };
 
       await saveGeneratedContract(generatedContract);
@@ -464,21 +464,9 @@ export default function ContractGenerationScreen() {
             <MaterialCommunityIcons name="file-pdf-box" size={20} color="#fff" />
             <Text style={styles.submitButtonText}>{t('exportPDF')}</Text>
           </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.docxButton}
-            onPress={() => {
-              if (formattedContract) {
-                const fileName = `contrato_${contractData.tenant?.name}_${formatDate(new Date(), 'dd_MM_yyyy')}.docx`;
-                exportToDOCX(formattedContract, fileName, contractData);
-              }
-            }}
-          >
-            <MaterialCommunityIcons name="file-word-box" size={20} color="#fff" />
-            <Text style={styles.submitButtonText}>{t('exportDOCX') || 'Export DOCX'}</Text>
-          </TouchableOpacity>
           <TouchableOpacity style={styles.submitButton} onPress={handleGenerateContract}>
-            <MaterialCommunityIcons name="file-export" size={20} color="#fff" />
-            <Text style={styles.submitButtonText}>{t('generate')}</Text>
+            <MaterialCommunityIcons name="file-check" size={20} color="#fff" />
+            <Text style={styles.submitButtonText}>{t('saveContract')}</Text>
           </TouchableOpacity>
         </View>
       </View>

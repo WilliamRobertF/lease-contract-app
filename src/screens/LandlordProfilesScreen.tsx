@@ -313,6 +313,7 @@ const styles = StyleSheet.create({
   listContent: {
     paddingHorizontal: 16,
     paddingVertical: 12,
+    gap: 8,
   },
   profileCard: {
     flexDirection: 'row',

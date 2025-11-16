@@ -265,10 +265,10 @@ export default function ContractFormScreen() {
                       ]}
                       placeholder="0,00"
                       keyboardType="decimal-pad"
-                      value={values.monthlyRent.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      value={String(values.monthlyRent).replace('.', ',')}
                       onChangeText={(text) => {
-                        // Accept both comma and period as decimal separator
-                        const cleaned = text.replace(/[^0-9,.]/g, '').replace(',', '.');
+                        // Accept comma and convert to number
+                        const cleaned = text.replace(/[^0-9,]/g, '').replace(',', '.');
                         setFieldValue('monthlyRent', parseFloat(cleaned) || 0);
                       }}
                     />

@@ -1,5 +1,8 @@
 import { registerRootComponent } from 'expo';
 
+// Initialize i18n FIRST before App renders
+import './src/i18n/i18n';
+
 import App from './src/App';
 
 // registerRootComponent calls AppRegistry.registerComponent('main', () => App);

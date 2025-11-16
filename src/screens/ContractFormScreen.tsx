@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   Text,
   StyleSheet,
-  KeyboardAvoidingView,
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -16,6 +15,7 @@ import * as Yup from 'yup';
 import { useTranslation } from 'react-i18next';
 import { ContractData } from '../types/contractTypes';
 import { format } from 'date-fns';
+import PrimaryButton from '../components/PrimaryButton';
 
 const validationSchema = Yup.object().shape({
   landlord: Yup.object().shape({
@@ -105,14 +105,11 @@ export default function ContractFormScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardAvoid}
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
       >
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
-        >
           <Formik
             initialValues={initialValues}
             validationSchema={validationSchema}
@@ -256,36 +253,41 @@ export default function ContractFormScreen() {
 
                 <View style={styles.section}>
                   <Text style={styles.sectionTitle}>{t('monthlyRent')}</Text>
-                  <TextInput
-                    style={[
-                      styles.input,
-                      touched.monthlyRent && errors.monthlyRent
-                        ? styles.inputError
-                        : undefined,
-                    ]}
-                    placeholder="0.00"
-                    keyboardType="decimal-pad"
-                    value={values.monthlyRent.toString()}
-                    onChangeText={(text) =>
-                      setFieldValue('monthlyRent', parseFloat(text) || 0)
-                    }
-                  />
+                  <View style={styles.inputWithPrefix}>
+                    <Text style={styles.inputPrefix}>R$</Text>
+                    <TextInput
+                      style={[
+                        styles.input,
+                        styles.inputWithValue,
+                        touched.monthlyRent && errors.monthlyRent
+                          ? styles.inputError
+                          : undefined,
+                      ]}
+                      placeholder="0,00"
+                      keyboardType="decimal-pad"
+                      value={values.monthlyRent.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      onChangeText={(text) => {
+                        // Accept both comma and period as decimal separator
+                        const cleaned = text.replace(/[^0-9,.]/g, '').replace(',', '.');
+                        setFieldValue('monthlyRent', parseFloat(cleaned) || 0);
+                      }}
+                    />
+                  </View>
                   {touched.monthlyRent && errors.monthlyRent && (
                     <Text style={styles.errorText}>{errors.monthlyRent}</Text>
                   )}
                 </View>
 
-                <TouchableOpacity
-                  style={styles.submitButton}
+                <PrimaryButton
+                  label={t('generateContract')}
                   onPress={() => handleSubmit()}
-                >
-                  <Text style={styles.submitButtonText}>{t('generateContract')}</Text>
-                </TouchableOpacity>
+                  icon="file-document-plus"
+                  style={{ marginTop: 16, marginBottom: 32 }}
+                />
               </View>
             )}
           </Formik>
-        </ScrollView>
-      </KeyboardAvoidingView>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -295,15 +297,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  keyboardAvoid: {
-    flex: 1,
-  },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
     paddingHorizontal: 16,
     paddingVertical: 16,
+    paddingBottom: 20,
   },
   formContainer: {
     gap: 20,
@@ -351,17 +351,24 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#333',
   },
-  submitButton: {
-    backgroundColor: '#1976d2',
-    borderRadius: 8,
-    paddingVertical: 12,
+  inputWithPrefix: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 16,
-    marginBottom: 32,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    backgroundColor: '#f9f9f9',
+    paddingLeft: 12,
   },
-  submitButtonText: {
-    color: '#fff',
-    fontSize: 16,
+  inputPrefix: {
+    fontSize: 14,
     fontWeight: '600',
+    color: '#333',
+    marginRight: 4,
+  },
+  inputWithValue: {
+    flex: 1,
+    borderWidth: 0,
+    backgroundColor: 'transparent',
   },
 });

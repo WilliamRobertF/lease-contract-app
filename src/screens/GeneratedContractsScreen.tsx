@@ -202,7 +202,7 @@ export default function GeneratedContractsScreen() {
           setFormattedText('');
         }}
       >
-        <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom']}>
+        <SafeAreaView style={styles.modalContainer} edges={['bottom']}>
           <View style={styles.modalHeader}>
             <TouchableOpacity
               onPress={() => {

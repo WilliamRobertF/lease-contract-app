@@ -129,6 +129,7 @@ export default function ContractGenerationScreen() {
         endDate: contractData.endDate || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
         monthlyRent: String(contractData.monthlyRent || ''),
         dueDay: contractData.dueDay || 1,
+        contractLocation: contractData.contractLocation || '',
         guaranteeInstallments: 0,
         adjustmentIndex: '',
         lateFeePercentage: 0,

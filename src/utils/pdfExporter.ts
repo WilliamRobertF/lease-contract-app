@@ -89,7 +89,6 @@ function generateContractHTML(
   const textLines = contractText
     .split("\n")
     .filter((line: string) => line.trim().length > 0)
-    .filter((line: string) => !line.match(/^(São partes|LOCADOR|LOCATÁRIO|FIADOR)/))
     .map((line: string) => {
       const trimmed = line.trim();
       // Check if line matches "CLÁUSULA PRIMEIRA: title" pattern and extract just "CLÁUSULA PRIMEIRA:"

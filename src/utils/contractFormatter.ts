@@ -64,18 +64,21 @@ export function formatContract(data: ContractDataForFormat, allClauses: Clause[]
   values['START_DATE'] = data.startDate ? format(data.startDate, 'dd/MM/yyyy') : '';
   values['END_DATE'] = data.endDate ? format(data.endDate, 'dd/MM/yyyy') : '';
 
-  const selectedClauses: Clause[] = data.template.clauseIds
+  // Always include clauses 1 and 2, then add the rest from template
+  const mandatoryClauseIds = ['clause-1', 'clause-2'];
+  const allClauseIds = [...new Set([...mandatoryClauseIds, ...data.template.clauseIds])];
+  
+  const selectedClauses: Clause[] = allClauseIds
     .map((id) => allClauses.find((c) => c.id === id))
     .filter(Boolean) as Clause[];
 
   const headerParts: string[] = [];
-  headerParts.push(`CONTRATO DE LOCAÇÃO`);
   if (values['LANDLORD']) headerParts.push(`LOCADOR: ${values['LANDLORD']} ${values['LANDLORD_CPF'] ? '- CPF: ' + values['LANDLORD_CPF'] : ''}`);
   if (values['TENANT']) headerParts.push(`LOCATÁRIO: ${values['TENANT']} ${values['TENANT_CPF'] ? '- CPF: ' + values['TENANT_CPF'] : ''}`);
-  if (values['PROPERTY']) headerParts.push(`IMÓVEL: ${values['PROPERTY']} - ${values['STREET']}, ${values['NUMBER']} - ${values['NEIGHBORHOOD']} - ${values['CITY']}/${values['STATE']}`);
   if (values['START_DATE'] || values['END_DATE']) headerParts.push(`PRAZO: ${values['START_DATE']} a ${values['END_DATE']}`);
   if (values['RENT']) headerParts.push(`ALUGUEL: R$ ${values['RENT']} (vencimento dia ${values['DUE_DAY'] || ''})`);
-
+  
+  headerParts.push(`São partes neste instrumento:`);
   const clausesText = selectedClauses
     .map((c, idx) => {
       let content = c.content;

@@ -299,35 +299,37 @@ export default function SettingsScreen() {
           </View>
 
           {editingClause && (
-            <ScrollView style={styles.modalContent} contentContainerStyle={styles.editModalContent}>
-              <View style={styles.editForm}>
-                <Text style={styles.label}>{t('clauseTitle')}</Text>
-                <TextInput
-                  style={styles.input}
-                  value={editingClause.title}
-                  onChangeText={(text) =>
-                    setEditingClause({ ...editingClause, title: text })
-                  }
-                />
+            <View style={styles.editModalContainer}>
+              <ScrollView style={styles.editScrollView} contentContainerStyle={styles.editModalContent}>
+                <View style={styles.editForm}>
+                  <Text style={styles.label}>{t('clauseTitle')}</Text>
+                  <TextInput
+                    style={styles.input}
+                    value={editingClause.title}
+                    onChangeText={(text) =>
+                      setEditingClause({ ...editingClause, title: text })
+                    }
+                  />
 
-                <Text style={[styles.label, { marginTop: 16 }]}>
-                  {t('clauseContent')}
-                </Text>
-                <TextInput
-                  style={[styles.input, styles.textAreaInput]}
-                  value={editingClause.content}
-                  onChangeText={(text) =>
-                    setEditingClause({ ...editingClause, content: text })
-                  }
-                  multiline
-                  numberOfLines={8}
-                />
+                  <Text style={[styles.label, { marginTop: 16 }]}>
+                    {t('clauseContent')}
+                  </Text>
+                  <TextInput
+                    style={[styles.input, styles.textAreaInput]}
+                    value={editingClause.content}
+                    onChangeText={(text) =>
+                      setEditingClause({ ...editingClause, content: text })
+                    }
+                    multiline
+                    numberOfLines={8}
+                  />
 
-                <Text style={[styles.hint, { marginTop: 12, marginBottom: 20 }]}>
-                  {t('useVariableNames')}
-                </Text>
-              </View>
-            </ScrollView>
+                  <Text style={[styles.hint, { marginTop: 12, marginBottom: 20 }]}>
+                    {t('useVariableNames')}
+                  </Text>
+                </View>
+              </ScrollView>
+            </View>
           )}
         </SafeAreaView>
       </Modal>
@@ -542,6 +544,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#333',
     lineHeight: 22,
+  },
+  editModalContainer: {
+    flex: 1,
+  },
+  editScrollView: {
+    flex: 1,
   },
   editForm: {
     paddingBottom: 20,

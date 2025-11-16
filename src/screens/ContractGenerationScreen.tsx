@@ -21,6 +21,7 @@ import { formatDate } from 'date-fns';
 import { LandlordProfile, PropertyProfile, ContractTemplate, PersonData, GeneratedContract } from '../types/contractTypes';
 import { getLandlords, getProperties, getTemplates, getClauses, saveGeneratedContract } from '../utils/storageManager';
 import { formatContract } from '../utils/contractFormatter';
+import { exportToPDF } from '../utils/pdfExporter';
 
 type Step = 'landlord' | 'property' | 'tenant' | 'template' | 'preview' | 'complete';
 
@@ -394,6 +395,18 @@ export default function ContractGenerationScreen() {
         <TouchableOpacity style={styles.backButton} onPress={() => setStep('template')}>
           <Text style={styles.backButtonText}>{t('back')}</Text>
         </TouchableOpacity>
+        <TouchableOpacity 
+          style={styles.exportButton}
+          onPress={() => {
+            if (formattedContract) {
+              const fileName = `contrato_${contractData.tenant?.name}_${formatDate(new Date(), 'dd_MM_yyyy')}.pdf`;
+              exportToPDF(formattedContract, fileName);
+            }
+          }}
+        >
+          <MaterialCommunityIcons name="file-pdf-box" size={20} color="#fff" />
+          <Text style={styles.submitButtonText}>Export PDF</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.submitButton} onPress={handleGenerateContract}>
           <MaterialCommunityIcons name="file-export" size={20} color="#fff" />
           <Text style={styles.submitButtonText}>{t('generate')}</Text>
@@ -636,6 +649,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#999',
+  },
+  exportButton: {
+    flex: 1,
+    flexDirection: 'row',
+    backgroundColor: '#d32f2f',
+    borderRadius: 6,
+    paddingVertical: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 6,
   },
   submitButton: {
     flex: 1,

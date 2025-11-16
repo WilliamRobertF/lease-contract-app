@@ -17,6 +17,7 @@ import { formatDate } from 'date-fns';
 import { GeneratedContract } from '../types/contractTypes';
 import { getGeneratedContracts, deleteGeneratedContract, getClauses, getLandlords } from '../utils/storageManager';
 import { formatContract } from '../utils/contractFormatter';
+import { exportToPDF } from '../utils/pdfExporter';
 
 export default function GeneratedContractsScreen() {
   const { t } = useTranslation();
@@ -117,6 +118,16 @@ export default function GeneratedContractsScreen() {
     }
   };
 
+  const handleExportPDF = async () => {
+    try {
+      const fileName = `contrato_${selectedContract?.tenant.name}_${formatDate(new Date(), 'dd_MM_yyyy')}.pdf`;
+      await exportToPDF(formattedText, fileName);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to export PDF');
+      console.error('Error exporting PDF:', error);
+    }
+  };
+
   const renderContractItem = ({ item }: { item: GeneratedContract }) => {
     const today = new Date();
     const isActive = item.endDate > today;
@@ -202,12 +213,20 @@ export default function GeneratedContractsScreen() {
               <MaterialCommunityIcons name="close" size={24} color="#333" />
             </TouchableOpacity>
             <Text style={styles.modalTitle}>Contract Preview</Text>
-            <TouchableOpacity
-              onPress={handleCopyToClipboard}
-              style={styles.modalButton}
-            >
-              <MaterialCommunityIcons name="content-copy" size={24} color="#1976d2" />
-            </TouchableOpacity>
+            <View style={styles.headerRightButtons}>
+              <TouchableOpacity
+                onPress={handleExportPDF}
+                style={styles.modalButton}
+              >
+                <MaterialCommunityIcons name="file-pdf-box" size={24} color="#d32f2f" />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleCopyToClipboard}
+                style={styles.modalButton}
+              >
+                <MaterialCommunityIcons name="content-copy" size={24} color="#1976d2" />
+              </TouchableOpacity>
+            </View>
           </View>
 
           {loading ? (
@@ -340,6 +359,10 @@ const styles = StyleSheet.create({
     minWidth: 44,
     minHeight: 44,
     justifyContent: 'center',
+    alignItems: 'center',
+  },
+  headerRightButtons: {
+    flexDirection: 'row',
     alignItems: 'center',
   },
   modalTitle: {

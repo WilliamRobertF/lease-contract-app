@@ -356,7 +356,6 @@ export default function ContractGenerationScreen() {
                 })
               }
               keyboardType="default"
-              placeholder="0,00"
             />
 
             <FormField

@@ -291,7 +291,6 @@ export default function ContractFormScreen() {
                         ? styles.inputError
                         : undefined,
                     ]}
-                    placeholder="0,00"
                     value={values.monthlyRent}
                     onChangeText={(text) =>
                       setFieldValue('monthlyRent', text)

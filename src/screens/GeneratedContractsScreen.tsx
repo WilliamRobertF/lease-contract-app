@@ -202,27 +202,28 @@ export default function GeneratedContractsScreen() {
           setFormattedText('');
         }}
       >
-        <SafeAreaView style={styles.modalContainer} edges={['bottom']}>
-          <View style={styles.modalHeader}>
-            <TouchableOpacity
-              onPress={() => {
-                setSelectedContract(null);
-                setFormattedText('');
-              }}
-              style={styles.modalButton}
-            >
-              <MaterialCommunityIcons name="close" size={24} color="#333" />
-            </TouchableOpacity>
-            <Text style={styles.modalTitle}>{t('contractPreview')}</Text>
-            <View style={styles.headerRightButtons}>
+        <View style={styles.modalOverlay}>
+          <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom']}>
+            <View style={styles.modalHeader}>
               <TouchableOpacity
-                onPress={handleExportPDF}
+                onPress={() => {
+                  setSelectedContract(null);
+                  setFormattedText('');
+                }}
                 style={styles.modalButton}
               >
-                <MaterialCommunityIcons name="file-pdf-box" size={24} color="#d32f2f" />
+                <MaterialCommunityIcons name="close" size={24} color="#333" />
               </TouchableOpacity>
+              <Text style={styles.modalTitle}>{t('contractPreview')}</Text>
+              <View style={styles.headerRightButtons}>
+                <TouchableOpacity
+                  onPress={handleExportPDF}
+                  style={styles.modalButton}
+                >
+                  <MaterialCommunityIcons name="file-pdf-box" size={24} color="#d32f2f" />
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
 
           {loading ? (
             <View style={styles.loadingContainer}>
@@ -249,6 +250,7 @@ export default function GeneratedContractsScreen() {
             </TouchableOpacity>
           )}
         </SafeAreaView>
+        </View>
       </Modal>
     </SafeAreaView>
   );
@@ -350,6 +352,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#999',
     marginTop: 12,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: '#000',
   },
   modalContainer: {
     flex: 1,

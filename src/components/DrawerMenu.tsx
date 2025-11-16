@@ -44,14 +44,14 @@ export default function DrawerMenu() {
           {
             id: 'english',
             label: t('english'),
-            icon: 'circle' as keyof typeof MaterialCommunityIcons.glyphMap,
+            icon: 'check-circle-outline' as keyof typeof MaterialCommunityIcons.glyphMap,
             onPress: () => handleLanguageChange('en'),
             isSubItem: true,
           },
           {
             id: 'portuguese',
             label: t('portuguese'),
-            icon: 'circle' as keyof typeof MaterialCommunityIcons.glyphMap,
+            icon: 'check-circle-outline' as keyof typeof MaterialCommunityIcons.glyphMap,
             onPress: () => handleLanguageChange('pt'),
             isSubItem: true,
           },
@@ -60,13 +60,13 @@ export default function DrawerMenu() {
     {
       id: 'settings',
       label: t('settings'),
-      icon: 'settings' as keyof typeof MaterialCommunityIcons.glyphMap,
+      icon: 'cog-outline' as keyof typeof MaterialCommunityIcons.glyphMap,
       onPress: () => {},
     },
     {
       id: 'about',
       label: t('about'),
-      icon: 'information-outline' as keyof typeof MaterialCommunityIcons.glyphMap,
+      icon: 'help-circle-outline' as keyof typeof MaterialCommunityIcons.glyphMap,
       onPress: () => {},
     },
   ];

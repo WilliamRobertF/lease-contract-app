@@ -13,6 +13,16 @@ export interface PropertyData {
     number: string;
     zipCode: string;
     neighborhood: string;
+    city?: string;
+    state?: string;
+    rooms?: number;
+    bathrooms?: number;
+}
+
+export interface PropertyProfile {
+    id: string;
+    createdAt: Date;
+    data: PropertyData;
 }
 
 export interface ContractData {

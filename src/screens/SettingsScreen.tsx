@@ -6,41 +6,56 @@ import {
   Text,
   StyleSheet,
   FlatList,
-  Switch,
   Alert,
   TextInput,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Clause, ContractTemplate } from '../types/contractTypes';
-import { getClauses, saveClauses, getTemplates, saveTemplate, deleteTemplate } from '../utils/storageManager';
+import { getClauses, getTemplates, saveTemplate, deleteTemplate, updateClause } from '../utils/storageManager';
 
 export default function SettingsScreen() {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<'clauses' | 'templates'>('clauses');
   const [clauses, setClauses] = useState<Clause[]>([]);
   const [templates, setTemplates] = useState<ContractTemplate[]>([]);
-  const [editingClauseId, setEditingClauseId] = useState<string | null>(null);
+  const [selectedClause, setSelectedClause] = useState<Clause | null>(null);
+  const [editingClause, setEditingClause] = useState<Clause | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [newTemplateName, setNewTemplateName] = useState('');
   const [selectedClauses, setSelectedClauses] = useState<string[]>([]);
 
   useEffect(() => {
-    loadClauses();
-    loadTemplates();
+    loadData();
   }, []);
 
-  const loadClauses = async () => {
-    const data = await getClauses();
-    setClauses(data);
+  const loadData = async () => {
+    const [clausesList, templatesList] = await Promise.all([
+      getClauses(),
+      getTemplates(),
+    ]);
+    setClauses(clausesList);
+    setTemplates(templatesList);
   };
 
-  const loadTemplates = async () => {
-    const data = await getTemplates();
-    setTemplates(data);
+  const handleEditClause = (clause: Clause) => {
+    setEditingClause({ ...clause });
+    setShowEditModal(true);
   };
 
-  const toggleClause = (clauseId: string) => {
+  const handleSaveClause = async () => {
+    if (editingClause) {
+      await updateClause(editingClause.id, editingClause);
+      setShowEditModal(false);
+      setEditingClause(null);
+      loadData();
+      Alert.alert('Success', 'Clause updated successfully');
+    }
+  };
+
+  const toggleClauseSelection = (clauseId: string) => {
     setSelectedClauses(prev =>
       prev.includes(clauseId)
         ? prev.filter(id => id !== clauseId)
@@ -51,6 +66,11 @@ export default function SettingsScreen() {
   const handleCreateTemplate = async () => {
     if (!newTemplateName.trim()) {
       Alert.alert('Error', 'Template name is required');
+      return;
+    }
+
+    if (selectedClauses.length === 0) {
+      Alert.alert('Error', 'Select at least one clause');
       return;
     }
 
@@ -65,7 +85,7 @@ export default function SettingsScreen() {
     await saveTemplate(template);
     setNewTemplateName('');
     setSelectedClauses([]);
-    loadTemplates();
+    loadData();
     Alert.alert('Success', 'Template created successfully');
   };
 
@@ -77,25 +97,32 @@ export default function SettingsScreen() {
         style: 'destructive',
         onPress: async () => {
           await deleteTemplate(id);
-          loadTemplates();
+          loadData();
         },
       },
     ]);
   };
 
   const renderClauseItem = ({ item }: { item: Clause }) => (
-    <View style={styles.clauseItem}>
+    <TouchableOpacity
+      style={styles.clauseItem}
+      onPress={() => setSelectedClause(item)}
+    >
       <View style={styles.clauseInfo}>
         <Text style={styles.clauseTitle}>{item.title}</Text>
-        <Text style={styles.clauseCategory}>
-          {item.category === 'obligatory' ? 'Mandatory' : 'Optional'}
-        </Text>
+        <View style={styles.clauseMeta}>
+          <Text style={styles.clauseCategory}>
+            {item.category === 'obligatory' ? '📌 Mandatory' : '⭐ Optional'}
+          </Text>
+          <MaterialCommunityIcons
+            name="chevron-right"
+            size={20}
+            color="#999"
+            style={{ marginLeft: 'auto' }}
+          />
+        </View>
       </View>
-      <Switch
-        value={selectedClauses.includes(item.id)}
-        onValueChange={() => toggleClause(item.id)}
-      />
-    </View>
+    </TouchableOpacity>
   );
 
   const renderTemplateItem = ({ item }: { item: ContractTemplate }) => (
@@ -108,10 +135,29 @@ export default function SettingsScreen() {
       </View>
       <TouchableOpacity
         onPress={() => handleDeleteTemplate(item.id)}
+        style={styles.deleteIconContainer}
       >
         <MaterialCommunityIcons name="trash-can" size={20} color="#d32f2f" />
       </TouchableOpacity>
     </View>
+  );
+
+  const renderClauseSelectionItem = ({ item }: { item: Clause }) => (
+    <TouchableOpacity
+      style={styles.clauseCheckbox}
+      onPress={() => toggleClauseSelection(item.id)}
+    >
+      <View style={styles.checkbox}>
+        {selectedClauses.includes(item.id) && (
+          <MaterialCommunityIcons
+            name="check"
+            size={16}
+            color="#1976d2"
+          />
+        )}
+      </View>
+      <Text style={styles.checkboxLabel}>{item.title}</Text>
+    </TouchableOpacity>
   );
 
   return (
@@ -122,7 +168,7 @@ export default function SettingsScreen() {
           onPress={() => setActiveTab('clauses')}
         >
           <Text style={[styles.tabText, activeTab === 'clauses' && styles.activeTabText]}>
-            Clauses
+            {t('clauses')}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -130,7 +176,7 @@ export default function SettingsScreen() {
           onPress={() => setActiveTab('templates')}
         >
           <Text style={[styles.tabText, activeTab === 'templates' && styles.activeTabText]}>
-            Templates
+            {t('templates')}
           </Text>
         </TouchableOpacity>
       </View>
@@ -138,7 +184,7 @@ export default function SettingsScreen() {
       <ScrollView style={styles.content}>
         {activeTab === 'clauses' ? (
           <View>
-            <Text style={styles.sectionTitle}>Available Clauses</Text>
+            <Text style={styles.sectionTitle}>{t('availableClauses')}</Text>
             <FlatList
               data={clauses}
               renderItem={renderClauseItem}
@@ -148,54 +194,37 @@ export default function SettingsScreen() {
           </View>
         ) : (
           <View>
-            <View style={styles.createTemplateSection}>
-              <Text style={styles.sectionTitle}>Create Template</Text>
-              
-              <View style={styles.templateForm}>
-                <TextInput
-                  style={styles.templateNameInput}
-                  placeholder="Template name"
-                  value={newTemplateName}
-                  onChangeText={setNewTemplateName}
-                />
-                
-                <Text style={styles.subTitle}>Select clauses:</Text>
-                <FlatList
-                  data={clauses}
-                  renderItem={({ item }) => (
-                    <View style={styles.clauseCheckbox}>
-                      <TouchableOpacity
-                        style={styles.checkbox}
-                        onPress={() => toggleClause(item.id)}
-                      >
-                        {selectedClauses.includes(item.id) && (
-                          <MaterialCommunityIcons
-                            name="check"
-                            size={16}
-                            color="#1976d2"
-                          />
-                        )}
-                      </TouchableOpacity>
-                      <Text style={styles.checkboxLabel}>{item.title}</Text>
-                    </View>
-                  )}
-                  keyExtractor={(item) => item.id}
-                  scrollEnabled={false}
-                />
+            <View style={styles.createSection}>
+              <Text style={styles.sectionTitle}>{t('createTemplate')}</Text>
 
-                <TouchableOpacity
-                  style={styles.createButton}
-                  onPress={handleCreateTemplate}
-                >
-                  <Text style={styles.createButtonText}>Create Template</Text>
-                </TouchableOpacity>
-              </View>
+              <TextInput
+                style={styles.templateNameInput}
+                placeholder={t('templateName')}
+                value={newTemplateName}
+                onChangeText={setNewTemplateName}
+              />
+
+              <Text style={styles.subTitle}>{t('selectClauses')}</Text>
+              <FlatList
+                data={clauses}
+                renderItem={renderClauseSelectionItem}
+                keyExtractor={(item) => item.id}
+                scrollEnabled={false}
+              />
+
+              <TouchableOpacity
+                style={styles.createButton}
+                onPress={handleCreateTemplate}
+              >
+                <MaterialCommunityIcons name="plus" size={20} color="#fff" />
+                <Text style={styles.createButtonText}>{t('createTemplate')}</Text>
+              </TouchableOpacity>
             </View>
 
-            <View style={styles.templatesListSection}>
-              <Text style={styles.sectionTitle}>Saved Templates</Text>
+            <View style={styles.savedSection}>
+              <Text style={styles.sectionTitle}>{t('savedTemplates')}</Text>
               {templates.length === 0 ? (
-                <Text style={styles.emptyText}>No templates yet</Text>
+                <Text style={styles.emptyText}>{t('noTemplates')}</Text>
               ) : (
                 <FlatList
                   data={templates}
@@ -208,6 +237,92 @@ export default function SettingsScreen() {
           </View>
         )}
       </ScrollView>
+
+      <Modal
+        visible={selectedClause !== null}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setSelectedClause(null)}
+      >
+        <SafeAreaView style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity onPress={() => setSelectedClause(null)}>
+              <MaterialCommunityIcons name="close" size={24} color="#333" />
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>{t('clauseContent')}</Text>
+            {selectedClause && (
+              <TouchableOpacity onPress={() => handleEditClause(selectedClause)}>
+                <MaterialCommunityIcons name="pencil" size={24} color="#1976d2" />
+              </TouchableOpacity>
+            )}
+          </View>
+
+          {selectedClause && (
+            <ScrollView style={styles.modalContent}>
+              <View style={styles.clauseDetailCard}>
+                <Text style={styles.detailTitle}>{selectedClause.title}</Text>
+                <Text style={styles.detailCategory}>
+                  {selectedClause.category === 'obligatory'
+                    ? '📌 Mandatory Clause'
+                    : '⭐ Optional Clause'}
+                </Text>
+                <Text style={styles.detailContent}>{selectedClause.content}</Text>
+              </View>
+            </ScrollView>
+          )}
+        </SafeAreaView>
+      </Modal>
+
+      <Modal
+        visible={showEditModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowEditModal(false)}
+      >
+        <SafeAreaView style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity onPress={() => setShowEditModal(false)}>
+              <MaterialCommunityIcons name="close" size={24} color="#333" />
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>{t('editClause')}</Text>
+            <TouchableOpacity onPress={handleSaveClause}>
+              <MaterialCommunityIcons name="check" size={24} color="#4caf50" />
+            </TouchableOpacity>
+          </View>
+
+          {editingClause && (
+            <ScrollView style={styles.modalContent}>
+              <View style={styles.editForm}>
+                <Text style={styles.label}>Title</Text>
+                <TextInput
+                  style={styles.input}
+                  value={editingClause.title}
+                  onChangeText={(text) =>
+                    setEditingClause({ ...editingClause, title: text })
+                  }
+                />
+
+                <Text style={[styles.label, { marginTop: 16 }]}>
+                  {t('clauseContent')}
+                </Text>
+                <TextInput
+                  style={[styles.input, styles.textAreaInput]}
+                  value={editingClause.content}
+                  onChangeText={(text) =>
+                    setEditingClause({ ...editingClause, content: text })
+                  }
+                  multiline
+                  numberOfLines={6}
+                />
+
+                <Text style={[styles.hint, { marginTop: 12 }]}>
+                  Use variable names like: PROPERTY, LANDLORD, TENANT, RENT, DUE_DAY
+                </Text>
+              </View>
+            </ScrollView>
+          )}
+        </SafeAreaView>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -249,6 +364,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#333',
     marginBottom: 12,
+    marginTop: 16,
   },
   subTitle: {
     fontSize: 14,
@@ -258,9 +374,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   clauseItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     paddingHorizontal: 12,
     paddingVertical: 12,
     marginBottom: 8,
@@ -268,26 +381,27 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   clauseInfo: {
-    flex: 1,
+    gap: 6,
   },
   clauseTitle: {
     fontSize: 14,
     fontWeight: '600',
     color: '#333',
   },
+  clauseMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   clauseCategory: {
     fontSize: 12,
     color: '#999',
-    marginTop: 4,
   },
-  createTemplateSection: {
+  createSection: {
     marginBottom: 24,
-  },
-  templateForm: {
-    backgroundColor: '#f9f9f9',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 16,
+    paddingBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
   },
   templateNameInput: {
     borderWidth: 1,
@@ -321,18 +435,21 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   createButton: {
+    flexDirection: 'row',
     backgroundColor: '#1976d2',
     borderRadius: 6,
     paddingVertical: 10,
     alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 12,
   },
   createButtonText: {
     color: '#fff',
     fontSize: 14,
     fontWeight: '600',
+    marginLeft: 8,
   },
-  templatesListSection: {
+  savedSection: {
     marginBottom: 24,
   },
   templateCard: {
@@ -358,10 +475,84 @@ const styles = StyleSheet.create({
     color: '#999',
     marginTop: 4,
   },
+  deleteIconContainer: {
+    padding: 8,
+  },
   emptyText: {
     fontSize: 14,
     color: '#999',
     textAlign: 'center',
     paddingVertical: 20,
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  modalTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+  },
+  modalContent: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  clauseDetailCard: {
+    backgroundColor: '#f9f9f9',
+    borderRadius: 8,
+    padding: 12,
+  },
+  detailTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#333',
+    marginBottom: 8,
+  },
+  detailCategory: {
+    fontSize: 12,
+    color: '#999',
+    marginBottom: 12,
+  },
+  detailContent: {
+    fontSize: 14,
+    color: '#333',
+    lineHeight: 22,
+  },
+  editForm: {
+    paddingBottom: 20,
+  },
+  label: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#666',
+    marginBottom: 6,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 14,
+    color: '#333',
+  },
+  textAreaInput: {
+    height: 120,
+    textAlignVertical: 'top',
+  },
+  hint: {
+    fontSize: 12,
+    color: '#1976d2',
+    fontStyle: 'italic',
   },
 });

@@ -1,7 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { LandlordProfile, Clause, ContractTemplate } from '../types/contractTypes';
+import { LandlordProfile, PropertyProfile, Clause, ContractTemplate } from '../types/contractTypes';
 
 const LANDLORDS_KEY = '@lease_app_landlords';
+const PROPERTIES_KEY = '@lease_app_properties';
 const CLAUSES_KEY = '@lease_app_clauses';
 const TEMPLATES_KEY = '@lease_app_templates';
 
@@ -153,5 +154,53 @@ export async function deleteTemplate(id: string): Promise<void> {
     await AsyncStorage.setItem(TEMPLATES_KEY, JSON.stringify(filtered));
   } catch (error) {
     console.error('Error deleting template:', error);
+  }
+}
+
+export async function getProperties(): Promise<PropertyProfile[]> {
+  try {
+    const data = await AsyncStorage.getItem(PROPERTIES_KEY);
+    return data ? JSON.parse(data) : [];
+  } catch (error) {
+    console.error('Error getting properties:', error);
+    return [];
+  }
+}
+
+export async function saveProperty(profile: PropertyProfile): Promise<void> {
+  try {
+    const properties = await getProperties();
+    const index = properties.findIndex(p => p.id === profile.id);
+    if (index >= 0) {
+      properties[index] = profile;
+    } else {
+      properties.push(profile);
+    }
+    await AsyncStorage.setItem(PROPERTIES_KEY, JSON.stringify(properties));
+  } catch (error) {
+    console.error('Error saving property:', error);
+  }
+}
+
+export async function deleteProperty(id: string): Promise<void> {
+  try {
+    const properties = await getProperties();
+    const filtered = properties.filter(p => p.id !== id);
+    await AsyncStorage.setItem(PROPERTIES_KEY, JSON.stringify(filtered));
+  } catch (error) {
+    console.error('Error deleting property:', error);
+  }
+}
+
+export async function updateClause(id: string, updatedClause: Clause): Promise<void> {
+  try {
+    const clauses = await getClauses();
+    const index = clauses.findIndex(c => c.id === id);
+    if (index >= 0) {
+      clauses[index] = updatedClause;
+      await saveClauses(clauses);
+    }
+  } catch (error) {
+    console.error('Error updating clause:', error);
   }
 }

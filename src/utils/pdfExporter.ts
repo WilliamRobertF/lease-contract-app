@@ -59,6 +59,17 @@ function generateContractHTML(contractText: string, contractData?: any): string 
   const city = contractData?.property?.data?.city || '';
   const state = contractData?.property?.data?.state || '';
 
+  // Parse clauses from contractText - they come formatted as "CLÁUSULA PRIMEIRA: content"
+  const clauseRegex = /CLÁUSULA\s+([A-ZÁÉÍÓÚàáéíóú\s]+):\s*([\s\S]*?)(?=CLÁUSULA\s+|$)/gi;
+  let clausesHtml = '';
+  let match;
+  
+  while ((match = clauseRegex.exec(contractText)) !== null) {
+    const clauseTitle = match[1].trim();
+    const clauseContent = match[2].trim();
+    clausesHtml += `<p style="text-align: justify; margin-bottom: 12pt;"><strong>CLÁUSULA ${clauseTitle}:</strong> ${clauseContent}</p>`;
+  }
+
   return `
     <!DOCTYPE html>
     <html>
@@ -81,6 +92,7 @@ function generateContractHTML(contractText: string, contractData?: any): string 
           font-family: 'Times New Roman', serif;
           color: #000;
           font-size: 12pt;
+          font-weight: bold;
           line-height: 1.5;
           text-align: justify;
         }
@@ -115,6 +127,7 @@ function generateContractHTML(contractText: string, contractData?: any): string 
           margin-bottom: 10pt;
           font-weight: bold;
           font-size: 12pt;
+          text-align: justify;
         }
         
         .content {
@@ -123,24 +136,15 @@ function generateContractHTML(contractText: string, contractData?: any): string 
         }
         
         .clause {
-          margin-bottom: 10pt;
+          margin-bottom: 12pt;
           text-align: justify;
           page-break-inside: avoid;
         }
         
-        .clause-title {
+        .clause p {
+          margin: 0;
+          text-align: justify;
           font-weight: bold;
-          margin-bottom: 4pt;
-          font-size: 12pt;
-          text-transform: uppercase;
-          text-align: justify;
-        }
-        
-        .clause-text {
-          margin-bottom: 6pt;
-          font-size: 12pt;
-          line-height: 1.5;
-          text-align: justify;
         }
         
         .signatures {
@@ -150,7 +154,7 @@ function generateContractHTML(contractText: string, contractData?: any): string 
         
         .signature-location {
           text-align: center;
-          font-weight: normal;
+          font-weight: bold;
           margin-bottom: 16pt;
           margin-top: 14pt;
           font-size: 12pt;
@@ -185,8 +189,9 @@ function generateContractHTML(contractText: string, contractData?: any): string 
         }
         
         .signature-cpf {
-          font-size: 11pt;
+          font-size: 12pt;
           color: #000;
+          font-weight: bold;
         }
         
         .witness-container {
@@ -209,8 +214,9 @@ function generateContractHTML(contractText: string, contractData?: any): string 
         }
         
         .witness-label {
-          font-size: 11pt;
+          font-size: 12pt;
           color: #000;
+          font-weight: bold;
         }
       </style>
     </head>
@@ -221,48 +227,48 @@ function generateContractHTML(contractText: string, contractData?: any): string 
         </div>
         
         <div class="parties">
-          <div class="party">
-            São partes neste instrumento:
-          </div>
+          <p class="party"><strong>São partes neste instrumento:</strong></p>
           
-          <div class="party">
-            LOCADOR(A): ${landlordName.toUpperCase()}, ${landlordNationality}, ${landlordMaritalStatus}, portador(a) do RG nº ${landlordRG} e inscrito(a) no CPF/MF nº ${landlordCPF}, nascido(a) em ${landlordBirthplace}.
-          </div>
+          <p class="party">
+            <strong>LOCADOR(A):</strong> ${landlordName.toUpperCase()}, ${landlordNationality}, ${landlordMaritalStatus}, portador(a) do RG nº ${landlordRG} e inscrito(a) no CPF/MF nº ${landlordCPF}, nascido(a) em ${landlordBirthplace}.
+          </p>
           
-          <div class="party">
-            LOCATÁRIO(A): Senhor(a) ${tenantName.toUpperCase()}, ${tenantNationality}, portador(a) do RG nº ${tenantRG} e inscrito(a) no CPF nº ${tenantCPF}, nascido(a) em ${tenantBirthplace}.
-          </div>
+          <p class="party">
+            <strong>LOCATÁRIO(A):</strong> Senhor(a) ${tenantName.toUpperCase()}, ${tenantNationality}, portador(a) do RG nº ${tenantRG} e inscrito(a) no CPF nº ${tenantCPF}, nascido(a) em ${tenantBirthplace}.
+          </p>
           
           ${
             guarantorName
-              ? `<div class="party">
-                 FIADOR(A): ${guarantorName.toUpperCase()}, portador(a) do RG nº ${guarantorRG} e inscrito(a) no CPF nº ${guarantorCPF}.
-               </div>`
+              ? `<p class="party">
+                 <strong>FIADOR(A):</strong> ${guarantorName.toUpperCase()}, portador(a) do RG nº ${guarantorRG} e inscrito(a) no CPF nº ${guarantorCPF}.
+               </p>`
               : ''
           }
         </div>
         
         <div class="content">
-          ${contractText}
+          <div class="clause">
+            ${clausesHtml}
+          </div>
         </div>
         
         <div class="signatures">
           <div class="signature-location">
-            ${city.toUpperCase()} – ${state.toUpperCase()}, _____ de _________________ de ${year}
+            <strong>${city.toUpperCase()} – ${state.toUpperCase()}, _____ de _________________ de ${year}</strong>
           </div>
           
           <div class="signature-block">
             <div class="signature-title">LOCADOR:</div>
             <div class="signature-line"></div>
             <div class="signature-name">${landlordName.toUpperCase()}</div>
-            <div class="signature-cpf">CPF: ${landlordCPF}</div>
+            <div class="signature-cpf"><strong>CPF: ${landlordCPF}</strong></div>
           </div>
           
           <div class="signature-block">
             <div class="signature-title">LOCATÁRIO:</div>
             <div class="signature-line"></div>
             <div class="signature-name">${tenantName.toUpperCase()}</div>
-            <div class="signature-cpf">CPF: ${tenantCPF}</div>
+            <div class="signature-cpf"><strong>CPF: ${tenantCPF}</strong></div>
           </div>
           
           ${
@@ -272,7 +278,7 @@ function generateContractHTML(contractText: string, contractData?: any): string 
             <div class="signature-title">FIADOR:</div>
             <div class="signature-line"></div>
             <div class="signature-name">${guarantorName.toUpperCase()}</div>
-            <div class="signature-cpf">CPF: ${guarantorCPF}</div>
+            <div class="signature-cpf"><strong>CPF: ${guarantorCPF}</strong></div>
           </div>
           `
               : ''
@@ -283,11 +289,11 @@ function generateContractHTML(contractText: string, contractData?: any): string 
             <div class="witness-container">
               <div class="witness-block">
                 <div class="witness-line"></div>
-                <div class="witness-label">CPF: _____________________</div>
+                <div class="witness-label"><strong>CPF: _____________________</strong></div>
               </div>
               <div class="witness-block">
                 <div class="witness-line"></div>
-                <div class="witness-label">CPF: _____________________</div>
+                <div class="witness-label"><strong>CPF: _____________________</strong></div>
               </div>
             </div>
           </div>

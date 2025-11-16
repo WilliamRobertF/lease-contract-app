@@ -20,8 +20,8 @@ export interface ContractData {
     tenant: PersonData;
     guarantor?: PersonData;
     property: PropertyData;
-    startDate: string;
-    endDate: string;
+    startDate: Date;
+    endDate: Date;
     monthlyRent: number;
     dueDay: number;
     guaranteeInstallments: number;

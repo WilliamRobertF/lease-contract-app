@@ -44,9 +44,7 @@ const validationSchema = Yup.object().shape({
       const num = parseFloat(value.replace(',', '.'));
       return num > 0;
     }),
-  dueDay: Yup.number()
-    .min(1, 'Due day must be between 1 and 31')
-    .max(31, 'Due day must be between 1 and 31'),
+  dueDay: Yup.string(),
 });
 
 const initialValues: ContractData = {
@@ -76,7 +74,7 @@ const initialValues: ContractData = {
   startDate: new Date(),
   endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
   monthlyRent: '',
-  dueDay: 1,
+  dueDay: '01',
   contractLocation: '',
   guaranteeInstallments: 0,
   adjustmentIndex: '',
@@ -270,12 +268,11 @@ export default function ContractFormScreen() {
                         ? styles.inputError
                         : undefined,
                     ]}
-                    placeholder="1-31"
-                    value={String(values.dueDay || 1)}
+                    placeholder="01"
+                    value={values.dueDay || ''}
                     onChangeText={(text) => {
-                      const num = parseInt(text) || 1;
-                      if (num >= 1 && num <= 31) {
-                        setFieldValue('dueDay', num);
+                      if (text === '' || parseInt(text, 10) <= 31) {
+                        setFieldValue('dueDay', text);
                       }
                     }}
                     keyboardType="number-pad"

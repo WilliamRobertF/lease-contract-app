@@ -6,34 +6,38 @@ import {
   Text,
   StyleSheet,
   Alert,
+  TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { DEFAULT_CLAUSES } from '../utils/defaultClauses';
-import { saveClauses } from '../utils/storageManager';
+import { saveClauses, getDefaultCity, setDefaultCity } from '../utils/storageManager';
 import LanguageSelector from '../components/LanguageSelector';
 
 export default function SettingsScreen() {
   const { t } = useTranslation();
   const navigation = useNavigation();
   const [showLanguageSelector, setShowLanguageSelector] = useState(false);
+  const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
+  const [defaultCity, setDefaultCityState] = useState('Salvador, Bahia');
+  const [isEditingCity, setIsEditingCity] = useState(false);
 
   const handleResetFactory = () => {
     Alert.alert(
       t('areYouSure'),
-      'This will reset all data to factory defaults and delete all custom clauses.',
+      t('resetConfirmMessage'),
       [
         { text: t('cancel') },
         {
-          text: 'Reset',
+          text: t('resetToFactoryDefaults'),
           onPress: async () => {
             try {
               await saveClauses(DEFAULT_CLAUSES);
-              Alert.alert('Success', 'App has been reset to factory defaults');
+              Alert.alert('Sucesso', t('resetSuccess'));
             } catch (error) {
-              Alert.alert('Error', 'Failed to reset app');
+              Alert.alert('Erro', t('resetError'));
             }
           },
           style: 'destructive',
@@ -115,16 +119,51 @@ export default function SettingsScreen() {
           />
         </View>
 
-        <View style={styles.dangerSection}>
-          <Text style={styles.sectionTitle}>Danger Zone</Text>
-
+        <View style={styles.advancedSection}>
           <SettingItem
-            icon="refresh"
-            title="Reset to Factory Defaults"
-            description="Delete all data and restore default clauses"
-            onPress={handleResetFactory}
-            isDangerous={true}
+            icon={showAdvancedSettings ? "chevron-up" : "chevron-down"}
+            title={t('advancedSettings')}
+            onPress={() => setShowAdvancedSettings(!showAdvancedSettings)}
           />
+
+          {showAdvancedSettings && (
+            <View style={styles.advancedContent}>
+              <SettingItem
+                icon="map-marker"
+                title={t('defaultCityForContracts')}
+                description={t('defaultCityForContracts')}
+                onPress={() => setIsEditingCity(!isEditingCity)}
+              />
+              {isEditingCity && (
+                <View style={styles.cityEditContainer}>
+                  <TextInput
+                    style={styles.cityInput}
+                    value={defaultCity}
+                    onChangeText={setDefaultCityState}
+                    placeholder="e.g., Salvador, Bahia"
+                  />
+                  <TouchableOpacity
+                    style={styles.saveCityButton}
+                    onPress={async () => {
+                      await setDefaultCity(defaultCity);
+                      setIsEditingCity(false);
+                      Alert.alert('Sucesso', 'Cidade padrão atualizada');
+                    }}
+                  >
+                    <Text style={styles.saveCityButtonText}>Salvar</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+              
+              <SettingItem
+                icon="refresh"
+                title={t('resetToFactoryDefaults')}
+                description={t('resetDescription')}
+                onPress={handleResetFactory}
+                isDangerous={true}
+              />
+            </View>
+          )}
         </View>
       </ScrollView>
 
@@ -149,15 +188,38 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: 24,
   },
-  dangerSection: {
+  advancedSection: {
     marginBottom: 32,
   },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 12,
+  advancedContent: {
     marginTop: 8,
+  },
+  cityEditContainer: {
+    backgroundColor: '#f9f9f9',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 10,
+    gap: 8,
+  },
+  cityInput: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 14,
+    backgroundColor: '#fff',
+  },
+  saveCityButton: {
+    backgroundColor: '#1976d2',
+    borderRadius: 6,
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  saveCityButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 14,
   },
   settingItem: {
     flexDirection: 'row',

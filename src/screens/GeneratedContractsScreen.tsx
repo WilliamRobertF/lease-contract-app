@@ -92,7 +92,7 @@ export default function GeneratedContractsScreen() {
   };
 
   const handleDeleteContract = (id: string) => {
-    Alert.alert(t('deleteProfile'), t('areYouSure'), [
+    Alert.alert(t('deleteContract'), t('areYouSure'), [
       { text: t('cancel'), style: 'cancel' },
       {
         text: t('delete'),
@@ -102,9 +102,9 @@ export default function GeneratedContractsScreen() {
             await deleteGeneratedContract(id);
             loadContracts();
             setSelectedContract(null);
-            Alert.alert('Success', 'Contract deleted successfully');
+            Alert.alert(t('delete'), t('contractDeletedSuccess'));
           } catch (error) {
-            Alert.alert('Error', 'Failed to delete contract');
+            Alert.alert(t('delete'), t('contractDeleteError'));
           }
         },
       },
@@ -121,9 +121,7 @@ export default function GeneratedContractsScreen() {
     }
   };
 
-
-
-    const renderContractItem = ({ item }: { item: GeneratedContract }) => {
+  const renderContractItem = ({ item }: { item: GeneratedContract }) => {
     const today = new Date();
     const isActive = item.endDate > today;
 
@@ -131,47 +129,47 @@ export default function GeneratedContractsScreen() {
       <TouchableOpacity
         style={styles.contractCard}
         onPress={() => handleViewContract(item)}
+        activeOpacity={0.7}
       >
-        <View style={styles.cardContent}>
-          <View style={styles.cardHeaderTop}>
-            <View style={styles.cardTitleSection}>
-              <Text style={styles.contractTitle}>{item.tenant.name.toUpperCase()}</Text>
-              <Text style={styles.contractProperty}>{item.property.description}</Text>
-            </View>
+        <View style={styles.cardTopRow}>
+          <View style={styles.cardTitleSection}>
+            <Text style={styles.contractTitle}>{item.tenant.name.toUpperCase()}</Text>
+            <Text style={styles.contractProperty}>{item.property.description}</Text>
+          </View>
+          <View style={styles.statusBadge}>
             {isActive ? (
-              <View style={styles.activeBadge}>
-                <MaterialCommunityIcons name="check-circle" size={16} color="#4caf50" />
-                <Text style={styles.activeBadgeText}>{t('activeContracts')}</Text>
+              <View style={styles.activeBadgeSmall}>
+                <Text style={styles.activeBadgeTextSmall}>{t('activeContracts')}</Text>
               </View>
             ) : (
-              <View style={styles.inactiveBadge}>
-                <MaterialCommunityIcons name="close-circle" size={16} color="#f44336" />
-                <Text style={styles.inactiveBadgeText}>{t('inactiveContract')}</Text>
+              <View style={styles.inactiveBadgeSmall}>
+                <Text style={styles.inactiveBadgeTextSmall}>{t('inactiveContract')}</Text>
               </View>
             )}
           </View>
+        </View>
 
-          <View style={styles.cardDetails}>
-            <View style={styles.detailRow}>
-              <MaterialCommunityIcons name="calendar" size={16} color="#666" />
-              <Text style={styles.contractDetail}>
-                {formatDate(item.startDate, 'dd/MM/yyyy')} - {formatDate(item.endDate, 'dd/MM/yyyy')}
-              </Text>
-            </View>
-            <View style={styles.detailRow}>
-              <MaterialCommunityIcons name="currency-brl" size={16} color="#666" />
-              <Text style={styles.contractDetail}>
-                {item.monthlyRent}
-              </Text>
-            </View>
+        <View style={styles.cardDetails}>
+          <View style={styles.detailRow}>
+            <MaterialCommunityIcons name="calendar" size={14} color="#999" />
+            <Text style={styles.contractDetail}>
+              {formatDate(item.startDate, 'dd/MM/yyyy')} - {formatDate(item.endDate, 'dd/MM/yyyy')}
+            </Text>
+          </View>
+          <View style={styles.detailRow}>
+            <MaterialCommunityIcons name="currency-brl" size={14} color="#999" />
+            <Text style={styles.contractDetail}>
+              {item.monthlyRent}
+            </Text>
           </View>
         </View>
 
         <TouchableOpacity
           onPress={() => handleDeleteContract(item.id)}
-          style={styles.deleteButton}
+          style={styles.deleteButtonSmall}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
-          <MaterialCommunityIcons name="trash-can" size={20} color="#d32f2f" />
+          <MaterialCommunityIcons name="trash-can-outline" size={16} color="#d32f2f" />
         </TouchableOpacity>
       </TouchableOpacity>
     );
@@ -203,7 +201,7 @@ export default function GeneratedContractsScreen() {
         }}
       >
         <View style={styles.modalOverlay}>
-          <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom']}>
+          <SafeAreaView style={styles.modalContent} edges={['top', 'bottom']}>
             <View style={styles.modalHeader}>
               <TouchableOpacity
                 onPress={() => {
@@ -225,31 +223,31 @@ export default function GeneratedContractsScreen() {
               </View>
             </View>
 
-          {loading ? (
-            <View style={styles.loadingContainer}>
-              <Text style={styles.loadingText}>Loading contract...</Text>
-            </View>
-          ) : (
-            <ScrollView 
-              style={styles.modalContent}
-              scrollEnabled={true}
-              keyboardShouldPersistTaps="handled"
-            >
-              <Text style={styles.formattedContractText}>{formattedText}</Text>
-              <View style={{ height: 20 }} />
-            </ScrollView>
-          )}
+            {loading ? (
+              <View style={styles.loadingContainer}>
+                <Text style={styles.loadingText}>Loading contract...</Text>
+              </View>
+            ) : (
+              <ScrollView 
+                style={styles.scrollContent}
+                scrollEnabled={true}
+                keyboardShouldPersistTaps="handled"
+              >
+                <Text style={styles.formattedContractText}>{formattedText}</Text>
+                <View style={{ height: 20 }} />
+              </ScrollView>
+            )}
 
-          {selectedContract && (
-            <TouchableOpacity
-              style={styles.deleteModalButton}
-              onPress={() => handleDeleteContract(selectedContract.id)}
-            >
-              <MaterialCommunityIcons name="trash-can" size={20} color="#fff" />
-              <Text style={styles.deleteModalButtonText}>Delete Contract</Text>
-            </TouchableOpacity>
-          )}
-        </SafeAreaView>
+            {selectedContract && (
+              <TouchableOpacity
+                style={styles.deleteModalButton}
+                onPress={() => handleDeleteContract(selectedContract.id)}
+              >
+                <MaterialCommunityIcons name="trash-can" size={20} color="#fff" />
+                <Text style={styles.deleteModalButtonText}>Delete Contract</Text>
+              </TouchableOpacity>
+            )}
+          </SafeAreaView>
         </View>
       </Modal>
     </SafeAreaView>
@@ -265,26 +263,42 @@ const styles = StyleSheet.create({
   listContent: {
     paddingHorizontal: 16,
     paddingVertical: 12,
+    gap: 12,
+  },
+  contractCardWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    position: 'relative',
+    gap: 8,
   },
   contractCard: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flex: 1,
+    position: 'relative',
     paddingHorizontal: 12,
     paddingVertical: 12,
-    marginBottom: 8,
     backgroundColor: '#f5f5f5',
     borderRadius: 8,
   },
   cardContent: {
     flex: 1,
   },
-  cardHeaderTop: {
+  cardTopRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
+    marginBottom: 10,
+  },
+  statusBadge: {
+    marginLeft: 8,
+  },
+  cardBadge: {
+    position: 'absolute',
+    top: 8,
+    right: 48,
+    zIndex: 5,
+  },
+  cardHeader: {
     marginBottom: 12,
-    gap: 12,
   },
   cardTitleSection: {
     flex: 1,
@@ -321,6 +335,17 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#2e7d32',
   },
+  activeBadgeSmall: {
+    backgroundColor: '#4caf50',
+    borderRadius: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  activeBadgeTextSmall: {
+    fontSize: 9,
+    fontWeight: '600',
+    color: '#fff',
+  },
   inactiveBadge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -335,13 +360,37 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#c62828',
   },
+  inactiveBadgeSmall: {
+    backgroundColor: '#f44336',
+    borderRadius: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  inactiveBadgeTextSmall: {
+    fontSize: 9,
+    fontWeight: '600',
+    color: '#fff',
+  },
   contractDetail: {
     fontSize: 12,
     color: '#666',
   },
   deleteButton: {
-    padding: 8,
-    marginLeft: 8,
+    width: 44,
+    height: 44,
+    borderRadius: 8,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  deleteButtonSmall: {
+    position: 'absolute',
+    bottom: 8,
+    right: 8,
+    padding: 6,
+    zIndex: 10,
   },
   emptyContainer: {
     flex: 1,
@@ -357,7 +406,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#000',
   },
-  modalContainer: {
+  modalContent: {
     flex: 1,
     backgroundColor: '#fff',
   },
@@ -369,6 +418,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
+    backgroundColor: '#fff',
   },
   modalButton: {
     padding: 8,
@@ -386,7 +436,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#333',
   },
-  modalContent: {
+  scrollContent: {
     flex: 1,
     paddingHorizontal: 16,
     paddingVertical: 12,
@@ -395,6 +445,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#fff',
   },
   loadingText: {
     fontSize: 14,

@@ -20,7 +20,7 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { formatDate } from 'date-fns';
 import { LandlordProfile, PropertyProfile, ContractTemplate, PersonData, GeneratedContract } from '../types/contractTypes';
-import { getLandlords, getProperties, getTemplates, getClauses, saveGeneratedContract } from '../utils/storageManager';
+import { getLandlords, getProperties, getTemplates, getClauses, saveGeneratedContract, getDefaultCity } from '../utils/storageManager';
 import { formatContract, removeClauseTitles } from '../utils/contractFormatter';
 import { exportToPDF } from '../utils/pdfExporter';
 
@@ -36,7 +36,7 @@ interface ContractData {
   startDate: Date;
   endDate: Date;
   monthlyRent: string;
-  dueDay: number;
+  dueDay: string;
 }
 
 export default function ContractGenerationScreen() {
@@ -56,8 +56,8 @@ export default function ContractGenerationScreen() {
     startDate: new Date(),
     endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
     monthlyRent: '',
-    dueDay: 1,
-    contractLocation: '',
+    dueDay: '01',
+    contractLocation: 'Salvador, Bahia',
     hasGuarantor: false,
   });
 
@@ -66,16 +66,19 @@ export default function ContractGenerationScreen() {
   }, []);
 
   const loadData = async () => {
-    const [landlordsList, propertiesList, templatesList, clausesList] = await Promise.all([
+    const [landlordsList, propertiesList, templatesList, clausesList, defaultCity] = await Promise.all([
       getLandlords(),
       getProperties(),
       getTemplates(),
       getClauses(),
+      getDefaultCity(),
     ]);
     setLandlords(landlordsList);
     setProperties(propertiesList);
     setTemplates(templatesList);
     setClauses(clausesList);
+    // Update contractData with the saved default city
+    setContractData(prev => ({ ...prev, contractLocation: defaultCity }));
   };
 
   const handleLandlordSelect = (landlord: LandlordProfile) => {
@@ -160,7 +163,7 @@ export default function ContractGenerationScreen() {
       startDate: new Date(),
       endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
       monthlyRent: '',
-      dueDay: 1,
+      dueDay: '01',
     });
   };
 
@@ -312,12 +315,19 @@ export default function ContractGenerationScreen() {
               onChangeText={(text) => setFieldValue('nationality', text)}
               error={touched.nationality && errors.nationality}
             />
-            <FormField
-              label={t('maritalStatus')}
-              value={values.maitalStatus}
-              onChangeText={(text) => setFieldValue('maitalStatus', text)}
-              error={touched.maitalStatus && errors.maitalStatus}
-            />
+            <View style={styles.formField}>
+              <Text style={styles.label}>{t('maritalStatus')}</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Solteiro(a) / Casado(a)"
+                value={values.maitalStatus}
+                onChangeText={(text) => setFieldValue('maitalStatus', text)}
+                placeholderTextColor="#999"
+              />
+              {touched.maitalStatus && errors.maitalStatus && (
+                <Text style={styles.errorText}>{errors.maitalStatus}</Text>
+              )}
+            </View>
             <FormField
               label={t('birthplace')}
               value={values.birthplace}
@@ -401,18 +411,17 @@ export default function ContractGenerationScreen() {
 
             <FormField
               label={t('dueDay') || 'Vencimento do Aluguel'}
-              value={String(contractData.dueDay || '1')}
+              value={contractData.dueDay || ''}
               onChangeText={(text) => {
-                const num = parseInt(text) || 1;
-                if (num >= 1 && num <= 31) {
+                if (text === '' || parseInt(text, 10) <= 31) {
                   setContractData({
                     ...contractData,
-                    dueDay: num,
+                    dueDay: text,
                   });
                 }
               }}
               keyboardType="number-pad"
-              placeholder="1-31"
+              placeholder="01"
             />
 
             <FormField
@@ -884,6 +893,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#666',
     marginBottom: 12,
+  },
+  errorText: {
+    color: '#d32f2f',
+    fontSize: 12,
+    marginTop: 4,
   },
   submitButtonDisabled: {
     opacity: 0.5,

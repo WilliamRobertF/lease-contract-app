@@ -10,7 +10,7 @@ interface ContractDataForFormat {
   startDate?: Date;
   endDate?: Date;
   monthlyRent?: string;
-  dueDay?: number;
+  dueDay?: string;
   contractLocation?: string;
   guarantor?: PersonData;
   hasGuarantor?: boolean;

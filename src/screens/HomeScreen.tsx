@@ -4,10 +4,50 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { GeneratedContract } from '../types/contractTypes';
+import { getGeneratedContracts } from '../utils/storageManager';
+import { formatDate } from 'date-fns';
 
 export default function HomeScreen() {
   const { t } = useTranslation();
   const navigation = useNavigation();
+  const [expiringContracts, setExpiringContracts] = useState<GeneratedContract[]>([]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      loadExpiringContracts();
+    }, [])
+  );
+
+  const loadExpiringContracts = async () => {
+    try {
+      const contracts = await getGeneratedContracts();
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      // Contratos que vencem nos próximos 30 dias
+      const thirtyDaysLater = new Date(today);
+      thirtyDaysLater.setDate(thirtyDaysLater.getDate() + 30);
+      
+      const expiring = contracts.filter(contract => {
+        const endDate = new Date(contract.endDate);
+        endDate.setHours(0, 0, 0, 0);
+        return endDate <= thirtyDaysLater && endDate > today;
+      }).sort((a, b) => new Date(a.endDate).getTime() - new Date(b.endDate).getTime());
+      
+      setExpiringContracts(expiring);
+    } catch (error) {
+      console.error('Error loading contracts:', error);
+    }
+  };
+
+  const getNextContractToExpire = () => {
+    if (expiringContracts.length > 0) {
+      return expiringContracts[0];
+    }
+    // Se não há contratos vencendo em 30 dias, busca o próximo a vencer
+    return null;
+  };
 
   const QuickActionButton = ({
     icon,
@@ -68,30 +108,33 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>💡 {t('tips')}</Text>
-          <View style={styles.tipsContainer}>
-            <View style={styles.tipCard}>
-              <MaterialCommunityIcons name="lightbulb-outline" size={20} color="#ff9800" />
-              <View style={styles.tipContent}>
-                <Text style={styles.tipTitle}>Dica 1</Text>
-                <Text style={styles.tipText}>Crie cláusulas obrigatórias e opcionais para padronizar seus contratos</Text>
+          <Text style={styles.sectionTitle}>{t('alerts').charAt(0).toUpperCase() + t('alerts').slice(1)}</Text>
+          {expiringContracts.length > 0 ? (
+            <View style={styles.alertsContainer}>
+              {expiringContracts.map(contract => {
+                const daysLeft = Math.ceil(
+                  (new Date(contract.endDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
+                );
+                return (
+                  <View key={contract.id} style={styles.alertCard}>
+                    <View style={styles.alertContent}>
+                      <Text style={styles.alertTitle}>{contract.tenant.name}</Text>
+                      <Text style={styles.alertText}>
+                        {t('expiresIn')} {daysLeft} {daysLeft === 1 ? t('day') : t('days')} ({formatDate(contract.endDate, 'dd/MM/yyyy')})
+                      </Text>
+                    </View>
+                  </View>
+                );
+              })}
+            </View>
+          ) : (
+            <View style={styles.noAlertCard}>
+              <View style={styles.alertContent}>
+                <Text style={styles.noAlertTitle}>{t('noAlerts')}</Text>
+                <Text style={styles.alertText}>{t('noContractsExpiring')}</Text>
               </View>
             </View>
-            <View style={styles.tipCard}>
-              <MaterialCommunityIcons name="lightbulb-outline" size={20} color="#4caf50" />
-              <View style={styles.tipContent}>
-                <Text style={styles.tipTitle}>Dica 2</Text>
-                <Text style={styles.tipText}>Organize seus modelos de contrato por tipo de propriedade</Text>
-              </View>
-            </View>
-            <View style={styles.tipCard}>
-              <MaterialCommunityIcons name="lightbulb-outline" size={20} color="#2196f3" />
-              <View style={styles.tipContent}>
-                <Text style={styles.tipTitle}>Dica 3</Text>
-                <Text style={styles.tipText}>Exporte seus contratos em PDF para compartilhamento fácil</Text>
-              </View>
-            </View>
-          </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -202,6 +245,45 @@ const styles = StyleSheet.create({
     marginBottom: 3,
   },
   tipText: {
+    fontSize: 12,
+    color: '#666',
+    lineHeight: 16,
+  },
+  alertsContainer: {
+    gap: 12,
+  },
+  alertCard: {
+    backgroundColor: '#fffbea',
+    borderLeftWidth: 4,
+    borderLeftColor: '#ff9800',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+  },
+  noAlertCard: {
+    backgroundColor: '#e3f2fd',
+    borderLeftWidth: 4,
+    borderLeftColor: '#1976d2',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+  },
+  alertContent: {
+    flex: 1,
+  },
+  alertTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 2,
+  },
+  noAlertTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#1976d2',
+    marginBottom: 2,
+  },
+  alertText: {
     fontSize: 12,
     color: '#666',
     lineHeight: 16,

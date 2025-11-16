@@ -34,7 +34,7 @@ export interface ContractData {
     startDate: Date;
     endDate: Date;
     monthlyRent: string;
-    dueDay: number;
+    dueDay: string;
     contractLocation: string;
     guaranteeInstallments: number;
     adjustmentIndex: string; //IGP-M, IPCA, etc.
@@ -72,7 +72,7 @@ export interface GeneratedContract {
     startDate: Date;
     endDate: Date;
     monthlyRent: string;
-    dueDay: number;
+    dueDay: string;
     contractLocation: string;
     guaranteeInstallments: number;
     adjustmentIndex: string;

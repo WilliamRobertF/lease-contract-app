@@ -7,6 +7,7 @@ const PROPERTIES_KEY = '@lease_app_properties';
 const CLAUSES_KEY = '@lease_app_clauses';
 const TEMPLATES_KEY = '@lease_app_templates';
 const GENERATED_CONTRACTS_KEY = '@lease_app_generated_contracts';
+const DEFAULT_CITY_KEY = '@lease_app_default_city';
 
 export async function getLandlords(): Promise<LandlordProfile[]> {
   try {
@@ -183,5 +184,23 @@ export async function deleteGeneratedContract(id: string): Promise<void> {
     await AsyncStorage.setItem(GENERATED_CONTRACTS_KEY, JSON.stringify(filtered));
   } catch (error) {
     console.error('Error deleting generated contract:', error);
+  }
+}
+
+export async function getDefaultCity(): Promise<string> {
+  try {
+    const city = await AsyncStorage.getItem(DEFAULT_CITY_KEY);
+    return city || 'Salvador, Bahia';
+  } catch (error) {
+    console.error('Error getting default city:', error);
+    return 'Salvador, Bahia';
+  }
+}
+
+export async function setDefaultCity(city: string): Promise<void> {
+  try {
+    await AsyncStorage.setItem(DEFAULT_CITY_KEY, city);
+  } catch (error) {
+    console.error('Error setting default city:', error);
   }
 }

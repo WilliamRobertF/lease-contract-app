@@ -81,6 +81,8 @@ const initialValues: ContractData = {
   adjustmentIndex: '',
   lateFeePercentage: 0,
   monthlyInterestPercentage: 0,
+  hasGuarantor: false,
+  guarantor: undefined,
 };
 
 export default function ContractFormScreen() {

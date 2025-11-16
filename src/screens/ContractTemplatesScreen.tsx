@@ -108,9 +108,6 @@ export default function ContractTemplatesScreen() {
       />
       <View style={styles.clauseCheckContent}>
         <Text style={styles.clauseCheckTitle}>{item.title}</Text>
-        <Text style={styles.clauseCheckCategory}>
-          {item.category === 'obligatory' ? t('mandatoryCl') : t('optionalCl')}
-        </Text>
       </View>
     </TouchableOpacity>
   );
@@ -208,11 +205,6 @@ export default function ContractTemplatesScreen() {
               return clause ? (
                 <View key={clause.id} style={styles.templateClauseItem}>
                   <Text style={styles.templateClauseTitle}>{clause.title}</Text>
-                  <Text style={styles.templateClauseCategory}>
-                    {clause.category === 'obligatory'
-                      ? t('mandatoryCl')
-                      : t('optionalCl')}
-                  </Text>
                   <Text style={styles.templateClauseContent}>{clause.content}</Text>
                 </View>
               ) : null;

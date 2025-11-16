@@ -123,5 +123,10 @@
   "createClause": "Create Clause",
   "quickActions": "Quick Actions",
   "profiles": "Profiles",
-  "tips": "Tips"
+  "tips": "Tips",
+  "guarantor": "Guarantor",
+  "hasGuarantor": "Include Guarantor",
+  "guarantorName": "Guarantor Name",
+  "guarantorNameRequired": "Guarantor name is required",
+  "details": "Details"
 }

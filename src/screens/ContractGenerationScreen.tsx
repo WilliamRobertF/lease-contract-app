@@ -24,7 +24,7 @@ import { getLandlords, getProperties, getTemplates, getClauses, saveGeneratedCon
 import { formatContract, removeClauseTitles } from '../utils/contractFormatter';
 import { exportToPDF } from '../utils/pdfExporter';
 
-type Step = 'landlord' | 'property' | 'tenant' | 'guarantor' | 'template' | 'preview' | 'complete';
+type Step = 'landlord' | 'property' | 'tenant' | 'template' | 'preview' | 'complete';
 
 interface ContractData {
   landlord: LandlordProfile;
@@ -85,13 +85,13 @@ export default function ContractGenerationScreen() {
     setStep('tenant');
   };
 
-  const handleTenantSubmit = (tenant: PersonData) => {
-    setContractData({ ...contractData, tenant });
-    setStep('guarantor');
-  };
-
-  const handleGuarantorSubmit = (hasGuarantor: boolean, guarantor?: PersonData) => {
-    setContractData({ ...contractData, hasGuarantor, guarantor });
+  const handleTenantSubmit = (tenant: PersonData, hasGuarantor: boolean, guarantor?: PersonData) => {
+    setContractData({ 
+      ...contractData, 
+      tenant,
+      hasGuarantor,
+      guarantor 
+    });
     setStep('template');
   };
 
@@ -231,7 +231,11 @@ export default function ContractGenerationScreen() {
     </View>
   );
 
-  const renderTenantForm = () => (
+  const renderTenantForm = () => {
+    const [hasGuarantorLocal, setHasGuarantorLocal] = useState(false);
+    const [guarantorFormVisible, setGuarantorFormVisible] = useState(false);
+
+    return (
     <View style={styles.stepContainer}>
       <Text style={styles.stepTitle}>{t('fillTenantData')}</Text>
 
@@ -243,6 +247,10 @@ export default function ContractGenerationScreen() {
           rg: '',
           cpf: '',
           birthplace: '',
+          guarantorName: contractData.guarantor?.name || '',
+          guarantorNationality: contractData.guarantor?.nationality || 'brasileiro(a)',
+          guarantorRg: contractData.guarantor?.rg || '',
+          guarantorCpf: contractData.guarantor?.cpf || '',
         }}
         validationSchema={Yup.object().shape({
           name: Yup.string().required(t('tenantNameRequired')),
@@ -251,10 +259,33 @@ export default function ContractGenerationScreen() {
           nationality: Yup.string().required(t('nationalityRequired')),
           maitalStatus: Yup.string().required(t('maritalStatusRequired')),
           birthplace: Yup.string().required(t('birthplaceRequired')),
+          guarantorName: hasGuarantorLocal ? Yup.string().required(t('guarantorNameRequired')) : Yup.string(),
+          guarantorCpf: hasGuarantorLocal ? Yup.string().required(t('cpfRequired')) : Yup.string(),
+          guarantorRg: hasGuarantorLocal ? Yup.string().required(t('rgRequired')) : Yup.string(),
         })}
-        onSubmit={(values) => handleTenantSubmit(values)}
+        onSubmit={(values) => {
+          const tenantData: PersonData = {
+            name: values.name,
+            nationality: values.nationality,
+            maitalStatus: values.maitalStatus,
+            rg: values.rg,
+            cpf: values.cpf,
+            birthplace: values.birthplace,
+          };
+
+          const guarantorData = hasGuarantorLocal ? {
+            name: values.guarantorName,
+            nationality: values.guarantorNationality,
+            rg: values.guarantorRg,
+            cpf: values.guarantorCpf,
+            maitalStatus: '',
+            birthplace: '',
+          } : undefined;
+
+          handleTenantSubmit(tenantData, hasGuarantorLocal, guarantorData);
+        }}
       >
-        {({ values, errors, touched, setFieldValue, handleSubmit }) => (
+        {({ values, errors, touched, setFieldValue, handleSubmit, isValid }) => (
           <View style={styles.formContainer}>
             <FormField
               label={t('tenantName')}
@@ -383,130 +414,69 @@ export default function ContractGenerationScreen() {
               placeholder="1-31"
             />
 
+            {/* Fiador Section */}
+            <View style={styles.separatorContainer}>
+              <TouchableOpacity
+                style={[styles.button, hasGuarantorLocal && styles.buttonActive]}
+                onPress={() => {
+                  setHasGuarantorLocal(!hasGuarantorLocal);
+                  setGuarantorFormVisible(!hasGuarantorLocal);
+                }}
+              >
+                <MaterialCommunityIcons
+                  name={hasGuarantorLocal ? 'checkbox-marked' : 'checkbox-blank-outline'}
+                  size={24}
+                  color={hasGuarantorLocal ? '#1976d2' : '#999'}
+                />
+                <Text style={styles.buttonText}>{t('hasGuarantor')}</Text>
+              </TouchableOpacity>
+            </View>
+
+            {guarantorFormVisible && (
+              <View style={styles.guarantorFormContainer}>
+                <Text style={styles.guarantorFormTitle}>{t('guarantor')} {t('details')}</Text>
+                
+                <FormField
+                  label={t('guarantorName')}
+                  value={values.guarantorName}
+                  onChangeText={(text) => setFieldValue('guarantorName', text)}
+                  error={touched.guarantorName && errors.guarantorName}
+                />
+                <FormField
+                  label={t('cpf')}
+                  value={values.guarantorCpf}
+                  onChangeText={(text) => setFieldValue('guarantorCpf', text)}
+                  error={touched.guarantorCpf && errors.guarantorCpf}
+                />
+                <FormField
+                  label={t('rg')}
+                  value={values.guarantorRg}
+                  onChangeText={(text) => setFieldValue('guarantorRg', text)}
+                  error={touched.guarantorRg && errors.guarantorRg}
+                />
+                <FormField
+                  label={t('nationality')}
+                  value={values.guarantorNationality}
+                  onChangeText={(text) => setFieldValue('guarantorNationality', text)}
+                />
+              </View>
+            )}
+
             <View style={styles.buttonGroup}>
               <TouchableOpacity style={styles.backButton} onPress={() => setStep('property')}>
                 <Text style={styles.backButtonText}>{t('back')}</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.submitButton} onPress={() => handleSubmit()}>
-                <Text style={styles.submitButtonText}>{t('generateContract')}</Text>
+              <TouchableOpacity 
+                style={[styles.submitButton, !isValid && styles.submitButtonDisabled]} 
+                onPress={() => handleSubmit()}
+                disabled={!isValid}
+              >
+                <Text style={styles.submitButtonText}>{t('next') || 'Próximo'}</Text>
               </TouchableOpacity>
             </View>
           </View>
         )}
       </Formik>
-    </View>
-  );
-
-  const renderGuarantorForm = () => {
-    const [hasGuarantor, setHasGuarantor] = useState(contractData.hasGuarantor || false);
-
-    return (
-      <View style={styles.stepContainer}>
-        <Text style={styles.stepTitle}>{t('guarantor') || 'Fiador'}</Text>
-
-        <View style={styles.formContainer}>
-          <TouchableOpacity
-            style={[styles.button, hasGuarantor && styles.buttonActive]}
-            onPress={() => setHasGuarantor(!hasGuarantor)}
-          >
-            <MaterialCommunityIcons
-              name={hasGuarantor ? 'checkbox-marked' : 'checkbox-blank-outline'}
-              size={24}
-              color={hasGuarantor ? '#1976d2' : '#999'}
-            />
-            <Text style={styles.buttonText}>{t('hasGuarantor') || 'Incluir Fiador'}</Text>
-          </TouchableOpacity>
-
-          {hasGuarantor && (
-            <Formik
-              initialValues={{
-                name: contractData.guarantor?.name || '',
-                nationality: contractData.guarantor?.nationality || 'brasileiro(a)',
-                rg: contractData.guarantor?.rg || '',
-                cpf: contractData.guarantor?.cpf || '',
-                maitalStatus: contractData.guarantor?.maitalStatus || '',
-                birthplace: contractData.guarantor?.birthplace || '',
-              }}
-              validationSchema={Yup.object().shape({
-                name: Yup.string().required(t('guarantorNameRequired') || 'Nome do fiador é obrigatório'),
-                cpf: Yup.string().required(t('cpfRequired')),
-                rg: Yup.string().required(t('rgRequired')),
-                nationality: Yup.string(),
-                maitalStatus: Yup.string(),
-                birthplace: Yup.string(),
-              })}
-              onSubmit={(values) => {
-                handleGuarantorSubmit(hasGuarantor, values);
-              }}
-            >
-              {({ values, errors, touched, setFieldValue, handleSubmit, isValid }) => (
-                <View>
-                  <FormField
-                    label={t('guarantorName') || 'Nome do Fiador'}
-                    value={values.name}
-                    onChangeText={(text) => setFieldValue('name', text)}
-                    error={touched.name && errors.name}
-                  />
-                  <FormField
-                    label={t('cpf')}
-                    value={values.cpf}
-                    onChangeText={(text) => setFieldValue('cpf', text)}
-                    error={touched.cpf && errors.cpf}
-                  />
-                  <FormField
-                    label={t('rg')}
-                    value={values.rg}
-                    onChangeText={(text) => setFieldValue('rg', text)}
-                    error={touched.rg && errors.rg}
-                  />
-                  <FormField
-                    label={t('nationality')}
-                    value={values.nationality}
-                    onChangeText={(text) => setFieldValue('nationality', text)}
-                  />
-                  <FormField
-                    label={t('maritalStatus')}
-                    value={values.maitalStatus}
-                    onChangeText={(text) => setFieldValue('maitalStatus', text)}
-                  />
-                  <FormField
-                    label={t('birthplace')}
-                    value={values.birthplace}
-                    onChangeText={(text) => setFieldValue('birthplace', text)}
-                  />
-
-                  <View style={styles.buttonGroup}>
-                    <TouchableOpacity style={styles.backButton} onPress={() => setStep('tenant')}>
-                      <Text style={styles.backButtonText}>{t('back')}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[styles.submitButton, !isValid && styles.submitButtonDisabled]}
-                      onPress={() => handleSubmit()}
-                      disabled={!isValid}
-                    >
-                      <Text style={styles.submitButtonText}>{t('next') || 'Próximo'}</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              )}
-            </Formik>
-          )}
-
-          {!hasGuarantor && (
-            <View style={styles.buttonGroup}>
-              <TouchableOpacity style={styles.backButton} onPress={() => setStep('tenant')}>
-                <Text style={styles.backButtonText}>{t('back')}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.submitButton}
-                onPress={() => handleGuarantorSubmit(false, undefined)}
-              >
-                <Text style={styles.submitButtonText}>{t('next') || 'Próximo'}</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </View>
-      </View>
     );
   };
 
@@ -620,7 +590,6 @@ export default function ContractGenerationScreen() {
         {step === 'landlord' && renderLandlordSelection()}
         {step === 'property' && renderPropertySelection()}
         {step === 'tenant' && renderTenantForm()}
-        {step === 'guarantor' && renderGuarantorForm()}
         {step === 'template' && renderTemplateSelection()}
         {step === 'preview' && renderPreview()}
         {step === 'complete' && renderComplete()}
@@ -878,5 +847,46 @@ const styles = StyleSheet.create({
     color: '#999',
     marginTop: 8,
     textAlign: 'center',
+  },
+  button: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    marginBottom: 12,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 6,
+    gap: 8,
+  },
+  buttonActive: {
+    backgroundColor: '#e3f2fd',
+  },
+  buttonText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#333',
+  },
+  separatorContainer: {
+    marginTop: 16,
+    marginBottom: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+    paddingTop: 16,
+  },
+  guarantorFormContainer: {
+    backgroundColor: '#f9f9f9',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 12,
+    marginTop: 8,
+  },
+  guarantorFormTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#666',
+    marginBottom: 12,
+  },
+  submitButtonDisabled: {
+    opacity: 0.5,
   },
 });

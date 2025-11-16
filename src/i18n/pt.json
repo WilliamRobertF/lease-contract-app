@@ -123,5 +123,10 @@
   "createClause": "Criar Cláusula",
   "quickActions": "Ações Rápidas",
   "profiles": "Perfis",
-  "tips": "Dicas"
+  "tips": "Dicas",
+  "guarantor": "Fiador",
+  "hasGuarantor": "Incluir Fiador",
+  "guarantorName": "Nome do Fiador",
+  "guarantorNameRequired": "Nome do fiador é obrigatório",
+  "details": "Detalhes"
 }

@@ -1,3 +1,6 @@
 {
-    "welcome": "Bem-vindo ao Gerador de Contratos de Locação"
+  "welcome": "Bem-vindo ao App de Contratos de Locação!",
+  "languageMenu": "Idioma",
+  "english": "Inglês",
+  "portuguese": "Português"
 }

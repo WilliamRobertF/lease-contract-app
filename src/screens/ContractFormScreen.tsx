@@ -271,19 +271,7 @@ export default function ContractFormScreen() {
                       keyboardType="decimal-pad"
                       value={String(values.monthlyRent || '0,00')}
                       onChangeText={(text) => {
-                        // Allow only digits and comma
-                        let cleaned = '';
-                        for (let i = 0; i < text.length; i++) {
-                          const char = text[i];
-                          if (/[0-9,]/.test(char)) {
-                            // Allow only one comma
-                            if (char === ',' && cleaned.includes(',')) {
-                              continue;
-                            }
-                            cleaned += char;
-                          }
-                        }
-                        setFieldValue('monthlyRent', cleaned || '0,00');
+                        setFieldValue('monthlyRent', text || '0,00');
                       }}
                     />
                   </View>

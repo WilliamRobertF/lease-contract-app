@@ -299,7 +299,7 @@ export default function SettingsScreen() {
           </View>
 
           {editingClause && (
-            <ScrollView style={styles.modalContent}>
+            <ScrollView style={styles.modalContent} contentContainerStyle={styles.editModalContent}>
               <View style={styles.editForm}>
                 <Text style={styles.label}>{t('clauseTitle')}</Text>
                 <TextInput
@@ -320,14 +320,13 @@ export default function SettingsScreen() {
                     setEditingClause({ ...editingClause, content: text })
                   }
                   multiline
-                  numberOfLines={6}
+                  numberOfLines={8}
                 />
 
-                <Text style={[styles.hint, { marginTop: 12 }]}>
+                <Text style={[styles.hint, { marginTop: 12, marginBottom: 20 }]}>
                   {t('useVariableNames')}
                 </Text>
               </View>
-              <View style={{ height: 20 }} />
             </ScrollView>
           )}
         </SafeAreaView>
@@ -546,6 +545,11 @@ const styles = StyleSheet.create({
   },
   editForm: {
     paddingBottom: 20,
+  },
+  editModalContent: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    paddingBottom: 40,
   },
   label: {
     fontSize: 13,

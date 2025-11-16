@@ -268,7 +268,7 @@ export default function ContractFormScreen() {
                           : undefined,
                       ]}
                       placeholder="0,00"
-                      keyboardType="decimal-pad"
+                      keyboardType="default"
                       value={String(values.monthlyRent || '0,00')}
                       onChangeText={(text) => {
                         setFieldValue('monthlyRent', text || '0,00');

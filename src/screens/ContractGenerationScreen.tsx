@@ -107,12 +107,12 @@ export default function ContractGenerationScreen() {
   const renderLandlordSelection = () => (
     <View style={styles.stepContainer}>
       <Text style={styles.stepTitle}>{t('selectLandlord')}</Text>
-      <Text style={styles.stepSubtitle}>Choose a landlord profile</Text>
+      <Text style={styles.stepSubtitle}>{t('chooseALandlordProfile')}</Text>
 
       {landlords.length === 0 ? (
         <View style={styles.emptyState}>
           <MaterialCommunityIcons name="inbox" size={48} color="#999" />
-          <Text style={styles.emptyText}>No landlords yet</Text>
+          <Text style={styles.emptyText}>{t('noLandlordsYet')}</Text>
         </View>
       ) : (
         <FlatList
@@ -139,12 +139,12 @@ export default function ContractGenerationScreen() {
   const renderPropertySelection = () => (
     <View style={styles.stepContainer}>
       <Text style={styles.stepTitle}>{t('selectProperty')}</Text>
-      <Text style={styles.stepSubtitle}>Choose a property</Text>
+      <Text style={styles.stepSubtitle}>{t('chooseAProperty')}</Text>
 
       {properties.length === 0 ? (
         <View style={styles.emptyState}>
           <MaterialCommunityIcons name="home-outline" size={48} color="#999" />
-          <Text style={styles.emptyText}>No properties yet</Text>
+          <Text style={styles.emptyText}>{t('noPropertiesYet')}</Text>
         </View>
       ) : (
         <FlatList
@@ -190,7 +190,7 @@ export default function ContractGenerationScreen() {
         }}
         validationSchema={Yup.object().shape({
           name: Yup.string().required(t('tenantNameRequired')),
-          cpf: Yup.string().required('CPF required'),
+          cpf: Yup.string().required(t('cpfRequired')),
         })}
         onSubmit={(values) => handleTenantSubmit(values)}
       >
@@ -277,13 +277,13 @@ export default function ContractGenerationScreen() {
 
   const renderTemplateSelection = () => (
     <View style={styles.stepContainer}>
-      <Text style={styles.stepTitle}>Select Template</Text>
-      <Text style={styles.stepSubtitle}>Choose contract clauses template</Text>
+      <Text style={styles.stepTitle}>{t('selectTemplate')}</Text>
+      <Text style={styles.stepSubtitle}>{t('selectTemplateSubtitle')}</Text>
 
       {templates.length === 0 ? (
         <View style={styles.emptyState}>
           <MaterialCommunityIcons name="file-document-outline" size={48} color="#999" />
-          <Text style={styles.emptyText}>No templates yet</Text>
+          <Text style={styles.emptyText}>{t('noTemplates')}</Text>
         </View>
       ) : (
         <FlatList

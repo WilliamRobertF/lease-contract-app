@@ -76,10 +76,10 @@ export default function LandlordProfilesScreen() {
   };
 
   const handleDelete = (id: string) => {
-    Alert.alert('Delete Profile', 'Are you sure?', [
-      { text: 'Cancel', style: 'cancel' },
+    Alert.alert(t('deleteProfile'), t('areYouSure'), [
+      { text: t('cancel'), style: 'cancel' },
       {
-        text: 'Delete',
+        text: t('delete'),
         style: 'destructive',
         onPress: async () => {
           await deleteLandlord(id);
@@ -125,13 +125,13 @@ export default function LandlordProfilesScreen() {
           >
             {({ values, errors, touched, handleChange, handleSubmit }) => (
               <View style={styles.formContainer}>
-                <Text style={styles.title}>Edit Landlord Profile</Text>
+                <Text style={styles.title}>{t('editLandlordProfile')}</Text>
 
                 <View style={styles.section}>
-                  <Text style={styles.label}>Name</Text>
+                  <Text style={styles.label}>{t('tenantName')}</Text>
                   <TextInput
                     style={styles.input}
-                    placeholder="Full Name"
+                    placeholder={t('fullName')}
                     value={values.name}
                     onChangeText={handleChange('name')}
                   />
@@ -141,20 +141,20 @@ export default function LandlordProfilesScreen() {
                 </View>
 
                 <View style={styles.section}>
-                  <Text style={styles.label}>Nationality</Text>
+                  <Text style={styles.label}>{t('nationality')}</Text>
                   <TextInput
                     style={styles.input}
-                    placeholder="Nationality"
+                    placeholder={t('nationality')}
                     value={values.nationality}
                     onChangeText={handleChange('nationality')}
                   />
                 </View>
 
                 <View style={styles.section}>
-                  <Text style={styles.label}>Marital Status</Text>
+                  <Text style={styles.label}>{t('maritalStatus')}</Text>
                   <TextInput
                     style={styles.input}
-                    placeholder="Marital Status"
+                    placeholder={t('maritalStatus')}
                     value={values.maitalStatus}
                     onChangeText={handleChange('maitalStatus')}
                   />
@@ -181,10 +181,10 @@ export default function LandlordProfilesScreen() {
                 </View>
 
                 <View style={styles.section}>
-                  <Text style={styles.label}>Birthplace</Text>
+                  <Text style={styles.label}>{t('birthplace')}</Text>
                   <TextInput
                     style={styles.input}
-                    placeholder="Birthplace"
+                    placeholder={t('birthplace')}
                     value={values.birthplace}
                     onChangeText={handleChange('birthplace')}
                   />
@@ -194,7 +194,7 @@ export default function LandlordProfilesScreen() {
                   style={styles.submitButton}
                   onPress={() => handleSubmit()}
                 >
-                  <Text style={styles.submitButtonText}>Save Profile</Text>
+                  <Text style={styles.submitButtonText}>{t('saveProfile')}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -204,7 +204,7 @@ export default function LandlordProfilesScreen() {
                     setEditingData(null);
                   }}
                 >
-                  <Text style={styles.cancelButtonText}>Cancel</Text>
+                  <Text style={styles.cancelButtonText}>{t('cancel')}</Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -217,7 +217,7 @@ export default function LandlordProfilesScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Landlord Profiles</Text>
+        <Text style={styles.title}>{t('landlordProfiles')}</Text>
         <TouchableOpacity
           style={styles.addButton}
           onPress={() => {
@@ -232,7 +232,7 @@ export default function LandlordProfilesScreen() {
       {landlords.length === 0 ? (
         <View style={styles.emptyContainer}>
           <MaterialCommunityIcons name="folder-open" size={48} color="#ccc" />
-          <Text style={styles.emptyText}>No profiles yet</Text>
+          <Text style={styles.emptyText}>{t('noLandlordsYet')}</Text>
         </View>
       ) : (
         <FlatList

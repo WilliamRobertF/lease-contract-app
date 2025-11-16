@@ -38,6 +38,15 @@ export default function DrawerMenu({ navigation }: DrawerMenuProps) {
 
   const menuItems: MenuItem[] = [
     {
+      id: "home",
+      label: t("home"),
+      icon: "home-outline" as keyof typeof MaterialCommunityIcons.glyphMap,
+      onPress: () => {
+        setVisible(false);
+        navigation?.navigate("Home");
+      },
+    },
+    {
       id: "language-header",
       label: languageExpanded ? t("languageMenu") : `${t("languageMenu")} ▼`,
       icon: "translate",

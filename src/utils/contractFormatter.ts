@@ -91,7 +91,7 @@ export function formatContract(data: ContractDataForFormat, allClauses: Clause[]
         // do not aggressively replace bare KEY to avoid accidental replacement, skip re4
       });
       const clauseNumber = numberToPortugueseOrdinal(idx + 1);
-      return `CLÁUSULA ${clauseNumber}: ${c.title}\n${content}`;
+      return `CLÁUSULA ${clauseNumber}: ${content}`;
     })
     .join('\n\n');
 

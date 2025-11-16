@@ -104,14 +104,35 @@ function generateContractHTML(
       }
       return trimmed;
     });
+  
+  // Group lines: clause headers with their content (no break between them)
   let clausesHtml = "";
-
+  let currentClauseBlock = "";
+  
   textLines.forEach((line: string) => {
-    const trimmedLine = line.trim();
-    if (trimmedLine.length > 0) {
-      clausesHtml += `<p style="text-align: justify; margin-bottom: 12pt;"><strong>${trimmedLine}</strong></p>`;
+    const isClauseHeader = line.match(/^CLÁUSULA\s+/);
+    
+    if (isClauseHeader) {
+      // If we have accumulated text, output it as a paragraph
+      if (currentClauseBlock) {
+        clausesHtml += `<p style="text-align: justify; margin-bottom: 12pt;"><strong>${currentClauseBlock}</strong></p>`;
+      }
+      // Start new clause block
+      currentClauseBlock = line;
+    } else {
+      // Add content to current clause block (space-separated, no line break)
+      if (currentClauseBlock) {
+        currentClauseBlock += " " + line;
+      } else {
+        currentClauseBlock = line;
+      }
     }
   });
+  
+  // Don't forget the last block
+  if (currentClauseBlock) {
+    clausesHtml += `<p style="text-align: justify; margin-bottom: 12pt;"><strong>${currentClauseBlock}</strong></p>`;
+  }
 
   return `
 <!DOCTYPE html>

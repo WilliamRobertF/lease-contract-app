@@ -4,38 +4,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { LandlordProfile } from '../types/contractTypes';
-import { getLandlords, getProperties, getTemplates, getGeneratedContracts } from '../utils/storageManager';
 
 export default function HomeScreen() {
   const { t } = useTranslation();
   const navigation = useNavigation();
-  const [landlordCount, setLandlordCount] = useState(0);
-  const [propertyCount, setPropertyCount] = useState(0);
-  const [templateCount, setTemplateCount] = useState(0);
-  const [activeContractCount, setActiveContractCount] = useState(0);
-
-  useFocusEffect(
-    React.useCallback(() => {
-      loadCounts();
-    }, [])
-  );
-
-  const loadCounts = async () => {
-    const landlords = await getLandlords();
-    const properties = await getProperties();
-    const templates = await getTemplates();
-    const generatedContracts = await getGeneratedContracts();
-    
-    setLandlordCount(landlords.length);
-    setPropertyCount(properties.length);
-    setTemplateCount(templates.length);
-    
-    // Count active contracts (where end date is after today)
-    const today = new Date();
-    const activeCount = generatedContracts.filter(contract => contract.endDate > today).length;
-    setActiveContractCount(activeCount);
-  };
 
   const QuickActionButton = ({
     icon,
@@ -58,128 +30,71 @@ export default function HomeScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       <ScrollView style={styles.content}>
-        {/* HEADER */}
         <View style={styles.header}>
           <Text style={styles.welcomeTitle}>{t('welcome')}</Text>
           <Text style={styles.subtitle}>Manage your rental contracts efficiently</Text>
         </View>
 
-        {/* QUICK ACTIONS */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Quick Actions</Text>
+          <Text style={styles.sectionTitle}>{t('quickActions')}</Text>
           <View style={styles.actionGrid}>
             <QuickActionButton
               icon="account-plus"
               label={t('addLandlord')}
               color="#4caf50"
-              onPress={() => navigation.navigate('LandlordProfiles' as never)}
+              onPress={() => navigation.navigate('Home', { screen: 'LandlordProfiles' } as never)}
             />
             <QuickActionButton
               icon="home-plus"
               label={t('addProperty')}
               color="#ff9800"
-              onPress={() => navigation.navigate('PropertyProfiles' as never)}
+              onPress={() => navigation.navigate('Home', { screen: 'PropertyProfiles' } as never)}
             />
             <QuickActionButton
               icon="file-document-plus"
               label={t('newContract')}
               color="#1976d2"
-              onPress={() => navigation.navigate('ContractGeneration' as never)}
+              onPress={() => navigation.navigate('Home', { screen: 'ContractGeneration' } as never)}
             />
             <QuickActionButton
               icon="file-check"
-              label="My Contracts"
+              label={t('viewMyContracts')}
               color="#9c27b0"
-              onPress={() => navigation.navigate('GeneratedContracts' as never)}
-            />
-            <QuickActionButton
-              icon="cog"
-              label={t('settings')}
-              color="#f44336"
-              onPress={() => navigation.navigate('Settings' as never)}
+              onPress={() => navigation.navigate('Home', { screen: 'GeneratedContracts' } as never)}
             />
           </View>
         </View>
 
-        {/* STATS */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('overview')}</Text>
-          <View style={styles.statsContainer}>
-            <View style={styles.statCard}>
-              <MaterialCommunityIcons name="account" size={32} color="#4caf50" />
-              <Text style={styles.statValue}>{landlordCount}</Text>
-              <Text style={styles.statLabel}>{t('activeLandlords')}</Text>
+          <Text style={styles.sectionTitle}>💡 {t('tips')}</Text>
+          <View style={styles.tipsContainer}>
+            <View style={styles.tipCard}>
+              <MaterialCommunityIcons name="lightbulb-outline" size={20} color="#ff9800" />
+              <View style={styles.tipContent}>
+                <Text style={styles.tipTitle}>Dica 1</Text>
+                <Text style={styles.tipText}>Crie cláusulas obrigatórias e opcionais para padronizar seus contratos</Text>
+              </View>
             </View>
-            <View style={styles.statCard}>
-              <MaterialCommunityIcons name="home" size={32} color="#ff9800" />
-              <Text style={styles.statValue}>{propertyCount}</Text>
-              <Text style={styles.statLabel}>{t('properties')}</Text>
+            <View style={styles.tipCard}>
+              <MaterialCommunityIcons name="lightbulb-outline" size={20} color="#4caf50" />
+              <View style={styles.tipContent}>
+                <Text style={styles.tipTitle}>Dica 2</Text>
+                <Text style={styles.tipText}>Organize seus modelos de contrato por tipo de propriedade</Text>
+              </View>
             </View>
-            <View style={styles.statCard}>
-              <MaterialCommunityIcons name="file-document" size={32} color="#1976d2" />
-              <Text style={styles.statValue}>{templateCount}</Text>
-              <Text style={styles.statLabel}>{t('activeTemplates')}</Text>
+            <View style={styles.tipCard}>
+              <MaterialCommunityIcons name="lightbulb-outline" size={20} color="#2196f3" />
+              <View style={styles.tipContent}>
+                <Text style={styles.tipTitle}>Dica 3</Text>
+                <Text style={styles.tipText}>Exporte seus contratos em PDF para compartilhamento fácil</Text>
+              </View>
             </View>
-          </View>
-          <View style={styles.statsContainer}>
-            <View style={[styles.statCard, { flex: 1 }]}>
-              <MaterialCommunityIcons name="file-check" size={32} color="#9c27b0" />
-              <Text style={styles.statValue}>{activeContractCount}</Text>
-              <Text style={styles.statLabel}>{t('activeContracts')}</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* FEATURES */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Features</Text>
-          <View style={styles.featureList}>
-            <FeatureItem
-              icon="check-circle"
-              title="Landlord Profiles"
-              description="Save landlord data to reuse across contracts"
-            />
-            <FeatureItem
-              icon="check-circle"
-              title="Property Profiles"
-              description="Store property details for quick selection"
-            />
-            <FeatureItem
-              icon="check-circle"
-              title="Customizable Clauses"
-              description="Edit and create contract templates"
-            />
-            <FeatureItem
-              icon="check-circle"
-              title="Multi-Step Workflow"
-              description="Generate contracts step by step"
-            />
           </View>
         </View>
       </ScrollView>
     </SafeAreaView>
-  );
-}
-
-function FeatureItem({
-  icon,
-  title,
-  description,
-}: {
-  icon: string;
-  title: string;
-  description: string;
-}) {
-  return (
-    <View style={styles.featureItem}>
-      <MaterialCommunityIcons name={icon as any} size={20} color="#4caf50" />
-      <View style={styles.featureContent}>
-        <Text style={styles.featureTitle}>{title}</Text>
-        <Text style={styles.featureDescription}>{description}</Text>
-      </View>
-    </View>
   );
 }
 
@@ -262,29 +177,32 @@ const styles = StyleSheet.create({
     marginTop: 4,
     textAlign: 'center',
   },
-  featureList: {
+  tipsContainer: {
     gap: 12,
   },
-  featureItem: {
+  tipCard: {
+    backgroundColor: '#f5f5f5',
+    borderLeftWidth: 4,
+    borderLeftColor: '#1976d2',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 12,
     flexDirection: 'row',
     alignItems: 'flex-start',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    backgroundColor: '#f9f9f9',
-    borderRadius: 8,
+    gap: 12,
   },
-  featureContent: {
+  tipContent: {
     flex: 1,
-    marginLeft: 12,
   },
-  featureTitle: {
+  tipTitle: {
     fontSize: 13,
     fontWeight: '600',
     color: '#333',
+    marginBottom: 3,
   },
-  featureDescription: {
+  tipText: {
     fontSize: 12,
-    color: '#999',
-    marginTop: 2,
+    color: '#666',
+    lineHeight: 16,
   },
 });

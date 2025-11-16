@@ -64,9 +64,9 @@ export function formatContract(data: ContractDataForFormat, allClauses: Clause[]
   values['START_DATE'] = data.startDate ? format(data.startDate, 'dd/MM/yyyy') : '';
   values['END_DATE'] = data.endDate ? format(data.endDate, 'dd/MM/yyyy') : '';
 
-  // Always include clauses 1 and 2, then add the rest from template
-  const mandatoryClauseIds = ['clause-1', 'clause-2'];
-  const allClauseIds = [...new Set([...mandatoryClauseIds, ...data.template.clauseIds])];
+  // Always include clauses marked as obligatory, then add the ones from template
+  const obligatoryClauses = allClauses.filter(c => c.category === 'obligatory').map(c => c.id);
+  const allClauseIds = [...new Set([...obligatoryClauses, ...data.template.clauseIds])];
   
   const selectedClauses: Clause[] = allClauseIds
     .map((id) => allClauses.find((c) => c.id === id))
@@ -94,19 +94,8 @@ export function formatContract(data: ContractDataForFormat, allClauses: Clause[]
   return clausesText;
 }
 
-// Remove clause titles from formatted contract text, keeping only "CLÁUSULA X:"
+// This function is kept for backward compatibility but is now a no-op
+// since clause titles are already removed during formatting
 export function removeClauseTitles(formattedText: string): string {
-  return formattedText
-    .split('\n')
-    .map((line: string) => {
-      const trimmed = line.trim();
-      // Match lines like "CLÁUSULA PRIMEIRA: SEÚNGA - PRAZO DE LOCAÇÃO"
-      const match = trimmed.match(/^(CLÁUSULA\s+[A-ZÁÉÍÓÚ\s]+):\s+.+/);
-      if (match) {
-        // Return just "CLÁUSULA PRIMEIRA:"
-        return match[1] + ':';
-      }
-      return line;
-    })
-    .join('\n');
+  return formattedText;
 }

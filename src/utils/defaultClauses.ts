@@ -11,7 +11,7 @@ export const DEFAULT_CLAUSES: Clause[] = [
     id: 'clause-2',
     title: 'Segunda - Prazo da Locação',
     category: 'obligatory',
-    content: `O prazo da locação é de 01 ano, iniciando-se em 10 (dez) de agosto de 2025 e a terminar em 10 (dez) de agosto de 2026, independentemente de aviso, notificação ou interpelação judicial ou mesmo extrajudicial.`,
+    content: `O prazo da locação inicia-se em ${"{START_DATE}"} e termina em ${"{END_DATE}"}, independentemente de aviso, notificação ou interpelação judicial ou mesmo extrajudicial.`,
   },
   {
     id: 'clause-3',

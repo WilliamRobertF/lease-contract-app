@@ -44,6 +44,9 @@ const validationSchema = Yup.object().shape({
       const num = parseFloat(value.replace(',', '.'));
       return num > 0;
     }),
+  dueDay: Yup.number()
+    .min(1, 'Due day must be between 1 and 31')
+    .max(31, 'Due day must be between 1 and 31'),
 });
 
 const initialValues: ContractData = {
@@ -256,6 +259,30 @@ export default function ContractFormScreen() {
                 </View>
 
                 <View style={styles.section}>
+                  <Text style={styles.sectionTitle}>{t('dueDay') || 'Vencimento do Aluguel'}</Text>
+                  <TextInput
+                    style={[
+                      styles.input,
+                      touched.dueDay && errors.dueDay
+                        ? styles.inputError
+                        : undefined,
+                    ]}
+                    placeholder="1-31"
+                    value={String(values.dueDay || 1)}
+                    onChangeText={(text) => {
+                      const num = parseInt(text) || 1;
+                      if (num >= 1 && num <= 31) {
+                        setFieldValue('dueDay', num);
+                      }
+                    }}
+                    keyboardType="number-pad"
+                  />
+                  {touched.dueDay && errors.dueDay && (
+                    <Text style={styles.errorText}>{errors.dueDay}</Text>
+                  )}
+                </View>
+
+                <View style={styles.section}>
                   <Text style={styles.sectionTitle}>{t('monthlyRent')}</Text>
                   <View style={styles.inputWithPrefix}>
                     <Text style={styles.inputPrefix}>R$</Text>
@@ -268,8 +295,7 @@ export default function ContractFormScreen() {
                           : undefined,
                       ]}
                       placeholder="0,00"
-                      keyboardType="default"
-                      value={String(values.monthlyRent || '0,00')}
+                      value={values.monthlyRent}
                       onChangeText={(text) => {
                         setFieldValue('monthlyRent', text || '0,00');
                       }}

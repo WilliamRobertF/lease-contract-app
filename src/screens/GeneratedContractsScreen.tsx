@@ -18,6 +18,7 @@ import { GeneratedContract } from '../types/contractTypes';
 import { getGeneratedContracts, deleteGeneratedContract, getClauses, getLandlords } from '../utils/storageManager';
 import { formatContract } from '../utils/contractFormatter';
 import { exportToPDF } from '../utils/pdfExporter';
+import { exportToDOCX } from '../utils/docxExporter';
 
 export default function GeneratedContractsScreen() {
   const { t } = useTranslation();
@@ -54,7 +55,6 @@ export default function GeneratedContractsScreen() {
         return;
       }
 
-      // Construct property for formatter
       const formattedOutput = formatContract(
         {
           landlord,
@@ -109,8 +109,7 @@ export default function GeneratedContractsScreen() {
 
   const handleCopyToClipboard = async () => {
     try {
-      // React Native doesn't have native clipboard in Expo, so we'll show an alert
-      Alert.alert('Copy', 'Contract text copied to clipboard (feature depends on device)', [
+      Alert.alert('Copy', 'Contract text copied (feature depends on device)', [
         { text: 'OK' },
       ]);
     } catch (error) {
@@ -121,14 +120,24 @@ export default function GeneratedContractsScreen() {
   const handleExportPDF = async () => {
     try {
       const fileName = `contrato_${selectedContract?.tenant.name}_${formatDate(new Date(), 'dd_MM_yyyy')}.pdf`;
-      await exportToPDF(formattedText, fileName);
+      await exportToPDF(formattedText, fileName, selectedContract);
     } catch (error) {
       Alert.alert('Error', 'Failed to export PDF');
       console.error('Error exporting PDF:', error);
     }
   };
 
-  const renderContractItem = ({ item }: { item: GeneratedContract }) => {
+  const handleExportDOCX = async () => {
+    try {
+      const fileName = `contrato_${selectedContract?.tenant.name}_${formatDate(new Date(), 'dd_MM_yyyy')}.docx`;
+      await exportToDOCX(formattedText, fileName, selectedContract);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to export DOCX');
+      console.error('Error exporting DOCX:', error);
+    }
+  };
+
+    const renderContractItem = ({ item }: { item: GeneratedContract }) => {
     const today = new Date();
     const isActive = item.endDate > today;
 
@@ -139,27 +148,37 @@ export default function GeneratedContractsScreen() {
       >
         <View style={styles.cardContent}>
           <View style={styles.cardHeader}>
-            <Text style={styles.contractTitle}>{item.tenant.name}</Text>
+            <View style={styles.cardTitleSection}>
+              <Text style={styles.contractTitle}>{item.tenant.name}</Text>
+              <Text style={styles.contractProperty}>{item.property.description}</Text>
+            </View>
             {isActive ? (
               <View style={styles.activeBadge}>
+                <MaterialCommunityIcons name="check-circle" size={16} color="#4caf50" />
                 <Text style={styles.activeBadgeText}>{t('activeContracts')}</Text>
               </View>
             ) : (
               <View style={styles.inactiveBadge}>
-                <Text style={styles.inactiveBadgeText}>Inactive</Text>
+                <MaterialCommunityIcons name="close-circle" size={16} color="#f44336" />
+                <Text style={styles.inactiveBadgeText}>{t('inactiveContract')}</Text>
               </View>
             )}
           </View>
 
-          <Text style={styles.contractDetail}>
-            {item.property.description}
-          </Text>
-          <Text style={styles.contractDetail}>
-            {formatDate(item.startDate, 'dd/MM/yyyy')} - {formatDate(item.endDate, 'dd/MM/yyyy')}
-          </Text>
-          <Text style={styles.contractDetail}>
-            R$ {item.monthlyRent.toFixed(2)}
-          </Text>
+          <View style={styles.cardDetails}>
+            <View style={styles.detailRow}>
+              <MaterialCommunityIcons name="calendar" size={16} color="#666" />
+              <Text style={styles.contractDetail}>
+                {formatDate(item.startDate, 'dd/MM/yyyy')} - {formatDate(item.endDate, 'dd/MM/yyyy')}
+              </Text>
+            </View>
+            <View style={styles.detailRow}>
+              <MaterialCommunityIcons name="currency-brl" size={16} color="#666" />
+              <Text style={styles.contractDetail}>
+                R$ {item.monthlyRent.toFixed(2).replace('.', ',')}
+              </Text>
+            </View>
+          </View>
         </View>
 
         <TouchableOpacity
@@ -173,15 +192,15 @@ export default function GeneratedContractsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       <View style={styles.header}>
-        <Text style={styles.title}>Generated Contracts</Text>
+        <Text style={styles.title}>{t('generatedContracts')}</Text>
       </View>
 
       {contracts.length === 0 ? (
         <View style={styles.emptyContainer}>
           <MaterialCommunityIcons name="file-document-outline" size={48} color="#ccc" />
-          <Text style={styles.emptyText}>No contracts generated yet</Text>
+          <Text style={styles.emptyText}>{t('noContracts')}</Text>
         </View>
       ) : (
         <FlatList
@@ -202,54 +221,64 @@ export default function GeneratedContractsScreen() {
         }}
       >
         <SafeAreaView style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <TouchableOpacity
-              onPress={() => {
-                setSelectedContract(null);
-                setFormattedText('');
-              }}
-              style={styles.modalButton}
-            >
-              <MaterialCommunityIcons name="close" size={24} color="#333" />
-            </TouchableOpacity>
-            <Text style={styles.modalTitle}>Contract Preview</Text>
-            <View style={styles.headerRightButtons}>
+            <View style={styles.modalHeader}>
               <TouchableOpacity
-                onPress={handleExportPDF}
+                onPress={() => {
+                  setSelectedContract(null);
+                  setFormattedText('');
+                }}
                 style={styles.modalButton}
               >
-                <MaterialCommunityIcons name="file-pdf-box" size={24} color="#d32f2f" />
+                <MaterialCommunityIcons name="close" size={24} color="#333" />
               </TouchableOpacity>
-              <TouchableOpacity
-                onPress={handleCopyToClipboard}
-                style={styles.modalButton}
+              <Text style={styles.modalTitle}>{t('contractPreview')}</Text>
+              <View style={styles.headerRightButtons}>
+                <TouchableOpacity
+                  onPress={handleExportPDF}
+                  style={styles.modalButton}
+                >
+                  <MaterialCommunityIcons name="file-pdf-box" size={24} color="#d32f2f" />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleExportDOCX}
+                  style={styles.modalButton}
+                >
+                  <MaterialCommunityIcons name="file-word-box" size={24} color="#2196f3" />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleCopyToClipboard}
+                  style={styles.modalButton}
+                >
+                  <MaterialCommunityIcons name="content-copy" size={24} color="#1976d2" />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {loading ? (
+              <View style={styles.loadingContainer}>
+                <Text style={styles.loadingText}>Loading contract...</Text>
+              </View>
+            ) : (
+              <ScrollView 
+                style={styles.modalContent}
+                scrollEnabled={true}
+                keyboardShouldPersistTaps="handled"
               >
-                <MaterialCommunityIcons name="content-copy" size={24} color="#1976d2" />
+                <Text style={styles.formattedContractText}>{formattedText}</Text>
+                <View style={{ height: 20 }} />
+              </ScrollView>
+            )}
+
+            {selectedContract && (
+              <TouchableOpacity
+                style={styles.deleteModalButton}
+                onPress={() => handleDeleteContract(selectedContract.id)}
+              >
+                <MaterialCommunityIcons name="trash-can" size={20} color="#fff" />
+                <Text style={styles.deleteModalButtonText}>Delete Contract</Text>
               </TouchableOpacity>
-            </View>
-          </View>
-
-          {loading ? (
-            <View style={styles.loadingContainer}>
-              <Text style={styles.loadingText}>Loading contract...</Text>
-            </View>
-          ) : (
-            <ScrollView style={styles.modalContent}>
-              <Text style={styles.formattedContractText}>{formattedText}</Text>
-              <View style={{ height: 20 }} />
-            </ScrollView>
-          )}
-
-          {selectedContract && (
-            <TouchableOpacity
-              style={styles.deleteModalButton}
-              onPress={() => handleDeleteContract(selectedContract.id)}
-            >
-              <MaterialCommunityIcons name="trash-can" size={20} color="#fff" />
-              <Text style={styles.deleteModalButtonText}>Delete Contract</Text>
-            </TouchableOpacity>
-          )}
-        </SafeAreaView>
+            )}
+          </SafeAreaView>
       </Modal>
     </SafeAreaView>
   );
@@ -262,7 +291,7 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 6,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },
@@ -291,41 +320,62 @@ const styles = StyleSheet.create({
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 6,
+    alignItems: 'flex-start',
+    marginBottom: 8,
+    gap: 12,
+  },
+  cardTitleSection: {
+    flex: 1,
   },
   contractTitle: {
     fontSize: 14,
     fontWeight: '600',
     color: '#333',
-    flex: 1,
+  },
+  contractProperty: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 2,
+  },
+  cardDetails: {
+    gap: 6,
+  },
+  detailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   activeBadge: {
-    backgroundColor: '#4caf50',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#e8f5e9',
     borderRadius: 4,
     paddingHorizontal: 8,
     paddingVertical: 4,
+    gap: 4,
   },
   activeBadgeText: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '600',
-    color: '#fff',
+    color: '#2e7d32',
   },
   inactiveBadge: {
-    backgroundColor: '#999',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ffebee',
     borderRadius: 4,
     paddingHorizontal: 8,
     paddingVertical: 4,
+    gap: 4,
   },
   inactiveBadgeText: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '600',
-    color: '#fff',
+    color: '#c62828',
   },
   contractDetail: {
     fontSize: 12,
     color: '#666',
-    marginTop: 4,
   },
   deleteButton: {
     padding: 8,

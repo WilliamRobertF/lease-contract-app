@@ -165,7 +165,7 @@ export default function GeneratedContractsScreen() {
             <View style={styles.detailRow}>
               <MaterialCommunityIcons name="currency-brl" size={16} color="#666" />
               <Text style={styles.contractDetail}>
-                R$ {typeof item.monthlyRent === 'string' ? item.monthlyRent : item.monthlyRent.toFixed(2).replace('.', ',')}
+                {typeof item.monthlyRent === 'string' ? item.monthlyRent : item.monthlyRent.toFixed(2).replace('.', ',')}
               </Text>
             </View>
           </View>

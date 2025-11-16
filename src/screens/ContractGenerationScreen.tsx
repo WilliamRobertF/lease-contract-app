@@ -51,7 +51,7 @@ export default function ContractGenerationScreen() {
   const [contractData, setContractData] = useState<Partial<ContractData>>({
     startDate: new Date(),
     endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
-    monthlyRent: '0,00',
+    monthlyRent: '',
     dueDay: 1,
   });
 
@@ -115,7 +115,7 @@ export default function ContractGenerationScreen() {
         property: contractData.property.data,
         startDate: contractData.startDate || new Date(),
         endDate: contractData.endDate || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
-        monthlyRent: String(contractData.monthlyRent || '0,00'),
+        monthlyRent: String(contractData.monthlyRent || ''),
         dueDay: contractData.dueDay || 1,
         guaranteeInstallments: 0,
         adjustmentIndex: '',
@@ -146,7 +146,7 @@ export default function ContractGenerationScreen() {
     setContractData({
       startDate: new Date(),
       endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
-      monthlyRent: '0,00',
+      monthlyRent: '',
       dueDay: 1,
     });
   };
@@ -348,11 +348,11 @@ export default function ContractGenerationScreen() {
 
             <FormField
               label={t('monthlyRent')}
-              value={String(contractData.monthlyRent || '0,00')}
+              value={String(contractData.monthlyRent || '')}
               onChangeText={(text) =>
                 setContractData({
                   ...contractData,
-                  monthlyRent: text || '0,00',
+                  monthlyRent: text,
                 })
               }
               keyboardType="default"

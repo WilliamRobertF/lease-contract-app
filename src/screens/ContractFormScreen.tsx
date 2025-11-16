@@ -75,7 +75,7 @@ const initialValues: ContractData = {
   },
   startDate: new Date(),
   endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
-  monthlyRent: '0,00',
+  monthlyRent: '',
   dueDay: 1,
   guaranteeInstallments: 0,
   adjustmentIndex: '',
@@ -293,9 +293,9 @@ export default function ContractFormScreen() {
                     ]}
                     placeholder="0,00"
                     value={values.monthlyRent}
-                    onChangeText={(text) => {
-                      setFieldValue('monthlyRent', text || '0,00');
-                    }}
+                    onChangeText={(text) =>
+                      setFieldValue('monthlyRent', text)
+                    }
                     keyboardType="default"
                   />
                   {touched.monthlyRent && errors.monthlyRent && (

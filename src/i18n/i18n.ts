@@ -9,9 +9,22 @@ const resources = {
   pt: { translation: pt },
 };
 
+let deviceLanguage = 'pt';
+
+try {
+  const RNLocalize = require('react-native-localize');
+  if (RNLocalize && RNLocalize.getLocales) {
+    const locale = RNLocalize.getLocales()[0];
+    deviceLanguage = locale?.languageCode || 'pt';
+  }
+} catch (error) {
+  // RNLocalize not available (web or not properly installed)
+  console.warn('RNLocalize not available, using default locale');
+}
+
 i18n.use(initReactI18next).init({
   resources,
-  lng: RNLocalize.getLocales()[0].languageCode || 'pt', // detecta o idioma do dispositivo
+  lng: RNLocalize.getLocales()[0].languageCode || 'pt', // detects device language
   fallbackLng: "en",
   interpolation: {
     escapeValue: false,

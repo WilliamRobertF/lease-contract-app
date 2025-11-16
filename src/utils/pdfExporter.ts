@@ -84,50 +84,21 @@ function generateContractHTML(
   const endDateFormatted = formatBrazilianDate(endDate);
   const monthlyRentFormatted = monthlyRent.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-  // Convert contractText lines to bold paragraphs
-  // Process lines: keep "CLÁUSULA X:" but remove clause titles that follow it
+  // Convert contractText to HTML paragraphs
+  // contractText already contains the formatted header and clauses from contractFormatter
   const textLines = contractText
     .split("\n")
     .filter((line: string) => line.trim().length > 0)
-    .map((line: string) => {
-      const trimmed = line.trim();
-      // Check if line matches "CLÁUSULA PRIMEIRA: title" pattern and extract just "CLÁUSULA PRIMEIRA:"
-      const clauseMatch = trimmed.match(/^(CLÁUSULA\s+[A-ZÁÉÍÓÚ\s]+):\s+.+/);
-      if (clauseMatch) {
-        // Return just "CLÁUSULA PRIMEIRA:" without the title
-        return clauseMatch[1] + ':';
-      }
-      return trimmed;
-    });
+    .map((line: string) => line.trim());
   
-  // Group lines: clause headers with their content (no break between them)
-  let clausesHtml = "";
-  let currentClauseBlock = "";
+  // Process lines: include all content from header and clauses
+  let contractHtml = "";
   
   textLines.forEach((line: string) => {
-    const isClauseHeader = line.match(/^CLÁUSULA\s+/);
-    
-    if (isClauseHeader) {
-      // If we have accumulated text, output it as a paragraph
-      if (currentClauseBlock) {
-        clausesHtml += `<p style="text-align: justify; margin-bottom: 12pt;"><strong>${currentClauseBlock}</strong></p>`;
-      }
-      // Start new clause block
-      currentClauseBlock = line;
-    } else {
-      // Add content to current clause block (space-separated, no line break)
-      if (currentClauseBlock) {
-        currentClauseBlock += " " + line;
-      } else {
-        currentClauseBlock = line;
-      }
+    if (line.length > 0) {
+      contractHtml += `<p style="text-align: justify; margin-bottom: 12pt;"><strong>${line}</strong></p>`;
     }
   });
-  
-  // Don't forget the last block
-  if (currentClauseBlock) {
-    clausesHtml += `<p style="text-align: justify; margin-bottom: 12pt;"><strong>${currentClauseBlock}</strong></p>`;
-  }
 
   return `
 <!DOCTYPE html>
@@ -216,25 +187,7 @@ function generateContractHTML(
 <h1>CONTRATO DE LOCAÇÃO RESIDENCIAL</h1>
 
 <div class="parties">
-  <p><strong>São partes neste instrumento:</strong></p>
-
-  <p><strong>LOCADOR(A):</strong> ${landlordName.toUpperCase()}, ${landlordNationality}, ${landlordMaritalStatus}, portador(a) do RG nº ${landlordRG} e inscrito(a) no CPF/MF nº ${landlordCPF}, nascido(a) em ${landlordBirthplace}.</p>
-
-  <p><strong>LOCATÁRIO(A):</strong> Senhor(a) ${tenantName.toUpperCase()}, ${tenantNationality}, portador(a) do RG nº ${tenantRG} e inscrito(a) no CPF nº ${tenantCPF}, nascido(a) em ${tenantBirthplace}.</p>
-
-  ${
-    guarantorName
-      ? `<p><strong>FIADOR(A):</strong> ${guarantorName.toUpperCase()}, portador(a) do RG nº ${guarantorRG} e inscrito(a) no CPF nº ${guarantorCPF}.</p>`
-      : ""
-  }
-
-  <p><strong>PRAZO DO CONTRATO:</strong> De ${startDateFormatted} a ${endDateFormatted}.</p>
-
-  <p><strong>ALUGUEL MENSAL:</strong> R$ ${monthlyRentFormatted} (${monthlyRent > 0 ? "Vencimento até o dia " + dueDay : "a combinar"}).</p>
-</div>
-
-<div class="clauses">
-  ${clausesHtml}
+  ${contractHtml}
 </div>
 
 <div class="signature-section">

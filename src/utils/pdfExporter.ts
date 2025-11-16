@@ -144,7 +144,7 @@ function generateContractHTML(
 
     .signature-section {
       margin-top: 40pt;
-      text-align: center;
+      text-align: left;
     }
 
     .signature-block {
@@ -195,10 +195,11 @@ function generateContractHTML(
 ${contractHtml}
 
 <div class="date-location">
-  <p><strong>${city.toUpperCase()} – ${state.toUpperCase()}, _____ de _________________ de ${year}</strong></p>
+  <strong>${city.toUpperCase()} – ${state.toUpperCase()}, _____ de _________________ de ${year}</strong>
 </div>
 
 <div class="signature-section">
+  <div class="signature-block">
     <div class="signature-title">LOCADOR:</div>
     <div class="signature-line"></div>
     <div class="signature-name"><strong>${landlordName.toUpperCase()}</strong></div>

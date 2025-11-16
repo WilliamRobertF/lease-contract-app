@@ -62,11 +62,38 @@ function generateContractHTML(
 
   const city = contractData?.property?.data?.city || "";
   const state = contractData?.property?.data?.state || "";
+  const propertyDescription = contractData?.property?.data?.description || "";
+
+  // Contract financial and date information
+  let monthlyRent = 0;
+  if (typeof contractData?.monthlyRent === 'string') {
+    monthlyRent = parseFloat(contractData.monthlyRent.replace(',', '.'));
+  } else {
+    monthlyRent = contractData?.monthlyRent || 0;
+  }
+  
+  const dueDay = contractData?.dueDay || 1;
+  const startDate = contractData?.startDate ? new Date(contractData.startDate) : new Date();
+  const endDate = contractData?.endDate ? new Date(contractData.endDate) : new Date();
+  
+  // Format dates to Brazilian format (DD/MM/YYYY)
+  const formatBrazilianDate = (date: Date) => {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
+  const startDateFormatted = formatBrazilianDate(startDate);
+  const endDateFormatted = formatBrazilianDate(endDate);
+  const monthlyRentFormatted = monthlyRent.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   // Convert contractText lines to bold paragraphs
+  // Remove lines that contain only clause titles (CLÁUSULA PRIMEIRA:, etc)
   const textLines = contractText
     .split("\n")
-    .filter((line: string) => line.trim().length > 0);
+    .filter((line: string) => line.trim().length > 0)
+    .filter((line: string) => !line.match(/^(São partes|LOCADOR|LOCATÁRIO|FIADOR)/));
   let clausesHtml = "";
 
   textLines.forEach((line: string) => {
@@ -174,6 +201,10 @@ function generateContractHTML(
       ? `<p><strong>FIADOR(A):</strong> ${guarantorName.toUpperCase()}, portador(a) do RG nº ${guarantorRG} e inscrito(a) no CPF nº ${guarantorCPF}.</p>`
       : ""
   }
+
+  <p><strong>PRAZO DO CONTRATO:</strong> De ${startDateFormatted} a ${endDateFormatted}.</p>
+
+  <p><strong>ALUGUEL MENSAL:</strong> R$ ${monthlyRentFormatted} (${monthlyRent > 0 ? "Vencimento até o dia " + dueDay : "a combinar"}).</p>
 </div>
 
 <div class="clauses">

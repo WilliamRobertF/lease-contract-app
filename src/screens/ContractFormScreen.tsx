@@ -265,11 +265,11 @@ export default function ContractFormScreen() {
                       ]}
                       placeholder="0,00"
                       keyboardType="decimal-pad"
-                      value={String(values.monthlyRent).replace('.', ',')}
+                      value={typeof values.monthlyRent === 'number' ? String(values.monthlyRent).replace('.', ',') : String(values.monthlyRent)}
                       onChangeText={(text) => {
-                        // Accept comma and convert to number
-                        const cleaned = text.replace(/[^0-9,]/g, '').replace(',', '.');
-                        setFieldValue('monthlyRent', parseFloat(cleaned) || 0);
+                        // Keep as string with comma for display
+                        const cleaned = text.replace(/[^0-9,]/g, '');
+                        setFieldValue('monthlyRent', cleaned || '0,00');
                       }}
                     />
                   </View>

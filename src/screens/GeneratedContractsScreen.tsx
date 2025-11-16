@@ -47,8 +47,7 @@ export default function GeneratedContractsScreen() {
     try {
       // Se tem formattedContent salvo, usa; senão tenta formatar novamente
       if (contract.formattedContent) {
-        const cleaned = removeClauseTitles(contract.formattedContent);
-        setFormattedText(cleaned);
+        setFormattedText(contract.formattedContent);
       } else {
         const clauses = await getClauses();
         const landlords = await getLandlords();
@@ -71,7 +70,7 @@ export default function GeneratedContractsScreen() {
             template: {
               id: contract.templateId,
               name: '',
-              clauseIds: [],
+              clauseIds: [], // Empty, will use only obligatory clauses
               hasGuarantor: false,
               createdAt: new Date(),
             },
@@ -82,8 +81,7 @@ export default function GeneratedContractsScreen() {
           },
           clauses
         );
-        const cleaned = removeClauseTitles(formattedOutput);
-        setFormattedText(cleaned);
+        setFormattedText(formattedOutput);
       }
     } catch (error) {
       console.error('Error formatting contract:', error);

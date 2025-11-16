@@ -434,19 +434,6 @@ export default function ContractGenerationScreen() {
         <Text style={styles.stepTitle}>{t('preview')}</Text>
 
         <ScrollView style={styles.previewContent} scrollEnabled={true} keyboardShouldPersistTaps="handled">
-          <PreviewSection title={t('landlord')} value={contractData.landlord?.data.name} />
-          <PreviewSection title={t('property')} value={contractData.property?.data.description} />
-          <PreviewSection title={t('tenantName')} value={contractData.tenant?.name} />
-          <PreviewSection
-            title={t('startDate')}
-            value={formatDate(contractData.startDate || new Date(), 'dd/MM/yyyy')}
-          />
-          <PreviewSection
-            title={t('endDate')}
-            value={formatDate(contractData.endDate || new Date(), 'dd/MM/yyyy')}
-          />
-          <PreviewSection title={t('monthlyRent')} value={`R$ ${contractData.monthlyRent}`} />
-
           <View style={styles.previewSection}>
             <Text style={styles.previewLabel}>{t('clauses')}</Text>
             {formattedContract ? (
@@ -454,14 +441,7 @@ export default function ContractGenerationScreen() {
                 <Text style={styles.formattedText}>{formattedContract}</Text>
               </View>
             ) : (
-              contractData.template?.clauseIds.map((clauseId) => {
-                const clause = clauses.find((c) => c.id === clauseId);
-                return clause ? (
-                  <View key={clauseId} style={styles.clausePreview}>
-                    <Text style={styles.clauseTitle}>{clause.title}</Text>
-                  </View>
-                ) : null;
-              })
+              <Text style={styles.formattedText}>Nenhuma cláusula selecionada</Text>
             )}
           </View>
         </ScrollView>

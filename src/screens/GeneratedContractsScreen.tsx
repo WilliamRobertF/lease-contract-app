@@ -201,7 +201,7 @@ export default function GeneratedContractsScreen() {
         }}
       >
         <View style={styles.modalOverlay}>
-          <SafeAreaView style={styles.modalContent} edges={['top', 'bottom']}>
+          <SafeAreaView style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <TouchableOpacity
                 onPress={() => {

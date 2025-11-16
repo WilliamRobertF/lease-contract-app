@@ -134,7 +134,6 @@ export default function ContractGenerationScreen() {
         dueDay: contractData.dueDay || 1,
         contractLocation: contractData.contractLocation || '',
         guaranteeInstallments: 0,
-        adjustmentIndex: '',
         lateFeePercentage: 0,
         monthlyInterestPercentage: 0,
         generatedAt: new Date(),

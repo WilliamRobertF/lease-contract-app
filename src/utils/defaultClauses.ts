@@ -14,7 +14,7 @@ export const DEFAULT_CLAUSES: Clause[] = [
   {
     id: 'clause-3',
     title: 'Terceira - Pagamento do Aluguel',
-    content: `O aluguel mensal deverá ser pago até o dia ${"{DUE_DAY}"} (quinze) do mês subseqüente ao vencido, no local indicado pelo LOCADOR. O valor correspondente é de R$ ${"{RENT}"} mensais, reajustados anualmente, de conformidade com a variação do IGP-M apurada no ano anterior.`,
+    content: `O aluguel mensal deverá ser pago até o dia ${"{DUE_DAY}"} do mês subseqüente ao vencido, no local indicado pelo LOCADOR. O valor correspondente é de R$ ${"{RENT}"} mensais, reajustados anualmente, de conformidade com a variação do IGP-M apurada no ano anterior.`,
   },
   {
     id: 'clause-4',

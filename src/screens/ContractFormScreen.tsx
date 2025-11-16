@@ -77,7 +77,6 @@ const initialValues: ContractData = {
   dueDay: '01',
   contractLocation: '',
   guaranteeInstallments: 0,
-  adjustmentIndex: '',
   lateFeePercentage: 0,
   monthlyInterestPercentage: 0,
   hasGuarantor: false,

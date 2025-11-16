@@ -11,6 +11,9 @@ interface ContractDataForFormat {
   endDate?: Date;
   monthlyRent?: string;
   dueDay?: number;
+  contractLocation?: string;
+  guarantor?: PersonData;
+  hasGuarantor?: boolean;
 }
 
 function safe(val: any) {

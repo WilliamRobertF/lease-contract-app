@@ -50,11 +50,14 @@ export default function ContractGenerationScreen() {
   const [formattedContract, setFormattedContract] = useState<string>('');
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
+  const [hasGuarantorLocal, setHasGuarantorLocal] = useState(false);
+  const [guarantorFormVisible, setGuarantorFormVisible] = useState(false);
   const [contractData, setContractData] = useState<Partial<ContractData>>({
     startDate: new Date(),
     endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
     monthlyRent: '',
     dueDay: 1,
+    contractLocation: '',
     hasGuarantor: false,
   });
 
@@ -232,9 +235,6 @@ export default function ContractGenerationScreen() {
   );
 
   const renderTenantForm = () => {
-    const [hasGuarantorLocal, setHasGuarantorLocal] = useState(false);
-    const [guarantorFormVisible, setGuarantorFormVisible] = useState(false);
-
     return (
     <View style={styles.stepContainer}>
       <Text style={styles.stepTitle}>{t('fillTenantData')}</Text>
@@ -414,6 +414,18 @@ export default function ContractGenerationScreen() {
               placeholder="1-31"
             />
 
+            <FormField
+              label={t('contractLocation')}
+              value={String(contractData.contractLocation || '')}
+              onChangeText={(text) =>
+                setContractData({
+                  ...contractData,
+                  contractLocation: text,
+                })
+              }
+              keyboardType="default"
+            />
+
             {/* Fiador Section */}
             <View style={styles.separatorContainer}>
               <TouchableOpacity
@@ -463,15 +475,12 @@ export default function ContractGenerationScreen() {
             )}
 
             <View style={styles.buttonGroup}>
-              <TouchableOpacity style={styles.backButton} onPress={() => setStep('property')}>
-                <Text style={styles.backButtonText}>{t('back')}</Text>
-              </TouchableOpacity>
               <TouchableOpacity 
                 style={[styles.submitButton, !isValid && styles.submitButtonDisabled]} 
                 onPress={() => handleSubmit()}
                 disabled={!isValid}
               >
-                <Text style={styles.submitButtonText}>{t('next') || 'Próximo'}</Text>
+                <Text style={styles.submitButtonText}>{t('next')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -542,21 +551,9 @@ export default function ContractGenerationScreen() {
           <TouchableOpacity style={styles.backButton} onPress={() => setStep('template')}>
             <Text style={styles.backButtonText}>{t('back')}</Text>
           </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.exportButton}
-            onPress={() => {
-              if (formattedContract) {
-                const fileName = `contrato_${contractData.tenant?.name}_${formatDate(new Date(), 'dd_MM_yyyy')}.pdf`;
-                exportToPDF(formattedContract, fileName, contractData);
-              }
-            }}
-          >
-            <MaterialCommunityIcons name="file-pdf-box" size={20} color="#fff" />
-            <Text style={styles.submitButtonText}>{t('exportPDF')}</Text>
-          </TouchableOpacity>
           <TouchableOpacity style={styles.submitButton} onPress={handleGenerateContract}>
             <MaterialCommunityIcons name="file-check" size={20} color="#fff" />
-            <Text style={styles.submitButtonText}>{t('saveContract')}</Text>
+            <Text style={styles.submitButtonText}>{t('generateContract')}</Text>
           </TouchableOpacity>
         </View>
       </View>

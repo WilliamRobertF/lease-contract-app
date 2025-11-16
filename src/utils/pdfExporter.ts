@@ -60,8 +60,7 @@ function generateContractHTML(
   const guarantorRG = contractData?.guarantor?.rg || "";
   const guarantorCPF = contractData?.guarantor?.cpf || "";
 
-  const city = contractData?.property?.data?.city || "";
-  const state = contractData?.property?.data?.state || "";
+  const contractLocation = contractData?.contractLocation || "";
   const propertyDescription = contractData?.property?.data?.description || "";
 
   // Contract financial and date information
@@ -195,7 +194,7 @@ function generateContractHTML(
 ${contractHtml}
 
 <div class="date-location">
-  <strong>${city.toUpperCase()} – ${state.toUpperCase()}, _____ de _________________ de ${year}</strong>
+  <strong>${contractLocation.toUpperCase()}, _____ de _________________ de ${year}</strong>
 </div>
 
 <div class="signature-section">

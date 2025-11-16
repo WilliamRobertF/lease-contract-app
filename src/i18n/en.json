@@ -128,5 +128,7 @@
   "hasGuarantor": "Include Guarantor",
   "guarantorName": "Guarantor Name",
   "guarantorNameRequired": "Guarantor name is required",
-  "details": "Details"
+  "details": "Details",
+  "next": "Next",
+  "contractLocation": "Contract City/Location"
 }

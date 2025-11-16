@@ -77,6 +77,7 @@ const initialValues: ContractData = {
   endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
   monthlyRent: '',
   dueDay: 1,
+  contractLocation: '',
   guaranteeInstallments: 0,
   adjustmentIndex: '',
   lateFeePercentage: 0,

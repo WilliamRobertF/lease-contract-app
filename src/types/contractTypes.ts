@@ -35,6 +35,7 @@ export interface ContractData {
     endDate: Date;
     monthlyRent: string;
     dueDay: number;
+    contractLocation: string;
     guaranteeInstallments: number;
     adjustmentIndex: string; //IGP-M, IPCA, etc.
     lateFeePercentage: number;
@@ -72,6 +73,7 @@ export interface GeneratedContract {
     endDate: Date;
     monthlyRent: string;
     dueDay: number;
+    contractLocation: string;
     guaranteeInstallments: number;
     adjustmentIndex: string;
     lateFeePercentage: number;

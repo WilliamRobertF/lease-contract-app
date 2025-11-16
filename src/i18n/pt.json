@@ -128,5 +128,7 @@
   "hasGuarantor": "Incluir Fiador",
   "guarantorName": "Nome do Fiador",
   "guarantorNameRequired": "Nome do fiador é obrigatório",
-  "details": "Detalhes"
+  "details": "Detalhes",
+  "next": "Próximo",
+  "contractLocation": "Cidade/Local do Contrato"
 }

@@ -77,9 +77,7 @@ export default function GeneratedContractsScreen() {
             },
             startDate: contract.startDate,
             endDate: contract.endDate,
-            monthlyRent: typeof contract.monthlyRent === 'string' 
-              ? parseFloat(contract.monthlyRent.replace(',', '.'))
-              : contract.monthlyRent,
+            monthlyRent: contract.monthlyRent,
             dueDay: contract.dueDay,
           },
           clauses
@@ -165,7 +163,7 @@ export default function GeneratedContractsScreen() {
             <View style={styles.detailRow}>
               <MaterialCommunityIcons name="currency-brl" size={16} color="#666" />
               <Text style={styles.contractDetail}>
-                {typeof item.monthlyRent === 'string' ? item.monthlyRent : item.monthlyRent.toFixed(2).replace('.', ',')}
+                {item.monthlyRent}
               </Text>
             </View>
           </View>

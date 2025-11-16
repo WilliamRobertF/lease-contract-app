@@ -65,12 +65,7 @@ function generateContractHTML(
   const propertyDescription = contractData?.property?.data?.description || "";
 
   // Contract financial and date information
-  let monthlyRent = 0;
-  if (typeof contractData?.monthlyRent === 'string') {
-    monthlyRent = parseFloat(contractData.monthlyRent.replace(',', '.'));
-  } else {
-    monthlyRent = contractData?.monthlyRent || 0;
-  }
+  const monthlyRent = parseFloat((contractData?.monthlyRent || '0').replace(',', '.'));
   
   const dueDay = contractData?.dueDay || 1;
   const startDate = contractData?.startDate ? new Date(contractData.startDate) : new Date();

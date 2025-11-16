@@ -9,7 +9,7 @@ interface ContractDataForFormat {
   template?: ContractTemplate;
   startDate?: Date;
   endDate?: Date;
-  monthlyRent?: number;
+  monthlyRent?: string;
   dueDay?: number;
 }
 

@@ -149,7 +149,6 @@ export async function getGeneratedContracts(): Promise<GeneratedContract[]> {
     const data = await AsyncStorage.getItem(GENERATED_CONTRACTS_KEY);
     if (!data) return [];
     const contracts = JSON.parse(data);
-    // Convert date strings back to Date objects
     return contracts.map((c: any) => ({
       ...c,
       startDate: new Date(c.startDate),

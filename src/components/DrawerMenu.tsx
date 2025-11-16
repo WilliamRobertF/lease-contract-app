@@ -5,19 +5,12 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
-  FlatList,
+  ScrollView,
   Text,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
-
-interface MenuItem {
-  id: string;
-  label: string;
-  icon: keyof typeof MaterialCommunityIcons.glyphMap;
-  onPress: () => void;
-  isSubItem?: boolean;
-}
+import { saveLanguage } from "../i18n/i18n";
 
 interface DrawerMenuProps {
   navigation?: any;
@@ -26,126 +19,36 @@ interface DrawerMenuProps {
 export default function DrawerMenu({ navigation }: DrawerMenuProps) {
   const { t, i18n } = useTranslation();
   const [visible, setVisible] = useState(false);
-  const [languageExpanded, setLanguageExpanded] = useState(true);
 
   const toggleMenu = () => {
     setVisible(!visible);
   };
 
   const handleLanguageChange = (language: string) => {
-    i18n.changeLanguage(language);
+    saveLanguage(language);
   };
 
-  const menuItems: MenuItem[] = [
-    {
-      id: "home",
-      label: t("home"),
-      icon: "home-outline" as keyof typeof MaterialCommunityIcons.glyphMap,
-      onPress: () => {
+  const MenuItem = ({
+    icon,
+    label,
+    onPress,
+  }: {
+    icon: string;
+    label: string;
+    onPress: () => void;
+  }) => (
+    <TouchableOpacity
+      style={styles.menuItem}
+      onPress={() => {
+        onPress();
         setVisible(false);
-        navigation?.navigate("Home");
-      },
-    },
-    {
-      id: "language-header",
-      label: languageExpanded ? t("languageMenu") : `${t("languageMenu")} ▼`,
-      icon: "translate",
-      onPress: () => setLanguageExpanded(!languageExpanded),
-    },
-    ...(languageExpanded
-      ? [
-          {
-            id: "english",
-            label: t("english"),
-            icon: "circle-outline" as keyof typeof MaterialCommunityIcons.glyphMap,
-            onPress: () => handleLanguageChange("en"),
-            isSubItem: true,
-          },
-          {
-            id: "portuguese",
-            label: t("portuguese"),
-            icon: "circle-outline" as keyof typeof MaterialCommunityIcons.glyphMap,
-            onPress: () => handleLanguageChange("pt"),
-            isSubItem: true,
-          },
-        ]
-      : []),
-    {
-      id: "newContract",
-      label: t("contractForm"),
-      icon: "file-document-plus-outline" as keyof typeof MaterialCommunityIcons.glyphMap,
-      onPress: () => {
-        setVisible(false);
-        navigation?.navigate("ContractGeneration");
-      },
-    },
-    {
-      id: "generatedContracts",
-      label: "Generated Contracts",
-      icon: "file-document-outline" as keyof typeof MaterialCommunityIcons.glyphMap,
-      onPress: () => {
-        setVisible(false);
-        navigation?.navigate("GeneratedContracts");
-      },
-    },
-    {
-      id: "settings",
-      label: t("settings"),
-      icon: "cog-outline" as keyof typeof MaterialCommunityIcons.glyphMap,
-      onPress: () => {
-        setVisible(false);
-        navigation?.navigate("Settings");
-      },
-    },
-    {
-      id: "about",
-      label: t("about"),
-      icon: "help-circle-outline" as keyof typeof MaterialCommunityIcons.glyphMap,
-      onPress: () => {},
-    },
-  ];
-
-  const renderMenuItem = ({ item }: { item: MenuItem }) => {
-    const isLanguageActive =
-      (item.id === "english" && i18n.language === "en") ||
-      (item.id === "portuguese" && i18n.language === "pt");
-
-    // Use different icon based on whether it's the active language
-    const iconName =
-      isLanguageActive && item.isSubItem
-        ? "check-circle"
-        : item.isSubItem
-        ? "circle-outline"
-        : item.icon;
-
-    return (
-      <TouchableOpacity
-        style={[
-          styles.menuItem,
-          item.isSubItem && styles.subMenuItem,
-          isLanguageActive && styles.activeLanguage,
-        ]}
-        onPress={() => {
-          item.onPress();
-          if (!item.isSubItem && item.id !== "language-header") {
-            setVisible(false);
-          }
-        }}
-      >
-        <MaterialCommunityIcons
-          name={iconName as keyof typeof MaterialCommunityIcons.glyphMap}
-          size={24}
-          color={isLanguageActive ? "#1976d2" : "#333"}
-          style={styles.icon}
-        />
-        <Text
-          style={[styles.label, isLanguageActive && styles.activeLabelText]}
-        >
-          {item.label}
-        </Text>
-      </TouchableOpacity>
-    );
-  };
+      }}
+    >
+      <MaterialCommunityIcons name={icon as any} size={22} color="#1976d2" />
+      <Text style={styles.menuItemText}>{label}</Text>
+      <MaterialCommunityIcons name="chevron-right" size={20} color="#ccc" style={{ marginLeft: "auto" }} />
+    </TouchableOpacity>
+  );
 
   return (
     <>
@@ -165,14 +68,96 @@ export default function DrawerMenu({ navigation }: DrawerMenuProps) {
           onPress={toggleMenu}
         >
           <SafeAreaView style={styles.drawer}>
-            <View style={styles.menuContainer}>
-              <FlatList
-                data={menuItems}
-                renderItem={renderMenuItem}
-                keyExtractor={(item) => item.id}
-                scrollEnabled={false}
+            <ScrollView style={styles.menuContainer}>
+              <View style={styles.menuHeader}>
+                <Text style={styles.menuHeaderText}>{t('menuTitle')}</Text>
+                <TouchableOpacity onPress={toggleMenu}>
+                  <MaterialCommunityIcons name="close" size={24} color="#333" />
+                </TouchableOpacity>
+              </View>
+
+              <MenuItem
+                icon="home-outline"
+                label={t('home')}
+                onPress={() => navigation?.navigate('Home')}
               />
-            </View>
+
+              <MenuItem
+                icon="file-document-plus-outline"
+                label={t('contractForm')}
+                onPress={() => navigation?.navigate('ContractGeneration')}
+              />
+
+              <MenuItem
+                icon="file-document-outline"
+                label={t('generatedContracts')}
+                onPress={() => navigation?.navigate('GeneratedContracts')}
+              />
+
+              <MenuItem
+                icon="account-outline"
+                label={t('landlordProfiles')}
+                onPress={() => navigation?.navigate('LandlordProfiles')}
+              />
+
+              <MenuItem
+                icon="home-outline"
+                label={t('propertyProfiles')}
+                onPress={() => navigation?.navigate('PropertyProfiles')}
+              />
+
+              <MenuItem
+                icon="cog-outline"
+                label={t('settings')}
+                onPress={() => navigation?.navigate('Settings')}
+              />
+
+              <View style={styles.divider} />
+
+              <View style={styles.languageSection}>
+                <Text style={styles.languageSectionTitle}>{t('changeLanguage')}</Text>
+                
+                <TouchableOpacity
+                  style={[
+                    styles.languageButton,
+                    i18n.language === 'en' && styles.languageButtonActive
+                  ]}
+                  onPress={() => handleLanguageChange('en')}
+                >
+                  <MaterialCommunityIcons 
+                    name={i18n.language === 'en' ? 'check-circle' : 'circle-outline'} 
+                    size={20} 
+                    color={i18n.language === 'en' ? '#1976d2' : '#999'} 
+                  />
+                  <Text style={[
+                    styles.languageButtonText,
+                    i18n.language === 'en' && styles.languageButtonTextActive
+                  ]}>
+                    {t('english')}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.languageButton,
+                    i18n.language === 'pt' && styles.languageButtonActive
+                  ]}
+                  onPress={() => handleLanguageChange('pt')}
+                >
+                  <MaterialCommunityIcons 
+                    name={i18n.language === 'pt' ? 'check-circle' : 'circle-outline'} 
+                    size={20} 
+                    color={i18n.language === 'pt' ? '#1976d2' : '#999'} 
+                  />
+                  <Text style={[
+                    styles.languageButtonText,
+                    i18n.language === 'pt' && styles.languageButtonTextActive
+                  ]}>
+                    {t('portuguese')}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
           </SafeAreaView>
         </TouchableOpacity>
       </Modal>
@@ -188,7 +173,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.4)",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   drawer: {
     position: "absolute",
@@ -202,29 +187,70 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 8,
   },
-  menuItem: {
+  menuHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 16,
     paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+  },
+  menuHeaderText: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#333",
+  },
+  menuItem: {
     flexDirection: "row",
     alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    gap: 12,
   },
-  subMenuItem: {
-    paddingLeft: 56,
-    backgroundColor: "#f5f5f5",
-  },
-  activeLanguage: {
-    backgroundColor: "#f0f0f0",
-  },
-  icon: {
-    marginRight: 12,
-  },
-  label: {
-    fontSize: 16,
+  menuItemText: {
+    fontSize: 15,
     color: "#333",
+    fontWeight: "500",
     flex: 1,
   },
-  activeLabelText: {
+  divider: {
+    height: 1,
+    backgroundColor: "#eee",
+    marginVertical: 12,
+  },
+  languageSection: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#eee",
+  },
+  languageSectionTitle: {
+    fontSize: 12,
     fontWeight: "600",
+    color: "#999",
+    textTransform: "uppercase",
+    marginBottom: 8,
+  },
+  languageButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    marginBottom: 8,
+    borderRadius: 6,
+    gap: 10,
+  },
+  languageButtonActive: {
+    backgroundColor: "#f0f7ff",
+  },
+  languageButtonText: {
+    fontSize: 14,
+    color: "#666",
+    fontWeight: "500",
+  },
+  languageButtonTextActive: {
     color: "#1976d2",
+    fontWeight: "600",
   },
 });

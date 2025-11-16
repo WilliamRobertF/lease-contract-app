@@ -189,10 +189,6 @@ export default function GeneratedContractsScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
-      <View style={styles.header}>
-        <Text style={styles.title}>{t('generatedContracts')}</Text>
-      </View>
-
       {contracts.length === 0 ? (
         <View style={styles.emptyContainer}>
           <MaterialCommunityIcons name="file-document-outline" size={48} color="#ccc" />
@@ -278,17 +274,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-  },
-  header: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
+    paddingTop: 12,
   },
   listContent: {
     paddingHorizontal: 16,

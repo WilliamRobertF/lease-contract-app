@@ -219,10 +219,6 @@ export default function LandlordProfilesScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>{t('landlordProfiles')}</Text>
-      </View>
-
       {landlords.length === 0 ? (
         <View style={styles.emptyContainer}>
           <MaterialCommunityIcons name="folder-open" size={48} color="#ccc" />
@@ -266,17 +262,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-  },
-  header: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
+    paddingTop: 12,
   },
   title: {
     fontSize: 18,

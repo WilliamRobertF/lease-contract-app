@@ -131,7 +131,7 @@ export default function ContractTemplatesScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <ScrollView style={styles.content}>
         <View style={styles.createSection}>
           <Text style={styles.sectionTitle}>{t('createTemplate')}</Text>

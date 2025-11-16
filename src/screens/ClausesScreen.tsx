@@ -103,7 +103,7 @@ export default function ClausesScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <ScrollView style={styles.content}>
         <View style={styles.clausesHeader}>
           <Text style={styles.sectionTitle}>{t('availableClauses')}</Text>

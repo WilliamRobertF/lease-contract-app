@@ -123,7 +123,7 @@ export default function PropertyProfilesScreen() {
 
   if (editingId || editingData) {
     return (
-      <SafeAreaView style={styles.container} edges={['bottom']}>
+      <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
         <ScrollView style={styles.scrollView}>
           <Formik
             initialValues={editingData || initialValues}
@@ -250,7 +250,7 @@ export default function PropertyProfilesScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       {properties.length === 0 ? (
         <View style={styles.emptyContainer}>
           <MaterialCommunityIcons name="home-outline" size={48} color="#ccc" />

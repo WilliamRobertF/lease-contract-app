@@ -118,7 +118,7 @@ export default function LandlordProfilesScreen() {
 
   if (editingId || editingData) {
     return (
-      <SafeAreaView style={styles.container} edges={['bottom']}>
+      <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
         <ScrollView style={styles.scrollView}>
           <Formik
             initialValues={editingData || initialValues}
@@ -218,7 +218,7 @@ export default function LandlordProfilesScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       {landlords.length === 0 ? (
         <View style={styles.emptyContainer}>
           <MaterialCommunityIcons name="folder-open" size={48} color="#ccc" />

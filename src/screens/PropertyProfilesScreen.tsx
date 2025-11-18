@@ -9,7 +9,7 @@ import {
   FlatList,
   Alert,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { useTranslation } from 'react-i18next';
@@ -18,6 +18,8 @@ import { PropertyProfile, PropertyData } from '../types/contractTypes';
 import { getProperties, saveProperty, deleteProperty } from '../utils/storageManager';
 import PrimaryButton from '../components/PrimaryButton';
 import SecondaryButton from '../components/SecondaryButton';
+import AutocompleteInput from '../components/AutocompleteInput';
+import { BRAZILIAN_CITIES, SALVADOR_NEIGHBORHOODS } from '../utils/constants';
 
 function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -45,13 +47,27 @@ const initialValues: PropertyData = {
 
 export default function PropertyProfilesScreen() {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   const [properties, setProperties] = useState<PropertyProfile[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingData, setEditingData] = useState<PropertyData | null>(null);
+  const [cityStateValue, setCityStateValue] = useState('');
 
   useEffect(() => {
     loadProperties();
   }, []);
+
+  useEffect(() => {
+    if (editingData) {
+      if (editingData.city && editingData.state) {
+        setCityStateValue(`${editingData.city}, ${editingData.state}`);
+      } else {
+        setCityStateValue('');
+      }
+    } else {
+      setCityStateValue('');
+    }
+  }, [editingData]);
 
   const loadProperties = async () => {
     const data = await getProperties();
@@ -68,6 +84,7 @@ export default function PropertyProfilesScreen() {
       await saveProperty(profile);
       setEditingId(null);
       setEditingData(null);
+      setCityStateValue('');
     } else {
       const profile: PropertyProfile = {
         id: generateId(),
@@ -75,6 +92,7 @@ export default function PropertyProfilesScreen() {
         data: values,
       };
       await saveProperty(profile);
+      setCityStateValue('');
     }
     loadProperties();
   };
@@ -130,7 +148,7 @@ export default function PropertyProfilesScreen() {
             validationSchema={validationSchema}
             onSubmit={handleSave}
           >
-            {({ values, errors, touched, handleChange, handleSubmit }) => (
+            {({ values, errors, touched, handleChange, handleSubmit, setFieldValue }) => (
               <View style={styles.formContainer}>
                 <Text style={styles.title}>{t('addProperty')}</Text>
 
@@ -190,54 +208,55 @@ export default function PropertyProfilesScreen() {
 
                 <View style={styles.section}>
                   <Text style={styles.label}>{t('neighborhood')}</Text>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Neighborhood"
+                  <AutocompleteInput
                     value={values.neighborhood}
                     onChangeText={handleChange('neighborhood')}
+                    placeholder="Neighborhood"
+                    suggestions={SALVADOR_NEIGHBORHOODS}
+                    allowCustom={true}
                   />
                   {touched.neighborhood && errors.neighborhood && (
                     <Text style={styles.errorText}>{errors.neighborhood}</Text>
                   )}
                 </View>
 
-                <View style={styles.row}>
-                  <View style={styles.section}>
-                    <Text style={styles.label}>{t('city')}</Text>
-                    <TextInput
-                      style={styles.input}
-                      placeholder="City"
-                      value={values.city || ''}
-                      onChangeText={handleChange('city')}
-                    />
-                  </View>
-
-                  <View style={styles.section}>
-                    <Text style={styles.label}>{t('state')}</Text>
-                    <TextInput
-                      style={styles.input}
-                      placeholder="State"
-                      maxLength={2}
-                      value={values.state || ''}
-                      onChangeText={handleChange('state')}
-                    />
-                  </View>
+                <View style={styles.section}>
+                  <Text style={styles.label}>{t('city')} e {t('state')}</Text>
+                  <AutocompleteInput
+                    value={cityStateValue}
+                    onChangeText={(text) => {
+                      setCityStateValue(text);
+                      // Parse "City, State" format
+                      const parts = text.split(',').map(p => p.trim());
+                      if (parts.length >= 2) {
+                        setFieldValue('city', parts[0]);
+                        setFieldValue('state', parts[1]);
+                      } else {
+                        setFieldValue('city', text);
+                        setFieldValue('state', '');
+                      }
+                    }}
+                    placeholder="Ex: Salvador, Bahia"
+                    suggestions={BRAZILIAN_CITIES}
+                    allowCustom={true}
+                  />
                 </View>
 
                 <View style={styles.buttonGroup}>
-                  <PrimaryButton
-                    label={t('save')}
-                    onPress={() => handleSubmit()}
-                    icon="check"
-                    style={{ flex: 1 }}
-                  />
                   <SecondaryButton
                     label={t('cancel')}
                     onPress={() => {
                       setEditingId(null);
                       setEditingData(null);
+                      setCityStateValue('');
                     }}
                     icon="close"
+                    style={{ flex: 1 }}
+                  />
+                  <PrimaryButton
+                    label={t('save')}
+                    onPress={() => handleSubmit()}
+                    icon="check"
                     style={{ flex: 1, marginLeft: 12 }}
                   />
                 </View>
@@ -273,7 +292,7 @@ export default function PropertyProfilesScreen() {
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.listContent}
           />
-          <View style={styles.addButtonContainer}>
+          <View style={[styles.addButtonContainer, { paddingBottom: insets.bottom + 12 }]}>
             <PrimaryButton
               label={t('addProperty')}
               onPress={() => {

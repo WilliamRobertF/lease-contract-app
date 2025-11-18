@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   ScrollView,
@@ -7,22 +7,22 @@ import {
   StyleSheet,
   Alert,
   TextInput,
+  Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import Collapsible from 'react-native-collapsible';
 import { DEFAULT_CLAUSES } from '../utils/defaultClauses';
-import { saveClauses, getDefaultCity, setDefaultCity } from '../utils/storageManager';
-import LanguageSelector from '../components/LanguageSelector';
+import { saveClauses } from '../utils/storageManager';
+import { saveLanguage } from '../i18n/i18n';
 
 export default function SettingsScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigation = useNavigation();
   const [showLanguageSelector, setShowLanguageSelector] = useState(false);
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
-  const [defaultCity, setDefaultCityState] = useState('Salvador, Bahia');
-  const [isEditingCity, setIsEditingCity] = useState(false);
 
   const handleResetFactory = () => {
     Alert.alert(
@@ -52,12 +52,14 @@ export default function SettingsScreen() {
     description,
     onPress,
     isDangerous = false,
+    hideChevron = false,
   }: {
     icon: string;
     title: string;
     description?: string;
     onPress: () => void;
     isDangerous?: boolean;
+    hideChevron?: boolean;
   }) => (
     <TouchableOpacity
       style={[styles.settingItem, isDangerous && styles.settingItemDangerous]}
@@ -83,7 +85,9 @@ export default function SettingsScreen() {
           )}
         </View>
       </View>
-      <MaterialCommunityIcons name="chevron-right" size={24} color="#ccc" />
+      {!hideChevron && (
+        <MaterialCommunityIcons name="chevron-right" size={24} color="#ccc" />
+      )}
     </TouchableOpacity>
   );
 
@@ -91,14 +95,66 @@ export default function SettingsScreen() {
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <ScrollView style={styles.content}>
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('settings')}</Text>
 
           <SettingItem
-            icon="translate"
+            icon={showLanguageSelector ? "chevron-up" : "chevron-down"}
             title={t('changeLanguage')}
             description={`${t('english')} / ${t('portuguese')}`}
-            onPress={() => setShowLanguageSelector(true)}
+            onPress={() => setShowLanguageSelector(!showLanguageSelector)}
+            hideChevron={true}
           />
+
+          <Collapsible collapsed={!showLanguageSelector} duration={300}>
+            <View style={styles.collapsibleContent}>
+              <TouchableOpacity
+                style={[
+                  styles.languageOption,
+                  i18n.language === 'en' && styles.languageOptionActive,
+                ]}
+                onPress={() => {
+                  saveLanguage('en');
+                }}
+              >
+                <MaterialCommunityIcons
+                  name={i18n.language === 'en' ? 'check-circle' : 'circle-outline'}
+                  size={20}
+                  color={i18n.language === 'en' ? '#1976d2' : '#999'}
+                />
+                <Text
+                  style={[
+                    styles.languageText,
+                    i18n.language === 'en' && styles.languageTextActive,
+                  ]}
+                >
+                  {t('english')}
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.languageOption,
+                  i18n.language === 'pt' && styles.languageOptionActive,
+                ]}
+                onPress={() => {
+                  saveLanguage('pt');
+                }}
+              >
+                <MaterialCommunityIcons
+                  name={i18n.language === 'pt' ? 'check-circle' : 'circle-outline'}
+                  size={20}
+                  color={i18n.language === 'pt' ? '#1976d2' : '#999'}
+                />
+                <Text
+                  style={[
+                    styles.languageText,
+                    i18n.language === 'pt' && styles.languageTextActive,
+                  ]}
+                >
+                  {t('portuguese')}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </Collapsible>
 
           <SettingItem
             icon="file-document"
@@ -124,37 +180,11 @@ export default function SettingsScreen() {
             icon={showAdvancedSettings ? "chevron-up" : "chevron-down"}
             title={t('advancedSettings')}
             onPress={() => setShowAdvancedSettings(!showAdvancedSettings)}
+            hideChevron={true}
           />
 
-          {showAdvancedSettings && (
-            <View style={styles.advancedContent}>
-              <SettingItem
-                icon="map-marker"
-                title={t('defaultCityForContracts')}
-                description={t('defaultCityForContracts')}
-                onPress={() => setIsEditingCity(!isEditingCity)}
-              />
-              {isEditingCity && (
-                <View style={styles.cityEditContainer}>
-                  <TextInput
-                    style={styles.cityInput}
-                    value={defaultCity}
-                    onChangeText={setDefaultCityState}
-                    placeholder="e.g., Salvador, Bahia"
-                  />
-                  <TouchableOpacity
-                    style={styles.saveCityButton}
-                    onPress={async () => {
-                      await setDefaultCity(defaultCity);
-                      setIsEditingCity(false);
-                      Alert.alert('Sucesso', 'Cidade padrão atualizada');
-                    }}
-                  >
-                    <Text style={styles.saveCityButtonText}>Salvar</Text>
-                  </TouchableOpacity>
-                </View>
-              )}
-              
+          <Collapsible collapsed={!showAdvancedSettings} duration={300}>
+            <View style={styles.collapsibleContent}>
               <SettingItem
                 icon="refresh"
                 title={t('resetToFactoryDefaults')}
@@ -163,14 +193,9 @@ export default function SettingsScreen() {
                 isDangerous={true}
               />
             </View>
-          )}
+          </Collapsible>
         </View>
       </ScrollView>
-
-      <LanguageSelector
-        visible={showLanguageSelector}
-        onClose={() => setShowLanguageSelector(false)}
-      />
     </SafeAreaView>
   );
 }
@@ -188,38 +213,33 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: 24,
   },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#333',
+    marginBottom: 12,
+  },
   advancedSection: {
     marginBottom: 32,
+    borderRadius: 8,
+    overflow: 'hidden',
   },
   advancedContent: {
-    marginTop: 8,
+    marginTop: 0,
+    marginBottom: 12,
+    backgroundColor: '#f5f5f5',
+    paddingVertical: 8,
+    overflow: 'hidden',
   },
-  cityEditContainer: {
-    backgroundColor: '#f9f9f9',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 10,
-    gap: 8,
+  collapsibleContent: {
+    backgroundColor: '#f5f5f5',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    marginBottom: 12,
   },
-  cityInput: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 14,
-    backgroundColor: '#fff',
-  },
-  saveCityButton: {
-    backgroundColor: '#1976d2',
-    borderRadius: 6,
-    paddingVertical: 10,
-    alignItems: 'center',
-  },
-  saveCityButtonText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 14,
+  advancedItem: {
+    paddingHorizontal: 0,
+    marginBottom: 0,
   },
   settingItem: {
     flexDirection: 'row',
@@ -255,6 +275,31 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#999',
     marginTop: 4,
+  },
+  languageOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderRadius: 6,
+    gap: 10,
+    backgroundColor: '#fff',
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+  },
+  languageOptionActive: {
+    backgroundColor: '#f0f7ff',
+    borderColor: '#1976d2',
+  },
+  languageText: {
+    fontSize: 14,
+    color: '#666',
+    fontWeight: '500',
+  },
+  languageTextActive: {
+    color: '#1976d2',
+    fontWeight: '600',
   },
 });
 

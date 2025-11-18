@@ -120,7 +120,7 @@ export default function HomeScreen() {
                     <View style={styles.alertContent}>
                       <Text style={styles.alertTitle}>{contract.tenant.name}</Text>
                       <Text style={styles.alertText}>
-                        {t('expiresIn')} {daysLeft} {daysLeft === 1 ? t('day') : t('days')} ({formatDate(contract.endDate, 'dd/MM/yyyy')})
+                        {`${t('expiresIn')} ${daysLeft} ${daysLeft === 1 ? t('day') : t('days')} (${formatDate(contract.endDate, 'dd/MM/yyyy')})`}
                       </Text>
                     </View>
                   </View>

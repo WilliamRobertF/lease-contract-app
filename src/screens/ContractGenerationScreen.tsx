@@ -481,7 +481,7 @@ export default function ContractGenerationScreen() {
 
             {guarantorFormVisible && (
               <View style={styles.guarantorFormContainer}>
-                <Text style={styles.guarantorFormTitle}>{t('guarantor')} {t('details')}</Text>
+                <Text style={styles.guarantorFormTitle}>{`${t('guarantor')} ${t('details')}`}</Text>
                 
                 <FormField
                   label={t('guarantorName')}

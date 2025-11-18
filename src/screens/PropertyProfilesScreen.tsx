@@ -221,7 +221,7 @@ export default function PropertyProfilesScreen() {
                 </View>
 
                 <View style={styles.section}>
-                  <Text style={styles.label}>{t('city')} e {t('state')}</Text>
+                  <Text style={styles.label}>{t('city')} e Estado</Text>
                   <AutocompleteInput
                     value={cityStateValue}
                     onChangeText={(text) => {

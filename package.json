@@ -17,7 +17,7 @@
     "@react-navigation/native-stack": "^7.6.3",
     "@react-navigation/stack": "^7.6.4",
     "date-fns": "^4.1.0",
-    "expo": "~54.0.23",
+    "expo": "~54.0.24",
     "expo-print": "~15.0.7",
     "expo-sharing": "~14.0.7",
     "formik": "^2.4.9",
@@ -27,7 +27,7 @@
     "react-native": "0.81.5",
     "react-native-autocomplete-dropdown": "^5.0.0",
     "react-native-collapsible": "^1.6.2",
-    "react-native-gesture-handler": "^2.29.1",
+    "react-native-gesture-handler": "~2.28.0",
     "react-native-safe-area-context": "~5.6.0",
     "react-native-screens": "~4.16.0",
     "yup": "^1.7.1"

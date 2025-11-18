@@ -197,7 +197,7 @@ export default function ContractFormScreen() {
                     onPress={() => setShowStartDatePicker(true)}
                   >
                     <Text style={styles.dateButtonText}>
-                      {t('startDate')}: {format(values.startDate, 'MM/dd/yyyy')}
+                      {`${t('startDate')}: ${format(values.startDate, 'MM/dd/yyyy')}`}
                     </Text>
                   </TouchableOpacity>
                   {showStartDatePicker && (
@@ -232,7 +232,7 @@ export default function ContractFormScreen() {
                     onPress={() => setShowEndDatePicker(true)}
                   >
                     <Text style={styles.dateButtonText}>
-                      {t('endDate')}: {format(values.endDate, 'MM/dd/yyyy')}
+                      {`${t('endDate')}: ${format(values.endDate, 'MM/dd/yyyy')}`}
                     </Text>
                   </TouchableOpacity>
                   {showEndDatePicker && (

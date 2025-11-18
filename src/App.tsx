@@ -1,11 +1,13 @@
 import './i18n/i18n';
 import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useTranslation, I18nextProvider } from 'react-i18next';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { TouchableOpacity, Text, View, StyleSheet, Animated } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import i18n from './i18n/i18n';
 import HomeScreen from './screens/HomeScreen';
 import ContractFormScreen from './screens/ContractFormScreen';
@@ -17,18 +19,79 @@ import GeneratedContractsScreen from './screens/GeneratedContractsScreen';
 import ClausesScreen from './screens/ClausesScreen';
 import ContractTemplatesScreen from './screens/ContractTemplatesScreen';
 
-const Stack = createNativeStackNavigator();
+const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 function HomeStack() {
   const { t } = useTranslation();
+  
+  const getBackButtonLabel = (routeName: string) => {
+    const labels: { [key: string]: string } = {
+      'HomeScreen': t('home'),
+      'ContractForm': t('contractForm'),
+      'ContractGeneration': t('newContract'),
+      'GeneratedContracts': t('generatedContracts'),
+      'LandlordProfiles': t('landlordProfiles'),
+      'PropertyProfiles': t('propertyProfiles'),
+      'Settings': t('settings'),
+      'Clauses': t('clauses'),
+      'Templates': t('templates'),
+    };
+    return labels[routeName] || t('back');
+  };
+
   return (
     <Stack.Navigator
-      screenOptions={{
+      screenOptions={({ navigation, route }) => ({
         headerStyle: {
           backgroundColor: '#f8f9fa',
+          elevation: 0,
+          shadowOpacity: 0,
         },
-      }}
+        headerTintColor: '#1976d2',
+        headerTitleStyle: {
+          fontSize: 18,
+          fontWeight: '600',
+          color: '#333',
+        },
+        cardStyleInterpolator: ({ current, layouts }) => {
+          return {
+            cardStyle: {
+              transform: [
+                {
+                  translateX: current.progress.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [layouts.screen.width, 0],
+                  }),
+                },
+              ],
+            },
+          };
+        },
+        headerBackTitleVisible: false,
+        headerLeftContainerStyle: { paddingLeft: 0 },
+        
+        headerLeft: () => {
+          if (!navigation.canGoBack()) return null;
+          
+          const state = navigation.getState();
+          const previousRoute = state.routes[state.index - 1];
+          const backLabel = previousRoute ? getBackButtonLabel(previousRoute.name) : t('back');
+          
+          return (
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              activeOpacity={0.7}
+              style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 8 }}
+            >
+              <MaterialCommunityIcons name="chevron-left" size={26} color="#1976d2" />
+              <Text style={{ fontSize: 16, color: '#1976d2', marginLeft: -4 }}>
+                {backLabel}
+              </Text>
+            </TouchableOpacity>
+          );
+        },
+      })}
     >
       <Stack.Screen 
         name="HomeScreen" 
@@ -40,7 +103,6 @@ function HomeStack() {
         component={ContractFormScreen} 
         options={{
           title: t('contractForm'),
-          headerBackTitle: t('back'),
         }} 
       />
       <Stack.Screen 
@@ -48,7 +110,6 @@ function HomeStack() {
         component={ContractGenerationScreen} 
         options={{
           title: t('newContract'),
-          headerBackTitle: t('back'),
         }} 
       />
       <Stack.Screen 
@@ -56,7 +117,6 @@ function HomeStack() {
         component={GeneratedContractsScreen} 
         options={{
           title: t('generatedContracts'),
-          headerBackTitle: t('back'),
         }} 
       />
       <Stack.Screen 
@@ -64,7 +124,6 @@ function HomeStack() {
         component={LandlordProfilesScreen} 
         options={{
           title: t('landlordProfiles'),
-          headerBackTitle: t('back'),
         }} 
       />
       <Stack.Screen 
@@ -72,29 +131,14 @@ function HomeStack() {
         component={PropertyProfilesScreen} 
         options={{
           title: t('propertyProfiles'),
-          headerBackTitle: t('back'),
         }} 
       />
-    </Stack.Navigator>
-  );
-}
-
-function SettingsStack() {
-  const { t } = useTranslation();
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: '#f8f9fa',
-        },
-      }}
-    >
       <Stack.Screen 
-        name="SettingsScreen" 
+        name="Settings" 
         component={SettingsScreen} 
-        options={{ 
+        options={{
           title: t('settings'),
-          headerBackTitle: t('back'),
+          headerTitleAlign: 'center',
         }} 
       />
       <Stack.Screen 
@@ -102,7 +146,6 @@ function SettingsStack() {
         component={ClausesScreen} 
         options={{
           title: t('clauses'),
-          headerBackTitle: t('back'),
         }} 
       />
       <Stack.Screen 
@@ -110,55 +153,97 @@ function SettingsStack() {
         component={ContractTemplatesScreen} 
         options={{
           title: t('templates'),
-          headerBackTitle: t('back'),
         }} 
       />
     </Stack.Navigator>
   );
 }
 
+
+
 function RootBottomTabNavigator() {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
 
   return (
     <Tab.Navigator
-      screenOptions={{
+      screenOptions={({ route }) => ({
         tabBarActiveTintColor: '#1976d2',
         tabBarInactiveTintColor: '#999',
         tabBarStyle: {
           backgroundColor: '#fff',
           borderTopWidth: 1,
           borderTopColor: '#eee',
-          paddingBottom: 8,
+          paddingBottom: insets.bottom > 0 ? insets.bottom : 8,
           paddingTop: 8,
-          height: 60,
+          height: 60 + (insets.bottom > 0 ? insets.bottom : 0),
         },
         tabBarLabelStyle: {
           fontSize: 12,
           marginBottom: 4,
         },
         headerShown: false,
-      }}
+        lazy: false,
+      })}
     >
       <Tab.Screen 
         name="Home" 
         component={HomeStack} 
-        options={{
-          title: t('home'),
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="home-outline" size={size} color={color} />
-          ),
+        options={({ route, navigation }) => {
+          const state = navigation.getState();
+          const currentRoute = state.routes[state.index];
+          const nestedState = currentRoute.state as any;
+          const currentScreen = nestedState?.routes?.[nestedState?.index]?.name;
+          const isHomeActive = !currentScreen || currentScreen === 'HomeScreen';
+          
+          return {
+            title: t('home'),
+            tabBarIcon: ({ size }) => (
+              <MaterialCommunityIcons 
+                name="home-outline" 
+                size={size} 
+                color={isHomeActive ? '#1976d2' : '#999'} 
+              />
+            ),
+            tabBarLabelStyle: {
+              fontSize: 12,
+              marginBottom: 4,
+              color: isHomeActive ? '#1976d2' : '#999',
+            },
+          };
         }}
       />
       <Tab.Screen 
-        name="Settings" 
-        component={SettingsStack} 
-        options={{
-          title: t('settings'),
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="cog-outline" size={size} color={color} />
-          ),
+        name="SettingsTab" 
+        component={HomeStack} 
+        options={({ route, navigation }) => {
+          const state = navigation.getState();
+          const currentRoute = state.routes[state.index];
+          const nestedState = currentRoute.state as any;
+          const isSettingsActive = nestedState?.routes?.[nestedState?.index]?.name === 'Settings';
+          
+          return {
+            title: t('settings'),
+            tabBarIcon: ({ size }) => (
+              <MaterialCommunityIcons 
+                name="cog-outline" 
+                size={size} 
+                color={isSettingsActive ? '#1976d2' : '#999'} 
+              />
+            ),
+            tabBarLabelStyle: {
+              fontSize: 12,
+              marginBottom: 4,
+              color: isSettingsActive ? '#1976d2' : '#999',
+            },
+          };
         }}
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            e.preventDefault();
+            navigation.navigate('Home', { screen: 'Settings' });
+          },
+        })}
       />
     </Tab.Navigator>
   );

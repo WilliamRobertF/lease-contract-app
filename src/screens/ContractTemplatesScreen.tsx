@@ -5,12 +5,9 @@ import {
   TouchableOpacity,
   Text,
   StyleSheet,
-  FlatList,
   Alert,
   TextInput,
   Modal,
-  KeyboardAvoidingView,
-  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -75,6 +72,10 @@ export default function ContractTemplatesScreen() {
   };
 
   const handleDeleteTemplate = (id: string) => {
+    if (id.startsWith('template-default-')) {
+      Alert.alert(t('error'), t('cannotDeleteDefaultTemplate'));
+      return;
+    }
     Alert.alert(t('areYouSure'), '', [
       { text: t('cancel') },
       {
@@ -86,46 +87,6 @@ export default function ContractTemplatesScreen() {
       },
     ]);
   };
-
-  const renderClauseSelectionItem = ({ item }: { item: Clause }) => (
-    <TouchableOpacity
-      style={[
-        styles.clauseCheckItem,
-        selectedClauses.includes(item.id) && styles.clauseCheckItemActive,
-      ]}
-      onPress={() => toggleClauseSelection(item.id)}
-    >
-      <MaterialCommunityIcons
-        name={
-          selectedClauses.includes(item.id)
-            ? 'checkbox-marked'
-            : 'checkbox-blank-outline'
-        }
-        size={20}
-        color={
-          selectedClauses.includes(item.id) ? '#1976d2' : '#ccc'
-        }
-      />
-      <View style={styles.clauseCheckContent}>
-        <Text style={styles.clauseCheckTitle}>{item.title}</Text>
-      </View>
-    </TouchableOpacity>
-  );
-
-  const renderTemplateItem = ({ item }: { item: ContractTemplate }) => (
-    <TouchableOpacity
-      style={styles.templateItem}
-      onPress={() => setSelectedTemplate(item)}
-    >
-      <View style={styles.templateItemContent}>
-        <Text style={styles.templateName}>{item.name}</Text>
-        <Text style={styles.templateClauseCount}>
-          {item.clauseIds.length} {t('clauses')}
-        </Text>
-      </View>
-      <MaterialCommunityIcons name="chevron-right" size={20} color="#ccc" />
-    </TouchableOpacity>
-  );
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
@@ -141,12 +102,31 @@ export default function ContractTemplatesScreen() {
           />
 
           <Text style={styles.subTitle}>{t('selectClauses')}</Text>
-          <FlatList
-            data={clauses}
-            renderItem={renderClauseSelectionItem}
-            keyExtractor={(item) => item.id}
-            scrollEnabled={false}
-          />
+          {clauses.map((item) => (
+            <TouchableOpacity
+              key={item.id}
+              style={[
+                styles.clauseCheckItem,
+                selectedClauses.includes(item.id) && styles.clauseCheckItemActive,
+              ]}
+              onPress={() => toggleClauseSelection(item.id)}
+            >
+              <MaterialCommunityIcons
+                name={
+                  selectedClauses.includes(item.id)
+                    ? 'checkbox-marked'
+                    : 'checkbox-blank-outline'
+                }
+                size={20}
+                color={
+                  selectedClauses.includes(item.id) ? '#1976d2' : '#ccc'
+                }
+              />
+              <View style={styles.clauseCheckContent}>
+                <Text style={styles.clauseCheckTitle}>{item.title}</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
 
           <View style={styles.buttonContainer}>
             <TouchableOpacity
@@ -164,12 +144,32 @@ export default function ContractTemplatesScreen() {
           {templates.length === 0 ? (
             <Text style={styles.emptyText}>{t('noTemplates')}</Text>
           ) : (
-            <FlatList
-              data={templates}
-              renderItem={renderTemplateItem}
-              keyExtractor={(item) => item.id}
-              scrollEnabled={false}
-            />
+            templates.map((item) => {
+              const isDefault = item.id.startsWith('template-default-');
+              
+              return (
+                <TouchableOpacity
+                  key={item.id}
+                  style={styles.templateItem}
+                  onPress={() => setSelectedTemplate(item)}
+                >
+                  <View style={styles.templateItemContent}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                      <Text style={styles.templateName}>{item.name}</Text>
+                      {isDefault && (
+                        <View style={styles.defaultBadge}>
+                          <Text style={styles.defaultBadgeText}>{t('default')}</Text>
+                        </View>
+                      )}
+                    </View>
+                    <Text style={styles.templateClauseCount}>
+                      {item.clauseIds.length} {t('clauses')}
+                    </Text>
+                  </View>
+                  <MaterialCommunityIcons name="chevron-right" size={20} color="#ccc" />
+                </TouchableOpacity>
+              );
+            })
           )}
         </View>
       </ScrollView>
@@ -189,15 +189,19 @@ export default function ContractTemplatesScreen() {
               <MaterialCommunityIcons name="close" size={24} color="#333" />
             </TouchableOpacity>
             <Text style={styles.modalTitle}>{selectedTemplate?.name}</Text>
-            <TouchableOpacity
-              onPress={() => {
-                handleDeleteTemplate(selectedTemplate!.id);
-                setSelectedTemplate(null);
-              }}
-              style={styles.modalButton}
-            >
-              <MaterialCommunityIcons name="delete" size={24} color="#f44336" />
-            </TouchableOpacity>
+            {!selectedTemplate?.id.startsWith('template-default-') ? (
+              <TouchableOpacity
+                onPress={() => {
+                  handleDeleteTemplate(selectedTemplate!.id);
+                  setSelectedTemplate(null);
+                }}
+                style={styles.modalButton}
+              >
+                <MaterialCommunityIcons name="delete" size={24} color="#f44336" />
+              </TouchableOpacity>
+            ) : (
+              <View style={styles.modalButton} />
+            )}
           </View>
           <ScrollView style={styles.modalContent}>
             {selectedTemplate?.clauseIds.map((clauseId) => {
@@ -379,5 +383,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 22,
     color: '#555',
+  },
+  defaultBadge: {
+    backgroundColor: '#e3f2fd',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  defaultBadgeText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#1976d2',
+    textTransform: 'uppercase',
   },
 });

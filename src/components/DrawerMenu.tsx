@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { saveLanguage } from "../i18n/i18n";
 
 interface DrawerMenuProps {
@@ -18,6 +19,7 @@ interface DrawerMenuProps {
 
 export default function DrawerMenu({ navigation }: DrawerMenuProps) {
   const { t, i18n } = useTranslation();
+  const insets = useSafeAreaInsets();
   const [visible, setVisible] = useState(false);
 
   const toggleMenu = () => {
@@ -68,7 +70,7 @@ export default function DrawerMenu({ navigation }: DrawerMenuProps) {
           onPress={toggleMenu}
         >
           <SafeAreaView style={styles.drawer}>
-            <ScrollView style={styles.menuContainer}>
+            <ScrollView style={[styles.menuContainer, { paddingBottom: insets.bottom + 16 }]}>
               <View style={styles.menuHeader}>
                 <Text style={styles.menuHeaderText}>{t('menuTitle')}</Text>
                 <TouchableOpacity onPress={toggleMenu}>
@@ -109,7 +111,7 @@ export default function DrawerMenu({ navigation }: DrawerMenuProps) {
               <MenuItem
                 icon="cog-outline"
                 label={t('settings')}
-                onPress={() => navigation?.navigate('Settings')}
+                onPress={() => navigation?.navigate('Home', { screen: 'Settings' })}
               />
 
               <View style={styles.divider} />

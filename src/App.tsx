@@ -6,8 +6,9 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useTranslation, I18nextProvider } from 'react-i18next';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { TouchableOpacity, Text, View, StyleSheet, Animated } from 'react-native';
+import { TouchableOpacity, Text, View, StyleSheet, Animated, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import * as Updates from 'expo-updates';
 import i18n from './i18n/i18n';
 import HomeScreen from './screens/HomeScreen';
 import ContractFormScreen from './screens/ContractFormScreen';
@@ -250,6 +251,49 @@ function RootBottomTabNavigator() {
 }
 
 function AppContent() {
+  const { t } = useTranslation();
+
+  React.useEffect(() => {
+    async function checkForUpdates() {
+      if (__DEV__) {
+        // Não verifica updates em desenvolvimento
+        return;
+      }
+
+      try {
+        const update = await Updates.checkForUpdateAsync();
+        
+        if (update.isAvailable) {
+          Alert.alert(
+            t('updateAvailable') || 'Atualização Disponível',
+            t('updateMessage') || 'Uma nova versão do app está disponível. Deseja atualizar agora?',
+            [
+              {
+                text: t('later') || 'Depois',
+                style: 'cancel',
+              },
+              {
+                text: t('update') || 'Atualizar',
+                onPress: async () => {
+                  try {
+                    await Updates.fetchUpdateAsync();
+                    await Updates.reloadAsync();
+                  } catch (e) {
+                    console.error('Erro ao baixar atualização:', e);
+                  }
+                },
+              },
+            ]
+          );
+        }
+      } catch (e) {
+        console.error('Erro ao verificar atualização:', e);
+      }
+    }
+
+    checkForUpdates();
+  }, [t]);
+
   return (
     <SafeAreaProvider>
       <NavigationContainer>

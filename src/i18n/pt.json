@@ -156,5 +156,9 @@
   "optionalFields": "Campos Opcionais",
   "showRGField": "Mostrar campo RG",
   "showCPFField": "Mostrar campo CPF",
-  "showBirthplaceField": "Mostrar campo Local de Nascimento"
+  "showBirthplaceField": "Mostrar campo Local de Nascimento",
+  "updateAvailable": "Atualização Disponível",
+  "updateMessage": "Uma nova versão do app está disponível. Deseja atualizar agora?",
+  "update": "Atualizar",
+  "later": "Depois"
 }

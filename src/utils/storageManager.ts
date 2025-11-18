@@ -7,7 +7,33 @@ const PROPERTIES_KEY = '@lease_app_properties';
 const CLAUSES_KEY = '@lease_app_clauses';
 const TEMPLATES_KEY = '@lease_app_templates';
 const GENERATED_CONTRACTS_KEY = '@lease_app_generated_contracts';
-const DEFAULT_CITY_KEY = '@lease_app_default_city';
+
+const DEFAULT_TEMPLATES: ContractTemplate[] = [
+  {
+    id: 'template-default-complete',
+    name: 'Modelo Padrão Completo',
+    clauseIds: [
+      'clause-1', 'clause-2', 'clause-3', 'clause-4', 'clause-5',
+      'clause-6', 'clause-7', 'clause-8', 'clause-9', 'clause-10',
+      'clause-11', 'clause-12', 'clause-13', 'clause-14', 'clause-15',
+      'clause-16', 'clause-17', 'clause-18'
+    ],
+    hasGuarantor: true,
+    createdAt: new Date(),
+  },
+  {
+    id: 'template-default-no-guarantor',
+    name: 'Modelo Padrão sem Fiador',
+    clauseIds: [
+      'clause-1', 'clause-2', 'clause-3', 'clause-4', 'clause-5',
+      'clause-6', 'clause-7', 'clause-8', 'clause-9', 'clause-10',
+      'clause-11', 'clause-12', 'clause-13', 'clause-14', 'clause-15',
+      'clause-16', 'clause-17'
+    ],
+    hasGuarantor: false,
+    createdAt: new Date(),
+  },
+];
 
 export async function getLandlords(): Promise<LandlordProfile[]> {
   try {
@@ -65,10 +91,21 @@ export async function saveClauses(clauses: Clause[]): Promise<void> {
 export async function getTemplates(): Promise<ContractTemplate[]> {
   try {
     const data = await AsyncStorage.getItem(TEMPLATES_KEY);
-    return data ? JSON.parse(data) : [];
+    if (!data) {
+      return DEFAULT_TEMPLATES;
+    }
+    const customTemplates = JSON.parse(data);
+    // Mescla templates padrão com templates customizados
+    const allTemplates = [...DEFAULT_TEMPLATES];
+    customTemplates.forEach((ct: ContractTemplate) => {
+      if (!allTemplates.find(t => t.id === ct.id)) {
+        allTemplates.push(ct);
+      }
+    });
+    return allTemplates;
   } catch (error) {
     console.error('Error getting templates:', error);
-    return [];
+    return DEFAULT_TEMPLATES;
   }
 }
 
@@ -89,9 +126,16 @@ export async function saveTemplate(template: ContractTemplate): Promise<void> {
 
 export async function deleteTemplate(id: string): Promise<void> {
   try {
+    // Não permite deletar templates padrão
+    if (id.startsWith('template-default-')) {
+      console.warn('Cannot delete default templates');
+      return;
+    }
     const templates = await getTemplates();
     const filtered = templates.filter(t => t.id !== id);
-    await AsyncStorage.setItem(TEMPLATES_KEY, JSON.stringify(filtered));
+    // Salva apenas templates customizados
+    const customTemplates = filtered.filter(t => !t.id.startsWith('template-default-'));
+    await AsyncStorage.setItem(TEMPLATES_KEY, JSON.stringify(customTemplates));
   } catch (error) {
     console.error('Error deleting template:', error);
   }
@@ -184,23 +228,5 @@ export async function deleteGeneratedContract(id: string): Promise<void> {
     await AsyncStorage.setItem(GENERATED_CONTRACTS_KEY, JSON.stringify(filtered));
   } catch (error) {
     console.error('Error deleting generated contract:', error);
-  }
-}
-
-export async function getDefaultCity(): Promise<string> {
-  try {
-    const city = await AsyncStorage.getItem(DEFAULT_CITY_KEY);
-    return city || 'Salvador, Bahia';
-  } catch (error) {
-    console.error('Error getting default city:', error);
-    return 'Salvador, Bahia';
-  }
-}
-
-export async function setDefaultCity(city: string): Promise<void> {
-  try {
-    await AsyncStorage.setItem(DEFAULT_CITY_KEY, city);
-  } catch (error) {
-    console.error('Error setting default city:', error);
   }
 }

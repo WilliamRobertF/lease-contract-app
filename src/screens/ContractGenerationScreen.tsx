@@ -20,9 +20,18 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { formatDate } from 'date-fns';
 import { LandlordProfile, PropertyProfile, ContractTemplate, PersonData, GeneratedContract } from '../types/contractTypes';
-import { getLandlords, getProperties, getTemplates, getClauses, saveGeneratedContract, getDefaultCity } from '../utils/storageManager';
+import { getLandlords, getProperties, getTemplates, getClauses, saveGeneratedContract } from '../utils/storageManager';
 import { formatContract, removeClauseTitles } from '../utils/contractFormatter';
 import { exportToPDF } from '../utils/pdfExporter';
+import AutocompleteInput from '../components/AutocompleteInput';
+import MaritalStatusPicker from '../components/MaritalStatusPicker';
+import {
+  NATIONALITIES_PT,
+  NATIONALITIES_EN,
+  ALL_BIRTHPLACES_PT,
+  ALL_BIRTHPLACES_EN,
+  BRAZILIAN_CITIES,
+} from '../utils/constants';
 
 type Step = 'landlord' | 'property' | 'tenant' | 'template' | 'preview' | 'complete';
 
@@ -40,13 +49,13 @@ interface ContractData {
 }
 
 export default function ContractGenerationScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigation = useNavigation();
   const [step, setStep] = useState<Step>('landlord');
   const [landlords, setLandlords] = useState<LandlordProfile[]>([]);
   const [properties, setProperties] = useState<PropertyProfile[]>([]);
   const [templates, setTemplates] = useState<ContractTemplate[]>([]);
-  const [clauses, setClauses] = useState<any[]>([]);
+  const [clauses, setClauses] = useState<Clause[]>([]);
   const [formattedContract, setFormattedContract] = useState<string>('');
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
@@ -61,24 +70,24 @@ export default function ContractGenerationScreen() {
     hasGuarantor: false,
   });
 
+  const nationalities = i18n.language === 'pt' ? NATIONALITIES_PT : NATIONALITIES_EN;
+  const birthplaces = i18n.language === 'pt' ? ALL_BIRTHPLACES_PT : ALL_BIRTHPLACES_EN;
+
   useEffect(() => {
     loadData();
   }, []);
 
   const loadData = async () => {
-    const [landlordsList, propertiesList, templatesList, clausesList, defaultCity] = await Promise.all([
+    const [landlordsList, propertiesList, templatesList, clausesList] = await Promise.all([
       getLandlords(),
       getProperties(),
       getTemplates(),
       getClauses(),
-      getDefaultCity(),
     ]);
     setLandlords(landlordsList);
     setProperties(propertiesList);
     setTemplates(templatesList);
     setClauses(clausesList);
-    // Update contractData with the saved default city
-    setContractData(prev => ({ ...prev, contractLocation: defaultCity }));
   };
 
   const handleLandlordSelect = (landlord: LandlordProfile) => {
@@ -251,20 +260,22 @@ export default function ContractGenerationScreen() {
           cpf: '',
           birthplace: '',
           guarantorName: contractData.guarantor?.name || '',
-          guarantorNationality: contractData.guarantor?.nationality || 'brasileiro(a)',
+          guarantorNationality: contractData.guarantor?.nationality || 'Brasileiro(a)',
+          guarantorMaritalStatus: contractData.guarantor?.maitalStatus || '',
           guarantorRg: contractData.guarantor?.rg || '',
           guarantorCpf: contractData.guarantor?.cpf || '',
+          guarantorBirthplace: contractData.guarantor?.birthplace || '',
         }}
         validationSchema={Yup.object().shape({
           name: Yup.string().required(t('tenantNameRequired')),
-          cpf: Yup.string().required(t('cpfRequired')),
-          rg: Yup.string().required(t('rgRequired')),
+          cpf: Yup.string(),
+          rg: Yup.string(),
           nationality: Yup.string().required(t('nationalityRequired')),
-          maitalStatus: Yup.string().required(t('maritalStatusRequired')),
-          birthplace: Yup.string().required(t('birthplaceRequired')),
+          maitalStatus: Yup.string(),
+          birthplace: Yup.string(),
           guarantorName: hasGuarantorLocal ? Yup.string().required(t('guarantorNameRequired')) : Yup.string(),
-          guarantorCpf: hasGuarantorLocal ? Yup.string().required(t('cpfRequired')) : Yup.string(),
-          guarantorRg: hasGuarantorLocal ? Yup.string().required(t('rgRequired')) : Yup.string(),
+          guarantorCpf: hasGuarantorLocal ? Yup.string() : Yup.string(),
+          guarantorRg: hasGuarantorLocal ? Yup.string() : Yup.string(),
         })}
         onSubmit={(values) => {
           const tenantData: PersonData = {
@@ -281,8 +292,8 @@ export default function ContractGenerationScreen() {
             nationality: values.guarantorNationality,
             rg: values.guarantorRg,
             cpf: values.guarantorCpf,
-            maitalStatus: '',
-            birthplace: '',
+            maitalStatus: values.guarantorMaritalStatus,
+            birthplace: values.guarantorBirthplace,
           } : undefined;
 
           handleTenantSubmit(tenantData, hasGuarantorLocal, guarantorData);
@@ -308,31 +319,42 @@ export default function ContractGenerationScreen() {
               onChangeText={(text) => setFieldValue('rg', text)}
               error={touched.rg && errors.rg}
             />
-            <FormField
-              label={t('nationality')}
-              value={values.nationality}
-              onChangeText={(text) => setFieldValue('nationality', text)}
-              error={touched.nationality && errors.nationality}
-            />
+            <View style={styles.formField}>
+              <Text style={styles.label}>{t('nationality')}</Text>
+              <AutocompleteInput
+                value={values.nationality}
+                onChangeText={(text) => setFieldValue('nationality', text)}
+                placeholder={t('nationality')}
+                suggestions={nationalities}
+                allowCustom={true}
+              />
+              {touched.nationality && errors.nationality && (
+                <Text style={styles.errorText}>{errors.nationality}</Text>
+              )}
+            </View>
             <View style={styles.formField}>
               <Text style={styles.label}>{t('maritalStatus')}</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Solteiro(a) / Casado(a)"
+              <MaritalStatusPicker
                 value={values.maitalStatus}
-                onChangeText={(text) => setFieldValue('maitalStatus', text)}
-                placeholderTextColor="#999"
+                onValueChange={(text) => setFieldValue('maitalStatus', text)}
               />
               {touched.maitalStatus && errors.maitalStatus && (
                 <Text style={styles.errorText}>{errors.maitalStatus}</Text>
               )}
             </View>
-            <FormField
-              label={t('birthplace')}
-              value={values.birthplace}
-              onChangeText={(text) => setFieldValue('birthplace', text)}
-              error={touched.birthplace && errors.birthplace}
-            />
+            <View style={styles.formField}>
+              <Text style={styles.label}>{t('birthplace')}</Text>
+              <AutocompleteInput
+                value={values.birthplace}
+                onChangeText={(text) => setFieldValue('birthplace', text)}
+                placeholder={t('birthplace')}
+                suggestions={birthplaces}
+                allowCustom={true}
+              />
+              {touched.birthplace && errors.birthplace && (
+                <Text style={styles.errorText}>{errors.birthplace}</Text>
+              )}
+            </View>
 
             <View style={styles.formField}>
               <Text style={styles.label}>{t('startDate')}</Text>
@@ -423,17 +445,21 @@ export default function ContractGenerationScreen() {
               placeholder="01"
             />
 
-            <FormField
-              label={t('contractLocation')}
-              value={String(contractData.contractLocation || '')}
-              onChangeText={(text) =>
-                setContractData({
-                  ...contractData,
-                  contractLocation: text,
-                })
-              }
-              keyboardType="default"
-            />
+            <View style={styles.formField}>
+              <Text style={styles.label}>{t('contractLocation')}</Text>
+              <AutocompleteInput
+                value={String(contractData.contractLocation || '')}
+                onChangeText={(text) =>
+                  setContractData({
+                    ...contractData,
+                    contractLocation: text,
+                  })
+                }
+                placeholder="Ex: Salvador, Bahia"
+                suggestions={BRAZILIAN_CITIES}
+                allowCustom={true}
+              />
+            </View>
 
             {/* Fiador Section */}
             <View style={styles.separatorContainer}>
@@ -475,11 +501,33 @@ export default function ContractGenerationScreen() {
                   onChangeText={(text) => setFieldValue('guarantorRg', text)}
                   error={touched.guarantorRg && errors.guarantorRg}
                 />
-                <FormField
-                  label={t('nationality')}
-                  value={values.guarantorNationality}
-                  onChangeText={(text) => setFieldValue('guarantorNationality', text)}
-                />
+                <View style={styles.formField}>
+                  <Text style={styles.label}>{t('nationality')}</Text>
+                  <AutocompleteInput
+                    value={values.guarantorNationality}
+                    onChangeText={(text) => setFieldValue('guarantorNationality', text)}
+                    placeholder={t('nationality')}
+                    suggestions={nationalities}
+                    allowCustom={true}
+                  />
+                </View>
+                <View style={styles.formField}>
+                  <Text style={styles.label}>{t('maritalStatus')}</Text>
+                  <MaritalStatusPicker
+                    value={values.guarantorMaritalStatus}
+                    onValueChange={(text) => setFieldValue('guarantorMaritalStatus', text)}
+                  />
+                </View>
+                <View style={styles.formField}>
+                  <Text style={styles.label}>{t('birthplace')}</Text>
+                  <AutocompleteInput
+                    value={values.guarantorBirthplace}
+                    onChangeText={(text) => setFieldValue('guarantorBirthplace', text)}
+                    placeholder={t('birthplace')}
+                    suggestions={birthplaces}
+                    allowCustom={true}
+                  />
+                </View>
               </View>
             )}
 

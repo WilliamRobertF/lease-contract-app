@@ -638,14 +638,14 @@ export default function ContractGenerationScreen() {
       </View>
 
       <View style={styles.buttonGroup}>
+        <TouchableOpacity style={styles.backButton} onPress={handleStartOver}>
+          <Text style={styles.backButtonText}>{t('createAnother')}</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.submitButton} onPress={() => {
           navigation.navigate('GeneratedContracts' as never);
         }}>
           <MaterialCommunityIcons name="file-check" size={20} color="#fff" />
           <Text style={styles.submitButtonText}>{t('viewMyContracts')}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.backButton} onPress={handleStartOver}>
-          <Text style={styles.backButtonText}>{t('createAnother')}</Text>
         </TouchableOpacity>
       </View>
     </View>

@@ -84,7 +84,7 @@ export const DEFAULT_CLAUSES: Clause[] = [
   {
     id: 'clause-17',
     title: 'Décima Sétima - Responsabilidade por Fenômenos Naturais',
-    content: `O(a) LOCADOR(a) não será responsabilizado(a) por danos ao imóvel ou aos pertences do(a) LOCATÁRIO(a) causados por fenômenos da natureza, como enchentes, tempestades, vendavais ou raios. O(a) LOCATÁRIO(a) deverá comunicar qualquer ocorrência imediatamente.`,
+    content: `O LOCADOR(A) não será responsabilizado por danos ao imóvel ou aos pertences do LOCATÁRIO(A) causados por fenômenos da natureza, como enchentes, tempestades, vendavais ou raios. O LOCATÁRIO(A) deverá comunicar qualquer ocorrência imediatamente.`,
   },
   {
     id: 'clause-18',

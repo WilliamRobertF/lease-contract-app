@@ -1,6 +1,7 @@
 import { ContractTemplate, Clause } from '../types/contractTypes';
 import { LandlordProfile, PropertyProfile, PersonData } from '../types/contractTypes';
 import { format } from 'date-fns';
+import i18n from '../i18n/i18n';
 
 interface ContractDataForFormat {
   landlord?: LandlordProfile;
@@ -18,6 +19,15 @@ interface ContractDataForFormat {
 
 function safe(val: any) {
   return val === undefined || val === null ? '' : String(val);
+}
+
+// Convert marital status key to translated text
+function getMaritalStatusText(status: string): string {
+  if (!status) return '';
+  if (status === 'single') return i18n.t('single');
+  if (status === 'married') return i18n.t('married');
+  // If it's already text (old data), return as is
+  return status;
 }
 
 // Convert number to Portuguese ordinal in words
@@ -60,12 +70,13 @@ export function formatContract(data: ContractDataForFormat, allClauses: Clause[]
   values['STATE'] = safe(data.property?.data.state);
   values['LANDLORD'] = safe(data.landlord?.data.name);
   values['LANDLORD_NATIONALITY'] = safe(data.landlord?.data.nationality);
-  values['LANDLORD_MARITAL_STATUS'] = safe(data.landlord?.data.maitalStatus);
+  values['LANDLORD_MARITAL_STATUS'] = getMaritalStatusText(data.landlord?.data.maitalStatus || '');
   values['LANDLORD_RG'] = safe(data.landlord?.data.rg);
   values['LANDLORD_CPF'] = safe(data.landlord?.data.cpf);
   values['LANDLORD_BIRTHPLACE'] = safe(data.landlord?.data.birthplace);
   values['TENANT'] = safe(data.tenant?.name);
   values['TENANT_NATIONALITY'] = safe(data.tenant?.nationality);
+  values['TENANT_MARITAL_STATUS'] = getMaritalStatusText(data.tenant?.maitalStatus || '');
   values['TENANT_RG'] = safe(data.tenant?.rg);
   values['TENANT_CPF'] = safe(data.tenant?.cpf);
   values['TENANT_BIRTHPLACE'] = safe(data.tenant?.birthplace);
@@ -89,15 +100,15 @@ export function formatContract(data: ContractDataForFormat, allClauses: Clause[]
   headerParts.push(`São partes neste instrumento:`);
   
   if (values['LANDLORD']) {
-    headerParts.push(`LOCADOR(A): ${values['LANDLORD']}, ${values['LANDLORD_NATIONALITY'] || ''}, ${values['LANDLORD_MARITAL_STATUS'] || ''}, portador(a) do RG nº ${values['LANDLORD_RG'] || ''} e inscrito(a) no CPF/MF nº ${values['LANDLORD_CPF'] || ''}, nascido(a) em ${values['LANDLORD_BIRTHPLACE'] || ''}.`);
+    headerParts.push(`LOCADOR(A): ${values['LANDLORD']}, ${values['LANDLORD_NATIONALITY'] || ''}, ${values['LANDLORD_MARITAL_STATUS'] || ''}, portador do RG nº ${values['LANDLORD_RG'] || ''} e inscrito no CPF/MF nº ${values['LANDLORD_CPF'] || ''}, nascido em ${values['LANDLORD_BIRTHPLACE'] || ''}.`);
   }
 
   if (values['TENANT']) {
-    headerParts.push(`LOCATÁRIO(A): Senhor(a) ${values['TENANT']}, ${values['TENANT_NATIONALITY'] || ''}, portador(a) do RG nº ${values['TENANT_RG'] || ''} e inscrito(a) no CPF nº ${values['TENANT_CPF'] || ''}, nascido(a) em ${values['TENANT_BIRTHPLACE'] || ''}.`);
+    headerParts.push(`LOCATÁRIO(A): Senhor ${values['TENANT']}, ${values['TENANT_NATIONALITY'] || ''}, ${values['TENANT_MARITAL_STATUS'] || ''}, portador do RG nº ${values['TENANT_RG'] || ''} e inscrito no CPF nº ${values['TENANT_CPF'] || ''}, nascido em ${values['TENANT_BIRTHPLACE'] || ''}.`);
   }
 
   if (data.guarantor?.name) {
-    headerParts.push(`FIADOR(A): ${values['GUARANTOR']}, ${values['GUARANTOR_NATIONALITY'] || ''}, portador(a) do RG nº ${values['GUARANTOR_RG'] || ''} e inscrito(a) no CPF nº ${values['GUARANTOR_CPF'] || ''}.`);
+    headerParts.push(`FIADOR(A): ${values['GUARANTOR']}, ${values['GUARANTOR_NATIONALITY'] || ''}, portador do RG nº ${values['GUARANTOR_RG'] || ''} e inscrito no CPF nº ${values['GUARANTOR_CPF'] || ''}.`);
   }
 
   if (data.tenant?.nationality) {

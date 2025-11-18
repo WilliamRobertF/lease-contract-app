@@ -248,10 +248,15 @@ export default function ContractGenerationScreen() {
 
   const renderTenantForm = () => {
     return (
-    <View style={styles.stepContainer}>
-      <Text style={styles.stepTitle}>{t('fillTenantData')}</Text>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ flex: 1 }}
+      keyboardVerticalOffset={100}
+    >
+      <View style={styles.stepContainer}>
+        <Text style={styles.stepTitle}>{t('fillTenantData')}</Text>
 
-      <Formik
+        <Formik
         initialValues={{
           name: '',
           nationality: '',
@@ -300,7 +305,12 @@ export default function ContractGenerationScreen() {
         }}
       >
         {({ values, errors, touched, setFieldValue, handleSubmit, isValid }) => (
-          <View style={styles.formContainer}>
+          <>
+          <ScrollView 
+            style={styles.formContainer}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={true}
+          >
             <FormField
               label={t('tenantName')}
               value={values.name}
@@ -530,20 +540,22 @@ export default function ContractGenerationScreen() {
                 </View>
               </View>
             )}
+          </ScrollView>
 
-            <View style={styles.buttonGroup}>
-              <TouchableOpacity 
-                style={[styles.submitButton, !isValid && styles.submitButtonDisabled]} 
-                onPress={() => handleSubmit()}
-                disabled={!isValid}
-              >
-                <Text style={styles.submitButtonText}>{t('next')}</Text>
-              </TouchableOpacity>
-            </View>
+          <View style={styles.buttonGroup}>
+            <TouchableOpacity 
+              style={[styles.submitButton, !isValid && styles.submitButtonDisabled]} 
+              onPress={() => handleSubmit()}
+              disabled={!isValid}
+            >
+              <Text style={styles.submitButtonText}>{t('next')}</Text>
+            </TouchableOpacity>
           </View>
+          </>
         )}
       </Formik>
     </View>
+    </KeyboardAvoidingView>
     );
   };
 
@@ -749,7 +761,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   formContainer: {
-    flex: 1,
+    flexGrow: 1,
   },
   formField: {
     marginBottom: 12,
@@ -940,11 +952,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#666',
     marginBottom: 12,
-  },
-  errorText: {
-    color: '#d32f2f',
-    fontSize: 12,
-    marginTop: 4,
   },
   submitButtonDisabled: {
     opacity: 0.5,

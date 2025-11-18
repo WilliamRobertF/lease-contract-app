@@ -156,5 +156,9 @@
   "optionalFields": "Optional Fields",
   "showRGField": "Show RG field",
   "showCPFField": "Show CPF field",
-  "showBirthplaceField": "Show Birthplace field"
+  "showBirthplaceField": "Show Birthplace field",
+  "updateAvailable": "Update Available",
+  "updateMessage": "A new version of the app is available. Would you like to update now?",
+  "update": "Update",
+  "later": "Later"
 }

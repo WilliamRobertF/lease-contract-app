@@ -8,8 +8,10 @@ import {
   StyleSheet,
   FlatList,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { useTranslation } from 'react-i18next';
@@ -18,6 +20,14 @@ import { LandlordProfile, PersonData } from '../types/contractTypes';
 import { getLandlords, saveLandlord, deleteLandlord } from '../utils/storageManager';
 import PrimaryButton from '../components/PrimaryButton';
 import SecondaryButton from '../components/SecondaryButton';
+import AutocompleteInput from '../components/AutocompleteInput';
+import MaritalStatusPicker from '../components/MaritalStatusPicker';
+import {
+  NATIONALITIES_PT,
+  NATIONALITIES_EN,
+  ALL_BIRTHPLACES_PT,
+  ALL_BIRTHPLACES_EN,
+} from '../utils/constants';
 
 function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -26,10 +36,10 @@ function generateId(): string {
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Name is required'),
   nationality: Yup.string().required('Nationality is required'),
-  maitalStatus: Yup.string().required('Marital status is required'),
-  rg: Yup.string().required('RG is required'),
-  cpf: Yup.string().required('CPF is required'),
-  birthplace: Yup.string().required('Birthplace is required'),
+  maitalStatus: Yup.string(),
+  rg: Yup.string(),
+  cpf: Yup.string(),
+  birthplace: Yup.string(),
 });
 
 const initialValues: PersonData = {
@@ -42,10 +52,14 @@ const initialValues: PersonData = {
 };
 
 export default function LandlordProfilesScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const insets = useSafeAreaInsets();
   const [landlords, setLandlords] = useState<LandlordProfile[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingData, setEditingData] = useState<PersonData | null>(null);
+
+  const nationalities = i18n.language === 'pt' ? NATIONALITIES_PT : NATIONALITIES_EN;
+  const birthplaces = i18n.language === 'pt' ? ALL_BIRTHPLACES_PT : ALL_BIRTHPLACES_EN;
 
   useEffect(() => {
     loadLandlords();
@@ -119,18 +133,23 @@ export default function LandlordProfilesScreen() {
   if (editingId || editingData) {
     return (
       <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-        <ScrollView style={styles.scrollView}>
-          <Formik
-            initialValues={editingData || initialValues}
-            validationSchema={validationSchema}
-            onSubmit={handleSave}
-          >
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+        >
+          <ScrollView style={styles.scrollView} keyboardShouldPersistTaps="handled">
+            <Formik
+              initialValues={editingData || initialValues}
+              validationSchema={validationSchema}
+              onSubmit={handleSave}
+            >
             {({ values, errors, touched, handleChange, handleSubmit }) => (
               <View style={styles.formContainer}>
                 <Text style={styles.title}>{t('editLandlordProfile')}</Text>
 
                 <View style={styles.section}>
-                  <Text style={styles.label}>{t('tenantName')}</Text>
+                  <Text style={styles.label}>{t('fullName')}</Text>
                   <TextInput
                     style={styles.input}
                     placeholder={t('fullName')}
@@ -144,22 +163,27 @@ export default function LandlordProfilesScreen() {
 
                 <View style={styles.section}>
                   <Text style={styles.label}>{t('nationality')}</Text>
-                  <TextInput
-                    style={styles.input}
-                    placeholder={t('nationality')}
+                  <AutocompleteInput
                     value={values.nationality}
                     onChangeText={handleChange('nationality')}
+                    placeholder={t('nationality')}
+                    suggestions={nationalities}
+                    allowCustom={true}
                   />
+                  {touched.nationality && errors.nationality && (
+                    <Text style={styles.errorText}>{errors.nationality}</Text>
+                  )}
                 </View>
 
                 <View style={styles.section}>
                   <Text style={styles.label}>{t('maritalStatus')}</Text>
-                  <TextInput
-                    style={styles.input}
-                    placeholder={t('maritalStatus')}
+                  <MaritalStatusPicker
                     value={values.maitalStatus}
-                    onChangeText={handleChange('maitalStatus')}
+                    onValueChange={handleChange('maitalStatus')}
                   />
+                  {touched.maitalStatus && errors.maitalStatus && (
+                    <Text style={styles.errorText}>{errors.maitalStatus}</Text>
+                  )}
                 </View>
 
                 <View style={styles.section}>
@@ -184,21 +208,19 @@ export default function LandlordProfilesScreen() {
 
                 <View style={styles.section}>
                   <Text style={styles.label}>{t('birthplace')}</Text>
-                  <TextInput
-                    style={styles.input}
-                    placeholder={t('birthplace')}
+                  <AutocompleteInput
                     value={values.birthplace}
                     onChangeText={handleChange('birthplace')}
+                    placeholder={t('birthplace')}
+                    suggestions={birthplaces}
+                    allowCustom={true}
                   />
+                  {touched.birthplace && errors.birthplace && (
+                    <Text style={styles.errorText}>{errors.birthplace}</Text>
+                  )}
                 </View>
 
                 <View style={styles.buttonGroup}>
-                  <PrimaryButton
-                    label={t('saveProfile')}
-                    onPress={() => handleSubmit()}
-                    icon="check"
-                    style={{ flex: 1 }}
-                  />
                   <SecondaryButton
                     label={t('cancel')}
                     onPress={() => {
@@ -206,6 +228,12 @@ export default function LandlordProfilesScreen() {
                       setEditingData(null);
                     }}
                     icon="close"
+                    style={{ flex: 1 }}
+                  />
+                  <PrimaryButton
+                    label={t('saveProfile')}
+                    onPress={() => handleSubmit()}
+                    icon="check"
                     style={{ flex: 1, marginLeft: 12 }}
                   />
                 </View>
@@ -213,6 +241,7 @@ export default function LandlordProfilesScreen() {
             )}
           </Formik>
         </ScrollView>
+        </KeyboardAvoidingView>
       </SafeAreaView>
     );
   }
@@ -241,7 +270,7 @@ export default function LandlordProfilesScreen() {
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.listContent}
           />
-          <View style={styles.addButtonContainer}>
+          <View style={[styles.addButtonContainer, { paddingBottom: insets.bottom + 12 }]}>
             <PrimaryButton
               label={t('addLandlord')}
               onPress={() => {

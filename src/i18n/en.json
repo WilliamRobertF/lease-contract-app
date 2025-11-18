@@ -142,7 +142,7 @@
   "advancedSettings": "Advanced Settings",
     "resetToFactoryDefaults": "Reset to Factory Defaults",
   "resetDescription": "Delete all data and restore default clauses",
-  "resetConfirmMessage": "This will delete all data and restore default clauses",,
+  "resetConfirmMessage": "This will delete all data and restore default clauses",
   "resetSuccess": "App has been reset to factory defaults",
   "resetError": "Failed to reset app",
   "contractDeletedSuccess": "Contract deleted successfully",

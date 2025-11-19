@@ -8,11 +8,11 @@ import {
   StyleSheet,
   FlatList,
   Alert,
-  KeyboardAvoidingView,
   Platform,
   Keyboard,
   Pressable,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
@@ -146,25 +146,21 @@ export default function PropertyProfilesScreen() {
   if (editingId || editingData) {
     return (
       <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        <Pressable
           style={{ flex: 1 }}
+          onPress={() => Keyboard.dismiss()}
         >
-          <Pressable
-            style={{ flex: 1 }}
-            onPress={() => Keyboard.dismiss()}
+          <KeyboardAwareScrollView
+            keyboardShouldPersistTaps="always"
+            contentContainerStyle={styles.scrollContentContainer}
+            enableAutomaticScroll={true}
+            extraHeight={100}
           >
-            <ScrollView
-              style={styles.scrollView}
-              keyboardShouldPersistTaps="always"
-              contentContainerStyle={styles.scrollContentContainer}
-              scrollEnabled={true}
+            <Formik
+              initialValues={editingData || initialValues}
+              validationSchema={validationSchema}
+              onSubmit={handleSave}
             >
-              <Formik
-                initialValues={editingData || initialValues}
-                validationSchema={validationSchema}
-                onSubmit={handleSave}
-              >
             {({ values, errors, touched, handleChange, handleSubmit, setFieldValue }) => (
               <View style={styles.formContainer}>
                 <Text style={styles.title}>{t('addProperty')}</Text>
@@ -280,9 +276,8 @@ export default function PropertyProfilesScreen() {
               </View>
             )}
             </Formik>
-            </ScrollView>
-          </Pressable>
-        </KeyboardAvoidingView>
+          </KeyboardAwareScrollView>
+        </Pressable>
       </SafeAreaView>
     );
   }

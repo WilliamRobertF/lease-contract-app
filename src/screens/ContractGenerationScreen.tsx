@@ -31,6 +31,7 @@ import {
   ALL_BIRTHPLACES_PT,
   ALL_BIRTHPLACES_EN,
   BRAZILIAN_CITIES,
+  STATE_ABBREVIATIONS,
 } from '../utils/constants';
 
 type Step = 'landlord' | 'property' | 'tenant' | 'template' | 'preview' | 'complete';

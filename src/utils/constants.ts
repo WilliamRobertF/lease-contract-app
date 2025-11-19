@@ -26,6 +26,37 @@ export const NATIONALITIES_PT = [
   'Equatoriano(a)',
 ];
 
+// Mapa de estados brasileiros para siglas
+export const STATE_ABBREVIATIONS: { [key: string]: string } = {
+  'Bahia': 'BA',
+  'São Paulo': 'SP',
+  'Rio de Janeiro': 'RJ',
+  'Distrito Federal': 'DF',
+  'Ceará': 'CE',
+  'Minas Gerais': 'MG',
+  'Amazonas': 'AM',
+  'Paraná': 'PR',
+  'Pernambuco': 'PE',
+  'Rio Grande do Sul': 'RS',
+  'Pará': 'PA',
+  'Goiás': 'GO',
+  'Santa Catarina': 'SC',
+  'Maranhão': 'MA',
+  'Alagoas': 'AL',
+  'Piauí': 'PI',
+  'Mato Grosso do Sul': 'MS',
+  'Mato Grosso': 'MT',
+  'Sergipe': 'SE',
+  'Espírito Santo': 'ES',
+  'Paraíba': 'PB',
+  'Amapá': 'AP',
+  'Acre': 'AC',
+  'Rio Grande do Norte': 'RN',
+  'Rondônia': 'RO',
+  'Roraima': 'RR',
+  'Tocantins': 'TO',
+};
+
 export const NATIONALITIES_EN = [
   'Brazilian',
   'American',

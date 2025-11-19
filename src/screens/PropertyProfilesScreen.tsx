@@ -22,7 +22,7 @@ import { getProperties, saveProperty, deleteProperty } from '../utils/storageMan
 import PrimaryButton from '../components/PrimaryButton';
 import SecondaryButton from '../components/SecondaryButton';
 import AutocompleteInput from '../components/AutocompleteInput';
-import { BRAZILIAN_CITIES, SALVADOR_NEIGHBORHOODS } from '../utils/constants';
+import { BRAZILIAN_CITIES, SALVADOR_NEIGHBORHOODS, STATE_ABBREVIATIONS } from '../utils/constants';
 
 function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -301,11 +301,13 @@ export default function PropertyProfilesScreen() {
                     value={cityStateValue}
                     onChangeText={(text) => {
                       setCityStateValue(text);
-                      // Parse "City, State" format
+                      // Parse "City, State" format and convert state to abbreviation
                       const parts = text.split(',').map(p => p.trim());
                       if (parts.length >= 2) {
                         setFieldValue('city', parts[0]);
-                        setFieldValue('state', parts[1]);
+                        // Convert state name to abbreviation
+                        const stateAbbr = STATE_ABBREVIATIONS[parts[1]] || parts[1];
+                        setFieldValue('state', stateAbbr);
                       } else {
                         setFieldValue('city', text);
                         setFieldValue('state', '');

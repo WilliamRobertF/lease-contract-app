@@ -58,8 +58,13 @@ export default function AutocompleteInput({
           onChangeText={onChangeText}
           placeholder={placeholder}
           onFocus={() => {
-            setShowSuggestions(true);
+            if (value.trim().length > 0) {
+              setShowSuggestions(true);
+            }
             onFocus?.();
+          }}
+          onBlur={() => {
+            setShowSuggestions(false);
           }}
         />
         {value.length > 0 && (

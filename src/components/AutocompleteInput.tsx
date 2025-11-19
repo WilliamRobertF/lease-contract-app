@@ -108,8 +108,7 @@ export default function AutocompleteInput({
 
 const styles = StyleSheet.create({
   container: {
-    position: 'relative',
-    zIndex: 1000,
+    zIndex: 10,
   },
   inputContainer: {
     flexDirection: 'row',
@@ -132,27 +131,27 @@ const styles = StyleSheet.create({
   },
   suggestionsContainer: {
     position: 'absolute',
-    bottom: '100%',
+    top: '100%',
     left: 0,
     right: 0,
     backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: '#ddd',
-    borderBottomWidth: 0,
-    borderTopLeftRadius: 6,
-    borderTopRightRadius: 6,
+    borderTopWidth: 0,
+    borderBottomLeftRadius: 6,
+    borderBottomRightRadius: 6,
     maxHeight: 200,
-    marginBottom: 4,
-    zIndex: 1001,
+    zIndex: 9999,
+    elevation: 10,
     ...Platform.select({
       ios: {
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: -2 },
+        shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
       },
       android: {
-        elevation: 4,
+        elevation: 10,
       },
     }),
   },

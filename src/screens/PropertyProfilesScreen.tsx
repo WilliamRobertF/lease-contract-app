@@ -11,8 +11,6 @@ import {
   Platform,
   Keyboard,
   Pressable,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Formik } from 'formik';
@@ -64,16 +62,13 @@ export default function PropertyProfilesScreen() {
     let keyboardShowListener: any;
     
     if (editingId || editingData) {
-      // Only on Android, use the native Keyboard API to handle scroll
       keyboardShowListener = Keyboard.addListener(
         Platform.OS === 'android' ? 'keyboardDidShow' : 'keyboardWillShow',
         (e: any) => {
-          // Scroll to focused input when keyboard appears
-          // The offset is calculated from TextInput onLayout callback
           if (focusedInputOffset > 0 && scrollViewRef.current) {
             setTimeout(() => {
-              scrollViewRef.current?.scrollToOffset({
-                offset: Math.max(0, focusedInputOffset - 100),
+              scrollViewRef.current?.scrollTo({
+                y: Math.max(0, focusedInputOffset - 150),
                 animated: true,
               });
             }, 100);

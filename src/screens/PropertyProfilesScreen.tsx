@@ -8,6 +8,10 @@ import {
   StyleSheet,
   FlatList,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
+  Pressable,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Formik } from 'formik';
@@ -142,12 +146,25 @@ export default function PropertyProfilesScreen() {
   if (editingId || editingData) {
     return (
       <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-        <ScrollView style={styles.scrollView}>
-          <Formik
-            initialValues={editingData || initialValues}
-            validationSchema={validationSchema}
-            onSubmit={handleSave}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={{ flex: 1 }}
+        >
+          <Pressable
+            style={{ flex: 1 }}
+            onPress={() => Keyboard.dismiss()}
           >
+            <ScrollView
+              style={styles.scrollView}
+              keyboardShouldPersistTaps="always"
+              contentContainerStyle={styles.scrollContentContainer}
+              scrollEnabled={true}
+            >
+              <Formik
+                initialValues={editingData || initialValues}
+                validationSchema={validationSchema}
+                onSubmit={handleSave}
+              >
             {({ values, errors, touched, handleChange, handleSubmit, setFieldValue }) => (
               <View style={styles.formContainer}>
                 <Text style={styles.title}>{t('addProperty')}</Text>
@@ -262,8 +279,10 @@ export default function PropertyProfilesScreen() {
                 </View>
               </View>
             )}
-          </Formik>
-        </ScrollView>
+            </Formik>
+            </ScrollView>
+          </Pressable>
+        </KeyboardAvoidingView>
       </SafeAreaView>
     );
   }
@@ -322,6 +341,9 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+  },
+  scrollContentContainer: {
+    paddingBottom: 300, // Extra space for autocomplete dropdown visibility when keyboard is open
   },
   formContainer: {
     padding: 16,

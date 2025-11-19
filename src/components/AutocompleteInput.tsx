@@ -108,7 +108,7 @@ export default function AutocompleteInput({
 
 const styles = StyleSheet.create({
   container: {
-    zIndex: 10,
+    zIndex: 1000,
   },
   inputContainer: {
     flexDirection: 'row',
@@ -142,7 +142,6 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 6,
     maxHeight: 200,
     zIndex: 9999,
-    elevation: 10,
     ...Platform.select({
       ios: {
         shadowColor: '#000',

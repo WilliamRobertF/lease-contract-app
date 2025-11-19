@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   ScrollView,
@@ -8,7 +8,6 @@ import {
   StyleSheet,
   FlatList,
   Alert,
-  KeyboardAvoidingView,
   Platform,
   Keyboard,
   Pressable,
@@ -23,7 +22,7 @@ import { getProperties, saveProperty, deleteProperty } from '../utils/storageMan
 import PrimaryButton from '../components/PrimaryButton';
 import SecondaryButton from '../components/SecondaryButton';
 import AutocompleteInput from '../components/AutocompleteInput';
-import { BRAZILIAN_CITIES, SALVADOR_NEIGHBORHOODS } from '../utils/constants';
+import { BRAZILIAN_CITIES, BRAZILIAN_NEIGHBORHOODS } from '../utils/constants';
 
 function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -56,6 +55,39 @@ export default function PropertyProfilesScreen() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingData, setEditingData] = useState<PropertyData | null>(null);
   const [cityStateValue, setCityStateValue] = useState('');
+  const scrollViewRef = useRef<ScrollView>(null);
+  const [focusedInputOffset, setFocusedInputOffset] = useState(0);
+
+  useEffect(() => {
+    let keyboardShowListener: any;
+    
+    if (editingId || editingData) {
+      keyboardShowListener = Keyboard.addListener(
+        Platform.OS === 'android' ? 'keyboardDidShow' : 'keyboardWillShow',
+        (e: any) => {
+          if (focusedInputOffset > 0 && scrollViewRef.current) {
+            setTimeout(() => {
+              scrollViewRef.current?.scrollTo({
+                y: Math.max(0, focusedInputOffset - 150),
+                animated: true,
+              });
+            }, 100);
+          }
+        }
+      );
+    }
+
+    return () => {
+      if (keyboardShowListener) {
+        keyboardShowListener.remove();
+      }
+    };
+  }, [editingId, editingData, focusedInputOffset]);
+
+  const loadProperties = async () => {
+    const data = await getProperties();
+    setProperties(data);
+  };
 
   useEffect(() => {
     loadProperties();
@@ -72,11 +104,6 @@ export default function PropertyProfilesScreen() {
       setCityStateValue('');
     }
   }, [editingData]);
-
-  const loadProperties = async () => {
-    const data = await getProperties();
-    setProperties(data);
-  };
 
   const handleSave = async (values: PropertyData) => {
     if (editingId) {
@@ -146,25 +173,21 @@ export default function PropertyProfilesScreen() {
   if (editingId || editingData) {
     return (
       <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        <Pressable
           style={{ flex: 1 }}
+          onPress={() => Keyboard.dismiss()}
         >
-          <Pressable
-            style={{ flex: 1 }}
-            onPress={() => Keyboard.dismiss()}
+          <ScrollView
+            ref={scrollViewRef}
+            keyboardShouldPersistTaps="always"
+            contentContainerStyle={styles.scrollContentContainer}
+            scrollEventThrottle={16}
           >
-            <ScrollView
-              style={styles.scrollView}
-              keyboardShouldPersistTaps="always"
-              contentContainerStyle={styles.scrollContentContainer}
-              scrollEnabled={true}
+            <Formik
+              initialValues={editingData || initialValues}
+              validationSchema={validationSchema}
+              onSubmit={handleSave}
             >
-              <Formik
-                initialValues={editingData || initialValues}
-                validationSchema={validationSchema}
-                onSubmit={handleSave}
-              >
             {({ values, errors, touched, handleChange, handleSubmit, setFieldValue }) => (
               <View style={styles.formContainer}>
                 <Text style={styles.title}>{t('addProperty')}</Text>
@@ -176,6 +199,11 @@ export default function PropertyProfilesScreen() {
                     placeholder="Ex: Casa térrea com 2 quartos"
                     value={values.description}
                     onChangeText={handleChange('description')}
+                    onFocus={(e) => {
+                      e.currentTarget.measure((x, y, width, height, pageX, pageY) => {
+                        setFocusedInputOffset(pageY);
+                      });
+                    }}
                   />
                   {touched.description && errors.description && (
                     <Text style={styles.errorText}>{errors.description}</Text>
@@ -186,9 +214,14 @@ export default function PropertyProfilesScreen() {
                   <Text style={styles.label}>{t('street')}</Text>
                   <TextInput
                     style={styles.input}
-                    placeholder="Street name"
+                    placeholder={t('street')}
                     value={values.street}
                     onChangeText={handleChange('street')}
+                    onFocus={(e) => {
+                      e.currentTarget.measure((x, y, width, height, pageX, pageY) => {
+                        setFocusedInputOffset(pageY);
+                      });
+                    }}
                   />
                   {touched.street && errors.street && (
                     <Text style={styles.errorText}>{errors.street}</Text>
@@ -200,9 +233,14 @@ export default function PropertyProfilesScreen() {
                     <Text style={styles.label}>{t('number')}</Text>
                     <TextInput
                       style={styles.input}
-                      placeholder="Number"
+                      placeholder={t('number')}
                       value={values.number}
                       onChangeText={handleChange('number')}
+                      onFocus={(e) => {
+                        e.currentTarget.measure((x, y, width, height, pageX, pageY) => {
+                          setFocusedInputOffset(pageY);
+                        });
+                      }}
                     />
                     {touched.number && errors.number && (
                       <Text style={styles.errorText}>{errors.number}</Text>
@@ -213,9 +251,14 @@ export default function PropertyProfilesScreen() {
                     <Text style={styles.label}>{t('zipCode')}</Text>
                     <TextInput
                       style={styles.input}
-                      placeholder="ZIP Code"
+                      placeholder={t('zipCode')}
                       value={values.zipCode}
                       onChangeText={handleChange('zipCode')}
+                      onFocus={(e) => {
+                        e.currentTarget.measure((x, y, width, height, pageX, pageY) => {
+                          setFocusedInputOffset(pageY);
+                        });
+                      }}
                     />
                     {touched.zipCode && errors.zipCode && (
                       <Text style={styles.errorText}>{errors.zipCode}</Text>
@@ -223,14 +266,29 @@ export default function PropertyProfilesScreen() {
                   </View>
                 </View>
 
-                <View style={styles.section}>
+                <View 
+                  style={styles.section}
+                  onLayout={(e) => {
+                    e.currentTarget.measure((x, y, width, height, pageX, pageY) => {
+                      // Store the Y position of this section for keyboard scroll
+                    });
+                  }}
+                >
                   <Text style={styles.label}>{t('neighborhood')}</Text>
                   <AutocompleteInput
                     value={values.neighborhood}
                     onChangeText={handleChange('neighborhood')}
-                    placeholder="Neighborhood"
-                    suggestions={SALVADOR_NEIGHBORHOODS}
+                    placeholder={t('neighborhood')}
+                    suggestions={BRAZILIAN_NEIGHBORHOODS}
                     allowCustom={true}
+                    onFocus={() => {
+                      setTimeout(() => {
+                        scrollViewRef.current?.scrollTo({
+                          y: 400,
+                          animated: true,
+                        });
+                      }, 100);
+                    }}
                   />
                   {touched.neighborhood && errors.neighborhood && (
                     <Text style={styles.errorText}>{errors.neighborhood}</Text>
@@ -243,7 +301,7 @@ export default function PropertyProfilesScreen() {
                     value={cityStateValue}
                     onChangeText={(text) => {
                       setCityStateValue(text);
-                      // Parse "City, State" format
+                      // Parse "City, State" format (state is already abbreviated)
                       const parts = text.split(',').map(p => p.trim());
                       if (parts.length >= 2) {
                         setFieldValue('city', parts[0]);
@@ -253,9 +311,17 @@ export default function PropertyProfilesScreen() {
                         setFieldValue('state', '');
                       }
                     }}
-                    placeholder="Ex: Salvador, Bahia"
+                    placeholder={`${t('city')}, ${t('state')}`}
                     suggestions={BRAZILIAN_CITIES}
                     allowCustom={true}
+                    onFocus={() => {
+                      setTimeout(() => {
+                        scrollViewRef.current?.scrollTo({
+                          y: 500,
+                          animated: true,
+                        });
+                      }, 100);
+                    }}
                   />
                 </View>
 
@@ -280,9 +346,8 @@ export default function PropertyProfilesScreen() {
               </View>
             )}
             </Formik>
-            </ScrollView>
-          </Pressable>
-        </KeyboardAvoidingView>
+          </ScrollView>
+        </Pressable>
       </SafeAreaView>
     );
   }

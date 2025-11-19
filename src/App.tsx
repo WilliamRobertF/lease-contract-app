@@ -152,6 +152,7 @@ function HomeStack() {
         component={ClausesScreen} 
         options={{
           title: t('clauses'),
+          headerTitleAlign: 'center',
         }} 
       />
       <Stack.Screen 
@@ -159,6 +160,7 @@ function HomeStack() {
         component={ContractTemplatesScreen} 
         options={{
           title: t('templates'),
+          headerTitleAlign: 'center',
         }} 
       />
     </Stack.Navigator>

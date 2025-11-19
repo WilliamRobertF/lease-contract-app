@@ -66,7 +66,7 @@ export default function ContractGenerationScreen() {
     endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
     monthlyRent: '',
     dueDay: '01',
-    contractLocation: 'Salvador, Bahia',
+    contractLocation: 'Salvador, BA',
     hasGuarantor: false,
   });
 
@@ -465,7 +465,7 @@ export default function ContractGenerationScreen() {
                     contractLocation: text,
                   })
                 }
-                placeholder="Ex: Salvador, Bahia"
+                placeholder="Ex: Salvador, BA"
                 suggestions={BRAZILIAN_CITIES}
                 allowCustom={true}
               />

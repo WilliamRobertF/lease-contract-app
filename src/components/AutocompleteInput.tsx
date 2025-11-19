@@ -108,7 +108,6 @@ export default function AutocompleteInput({
 
 const styles = StyleSheet.create({
   container: {
-    position: 'relative',
     zIndex: 1000,
   },
   inputContainer: {
@@ -142,7 +141,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 6,
     borderBottomRightRadius: 6,
     maxHeight: 200,
-    zIndex: 1001,
+    zIndex: 9999,
     ...Platform.select({
       ios: {
         shadowColor: '#000',
@@ -151,7 +150,7 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
       },
       android: {
-        elevation: 4,
+        elevation: 10,
       },
     }),
   },

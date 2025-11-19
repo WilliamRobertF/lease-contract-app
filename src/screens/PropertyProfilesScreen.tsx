@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   ScrollView,
@@ -11,8 +11,9 @@ import {
   Platform,
   Keyboard,
   Pressable,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
 } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
@@ -56,6 +57,42 @@ export default function PropertyProfilesScreen() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingData, setEditingData] = useState<PropertyData | null>(null);
   const [cityStateValue, setCityStateValue] = useState('');
+  const scrollViewRef = useRef<ScrollView>(null);
+  const [focusedInputOffset, setFocusedInputOffset] = useState(0);
+
+  useEffect(() => {
+    let keyboardShowListener: any;
+    
+    if (editingId || editingData) {
+      // Only on Android, use the native Keyboard API to handle scroll
+      keyboardShowListener = Keyboard.addListener(
+        Platform.OS === 'android' ? 'keyboardDidShow' : 'keyboardWillShow',
+        (e: any) => {
+          // Scroll to focused input when keyboard appears
+          // The offset is calculated from TextInput onLayout callback
+          if (focusedInputOffset > 0 && scrollViewRef.current) {
+            setTimeout(() => {
+              scrollViewRef.current?.scrollToOffset({
+                offset: Math.max(0, focusedInputOffset - 100),
+                animated: true,
+              });
+            }, 100);
+          }
+        }
+      );
+    }
+
+    return () => {
+      if (keyboardShowListener) {
+        keyboardShowListener.remove();
+      }
+    };
+  }, [editingId, editingData, focusedInputOffset]);
+
+  const loadProperties = async () => {
+    const data = await getProperties();
+    setProperties(data);
+  };
 
   useEffect(() => {
     loadProperties();
@@ -72,11 +109,6 @@ export default function PropertyProfilesScreen() {
       setCityStateValue('');
     }
   }, [editingData]);
-
-  const loadProperties = async () => {
-    const data = await getProperties();
-    setProperties(data);
-  };
 
   const handleSave = async (values: PropertyData) => {
     if (editingId) {
@@ -150,11 +182,11 @@ export default function PropertyProfilesScreen() {
           style={{ flex: 1 }}
           onPress={() => Keyboard.dismiss()}
         >
-          <KeyboardAwareScrollView
+          <ScrollView
+            ref={scrollViewRef}
             keyboardShouldPersistTaps="always"
             contentContainerStyle={styles.scrollContentContainer}
-            enableAutomaticScroll={true}
-            extraHeight={100}
+            scrollEventThrottle={16}
           >
             <Formik
               initialValues={editingData || initialValues}
@@ -172,6 +204,11 @@ export default function PropertyProfilesScreen() {
                     placeholder="Ex: Casa térrea com 2 quartos"
                     value={values.description}
                     onChangeText={handleChange('description')}
+                    onFocus={(e) => {
+                      e.currentTarget.measure((x, y, width, height, pageX, pageY) => {
+                        setFocusedInputOffset(pageY);
+                      });
+                    }}
                   />
                   {touched.description && errors.description && (
                     <Text style={styles.errorText}>{errors.description}</Text>
@@ -185,6 +222,11 @@ export default function PropertyProfilesScreen() {
                     placeholder="Street name"
                     value={values.street}
                     onChangeText={handleChange('street')}
+                    onFocus={(e) => {
+                      e.currentTarget.measure((x, y, width, height, pageX, pageY) => {
+                        setFocusedInputOffset(pageY);
+                      });
+                    }}
                   />
                   {touched.street && errors.street && (
                     <Text style={styles.errorText}>{errors.street}</Text>
@@ -199,6 +241,11 @@ export default function PropertyProfilesScreen() {
                       placeholder="Number"
                       value={values.number}
                       onChangeText={handleChange('number')}
+                      onFocus={(e) => {
+                        e.currentTarget.measure((x, y, width, height, pageX, pageY) => {
+                          setFocusedInputOffset(pageY);
+                        });
+                      }}
                     />
                     {touched.number && errors.number && (
                       <Text style={styles.errorText}>{errors.number}</Text>
@@ -212,6 +259,11 @@ export default function PropertyProfilesScreen() {
                       placeholder="ZIP Code"
                       value={values.zipCode}
                       onChangeText={handleChange('zipCode')}
+                      onFocus={(e) => {
+                        e.currentTarget.measure((x, y, width, height, pageX, pageY) => {
+                          setFocusedInputOffset(pageY);
+                        });
+                      }}
                     />
                     {touched.zipCode && errors.zipCode && (
                       <Text style={styles.errorText}>{errors.zipCode}</Text>
@@ -276,7 +328,7 @@ export default function PropertyProfilesScreen() {
               </View>
             )}
             </Formik>
-          </KeyboardAwareScrollView>
+          </ScrollView>
         </Pressable>
       </SafeAreaView>
     );

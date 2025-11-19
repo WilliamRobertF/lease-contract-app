@@ -266,7 +266,14 @@ export default function PropertyProfilesScreen() {
                   </View>
                 </View>
 
-                <View style={styles.section}>
+                <View 
+                  style={styles.section}
+                  onLayout={(e) => {
+                    e.currentTarget.measure((x, y, width, height, pageX, pageY) => {
+                      // Store the Y position of this section for keyboard scroll
+                    });
+                  }}
+                >
                   <Text style={styles.label}>{t('neighborhood')}</Text>
                   <AutocompleteInput
                     value={values.neighborhood}
@@ -274,6 +281,14 @@ export default function PropertyProfilesScreen() {
                     placeholder="Neighborhood"
                     suggestions={SALVADOR_NEIGHBORHOODS}
                     allowCustom={true}
+                    onFocus={() => {
+                      setTimeout(() => {
+                        scrollViewRef.current?.scrollTo({
+                          y: 400,
+                          animated: true,
+                        });
+                      }, 100);
+                    }}
                   />
                   {touched.neighborhood && errors.neighborhood && (
                     <Text style={styles.errorText}>{errors.neighborhood}</Text>
@@ -299,6 +314,14 @@ export default function PropertyProfilesScreen() {
                     placeholder="Ex: Salvador, Bahia"
                     suggestions={BRAZILIAN_CITIES}
                     allowCustom={true}
+                    onFocus={() => {
+                      setTimeout(() => {
+                        scrollViewRef.current?.scrollTo({
+                          y: 500,
+                          animated: true,
+                        });
+                      }, 100);
+                    }}
                   />
                 </View>
 

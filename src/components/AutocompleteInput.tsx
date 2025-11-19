@@ -20,6 +20,7 @@ interface AutocompleteInputProps {
   style?: StyleProp<ViewStyle>;
   maxSuggestions?: number;
   allowCustom?: boolean;
+  onFocus?: () => void;
 }
 
 export default function AutocompleteInput({
@@ -30,6 +31,7 @@ export default function AutocompleteInput({
   style,
   maxSuggestions = 5,
   allowCustom = true,
+  onFocus,
 }: AutocompleteInputProps) {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
@@ -55,7 +57,10 @@ export default function AutocompleteInput({
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          onFocus={() => setShowSuggestions(true)}
+          onFocus={() => {
+            setShowSuggestions(true);
+            onFocus?.();
+          }}
         />
         {value.length > 0 && (
           <TouchableOpacity

@@ -22,7 +22,7 @@ import { getProperties, saveProperty, deleteProperty } from '../utils/storageMan
 import PrimaryButton from '../components/PrimaryButton';
 import SecondaryButton from '../components/SecondaryButton';
 import AutocompleteInput from '../components/AutocompleteInput';
-import { BRAZILIAN_CITIES, SALVADOR_NEIGHBORHOODS } from '../utils/constants';
+import { BRAZILIAN_CITIES, BRAZILIAN_NEIGHBORHOODS } from '../utils/constants';
 
 function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -279,7 +279,7 @@ export default function PropertyProfilesScreen() {
                     value={values.neighborhood}
                     onChangeText={handleChange('neighborhood')}
                     placeholder={t('neighborhood')}
-                    suggestions={SALVADOR_NEIGHBORHOODS}
+                    suggestions={BRAZILIAN_NEIGHBORHOODS}
                     allowCustom={true}
                     onFocus={() => {
                       setTimeout(() => {

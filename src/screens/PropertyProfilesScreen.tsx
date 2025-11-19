@@ -233,7 +233,7 @@ export default function PropertyProfilesScreen() {
                     <Text style={styles.label}>{t('number')}</Text>
                     <TextInput
                       style={styles.input}
-                      placeholder="Number"
+                      placeholder={t('number')}
                       value={values.number}
                       onChangeText={handleChange('number')}
                       onFocus={(e) => {
@@ -251,7 +251,7 @@ export default function PropertyProfilesScreen() {
                     <Text style={styles.label}>{t('zipCode')}</Text>
                     <TextInput
                       style={styles.input}
-                      placeholder="ZIP Code"
+                      placeholder={t('zipCode')}
                       value={values.zipCode}
                       onChangeText={handleChange('zipCode')}
                       onFocus={(e) => {
@@ -278,7 +278,7 @@ export default function PropertyProfilesScreen() {
                   <AutocompleteInput
                     value={values.neighborhood}
                     onChangeText={handleChange('neighborhood')}
-                    placeholder="Neighborhood"
+                    placeholder={t('neighborhood')}
                     suggestions={SALVADOR_NEIGHBORHOODS}
                     allowCustom={true}
                     onFocus={() => {
@@ -311,7 +311,7 @@ export default function PropertyProfilesScreen() {
                         setFieldValue('state', '');
                       }
                     }}
-                    placeholder="Ex: Salvador, Bahia"
+                    placeholder={`${t('city')}, ${t('state')}`}
                     suggestions={BRAZILIAN_CITIES}
                     allowCustom={true}
                     onFocus={() => {

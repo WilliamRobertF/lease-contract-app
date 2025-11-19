@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   ScrollView,
@@ -8,8 +8,9 @@ import {
   StyleSheet,
   FlatList,
   Alert,
-  KeyboardAvoidingView,
   Platform,
+  Keyboard,
+  Pressable,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Formik } from 'formik';
@@ -57,9 +58,37 @@ export default function LandlordProfilesScreen() {
   const [landlords, setLandlords] = useState<LandlordProfile[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingData, setEditingData] = useState<PersonData | null>(null);
+  const scrollViewRef = useRef<ScrollView>(null);
+  const [focusedInputOffset, setFocusedInputOffset] = useState(0);
 
   const nationalities = i18n.language === 'pt' ? NATIONALITIES_PT : NATIONALITIES_EN;
   const birthplaces = i18n.language === 'pt' ? ALL_BIRTHPLACES_PT : ALL_BIRTHPLACES_EN;
+
+  useEffect(() => {
+    let keyboardShowListener: any;
+    
+    if (editingId || editingData) {
+      keyboardShowListener = Keyboard.addListener(
+        Platform.OS === 'android' ? 'keyboardDidShow' : 'keyboardWillShow',
+        (e: any) => {
+          if (focusedInputOffset > 0 && scrollViewRef.current) {
+            setTimeout(() => {
+              scrollViewRef.current?.scrollTo({
+                y: Math.max(0, focusedInputOffset - 150),
+                animated: true,
+              });
+            }, 100);
+          }
+        }
+      );
+    }
+
+    return () => {
+      if (keyboardShowListener) {
+        keyboardShowListener.remove();
+      }
+    };
+  }, [editingId, editingData, focusedInputOffset]);
 
   useEffect(() => {
     loadLandlords();
@@ -133,12 +162,16 @@ export default function LandlordProfilesScreen() {
   if (editingId || editingData) {
     return (
       <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-        <KeyboardAvoidingView
+        <Pressable
           style={{ flex: 1 }}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+          onPress={() => Keyboard.dismiss()}
         >
-          <ScrollView style={styles.scrollView} keyboardShouldPersistTaps="handled">
+          <ScrollView
+            ref={scrollViewRef}
+            keyboardShouldPersistTaps="always"
+            contentContainerStyle={styles.scrollContentContainer}
+            scrollEventThrottle={16}
+          >
             <Formik
               initialValues={editingData || initialValues}
               validationSchema={validationSchema}
@@ -214,6 +247,14 @@ export default function LandlordProfilesScreen() {
                     placeholder={t('birthplace')}
                     suggestions={birthplaces}
                     allowCustom={true}
+                    onFocus={() => {
+                      setTimeout(() => {
+                        scrollViewRef.current?.scrollTo({
+                          y: 400,
+                          animated: true,
+                        });
+                      }, 100);
+                    }}
                   />
                   {touched.birthplace && errors.birthplace && (
                     <Text style={styles.errorText}>{errors.birthplace}</Text>
@@ -239,9 +280,9 @@ export default function LandlordProfilesScreen() {
                 </View>
               </View>
             )}
-          </Formik>
-        </ScrollView>
-        </KeyboardAvoidingView>
+            </Formik>
+          </ScrollView>
+        </Pressable>
       </SafeAreaView>
     );
   }
@@ -300,6 +341,9 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+  },
+  scrollContentContainer: {
+    paddingBottom: 300,
   },
   formContainer: {
     padding: 16,

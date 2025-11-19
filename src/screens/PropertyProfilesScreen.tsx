@@ -214,7 +214,7 @@ export default function PropertyProfilesScreen() {
                   <Text style={styles.label}>{t('street')}</Text>
                   <TextInput
                     style={styles.input}
-                    placeholder="Street name"
+                    placeholder={t('street')}
                     value={values.street}
                     onChangeText={handleChange('street')}
                     onFocus={(e) => {

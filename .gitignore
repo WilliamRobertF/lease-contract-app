@@ -42,5 +42,6 @@ yarn-error.*
 
 # GitHub Copilot agent
 .github/agents/
+.github/copilot-instructions.md
 
 UPDATE_GUIDE.md

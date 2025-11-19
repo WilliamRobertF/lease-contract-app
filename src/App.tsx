@@ -104,6 +104,7 @@ function HomeStack() {
         component={ContractFormScreen} 
         options={{
           title: t('contractForm'),
+          headerTitleAlign: 'center',
         }} 
       />
       <Stack.Screen 
@@ -111,6 +112,7 @@ function HomeStack() {
         component={ContractGenerationScreen} 
         options={{
           title: t('newContract'),
+          headerTitleAlign: 'center',
         }} 
       />
       <Stack.Screen 
@@ -118,6 +120,7 @@ function HomeStack() {
         component={GeneratedContractsScreen} 
         options={{
           title: t('generatedContracts'),
+          headerTitleAlign: 'center',
         }} 
       />
       <Stack.Screen 
@@ -125,6 +128,7 @@ function HomeStack() {
         component={LandlordProfilesScreen} 
         options={{
           title: t('landlordProfiles'),
+          headerTitleAlign: 'center',
         }} 
       />
       <Stack.Screen 
@@ -132,6 +136,7 @@ function HomeStack() {
         component={PropertyProfilesScreen} 
         options={{
           title: t('propertyProfiles'),
+          headerTitleAlign: 'center',
         }} 
       />
       <Stack.Screen 
@@ -147,6 +152,7 @@ function HomeStack() {
         component={ClausesScreen} 
         options={{
           title: t('clauses'),
+          headerTitleAlign: 'center',
         }} 
       />
       <Stack.Screen 
@@ -154,6 +160,7 @@ function HomeStack() {
         component={ContractTemplatesScreen} 
         options={{
           title: t('templates'),
+          headerTitleAlign: 'center',
         }} 
       />
     </Stack.Navigator>

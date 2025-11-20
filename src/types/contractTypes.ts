@@ -1,7 +1,7 @@
 export interface PersonData {
     name: string;
     nationality: string;
-    maitalStatus: string;
+    maritalStatus: string;
     rg: string;
     cpf: string;
     birthplace: string;

@@ -51,7 +51,7 @@ const initialValues: ContractData = {
   landlord: {
     name: '',
     nationality: '',
-    maitalStatus: '',
+    maritalStatus: '',
     rg: '',
     cpf: '',
     birthplace: '',
@@ -59,7 +59,7 @@ const initialValues: ContractData = {
   tenant: {
     name: '',
     nationality: '',
-    maitalStatus: '',
+    maritalStatus: '',
     rg: '',
     cpf: '',
     birthplace: '',
@@ -107,7 +107,7 @@ export default function ContractFormScreen() {
   };
 
   const handleGenerateContract = (values: ContractData) => {
-    console.log(values);
+    // Function implementation will be added here
   };
 
   return (

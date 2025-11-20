@@ -70,13 +70,13 @@ export function formatContract(data: ContractDataForFormat, allClauses: Clause[]
   values['STATE'] = safe(data.property?.data.state);
   values['LANDLORD'] = safe(data.landlord?.data.name);
   values['LANDLORD_NATIONALITY'] = safe(data.landlord?.data.nationality);
-  values['LANDLORD_MARITAL_STATUS'] = getMaritalStatusText(data.landlord?.data.maitalStatus || '');
+  values['LANDLORD_MARITAL_STATUS'] = getMaritalStatusText(data.landlord?.data.maritalStatus || '');
   values['LANDLORD_RG'] = safe(data.landlord?.data.rg);
   values['LANDLORD_CPF'] = safe(data.landlord?.data.cpf);
   values['LANDLORD_BIRTHPLACE'] = safe(data.landlord?.data.birthplace);
   values['TENANT'] = safe(data.tenant?.name);
   values['TENANT_NATIONALITY'] = safe(data.tenant?.nationality);
-  values['TENANT_MARITAL_STATUS'] = getMaritalStatusText(data.tenant?.maitalStatus || '');
+  values['TENANT_MARITAL_STATUS'] = getMaritalStatusText(data.tenant?.maritalStatus || '');
   values['TENANT_RG'] = safe(data.tenant?.rg);
   values['TENANT_CPF'] = safe(data.tenant?.cpf);
   values['TENANT_BIRTHPLACE'] = safe(data.tenant?.birthplace);

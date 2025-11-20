@@ -46,14 +46,14 @@ function generateContractHTML(
   const landlordCPF = contractData?.landlord?.data?.cpf || "";
   const landlordBirthplace = contractData?.landlord?.data?.birthplace || "";
   const landlordMaritalStatus =
-    contractData?.landlord?.data?.maitalStatus || "";
+    contractData?.landlord?.data?.maritalStatus || "";
   const landlordNationality = contractData?.landlord?.data?.nationality || "";
 
   const tenantName = contractData?.tenant?.name || "";
   const tenantRG = contractData?.tenant?.rg || "";
   const tenantCPF = contractData?.tenant?.cpf || "";
   const tenantBirthplace = contractData?.tenant?.birthplace || "";
-  const tenantMaritalStatus = contractData?.tenant?.maitalStatus || "";
+  const tenantMaritalStatus = contractData?.tenant?.maritalStatus || "";
   const tenantNationality = contractData?.tenant?.nationality || "";
 
   const guarantorName = contractData?.guarantor?.name || "";

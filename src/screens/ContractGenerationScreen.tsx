@@ -269,13 +269,13 @@ export default function ContractGenerationScreen() {
           initialValues={{
             name: '',
             nationality: 'Brasileiro(a)',
-            maitalStatus: '',
+            maritalStatus: '',
             rg: '',
             cpf: '',
             birthplace: '',
             guarantorName: contractData.guarantor?.name || '',
             guarantorNationality: contractData.guarantor?.nationality || 'Brasileiro(a)',
-            guarantorMaritalStatus: contractData.guarantor?.maitalStatus || '',
+            guarantorMaritalStatus: contractData.guarantor?.maritalStatus || '',
             guarantorRg: contractData.guarantor?.rg || '',
             guarantorCpf: contractData.guarantor?.cpf || '',
             guarantorBirthplace: contractData.guarantor?.birthplace || '',
@@ -285,7 +285,7 @@ export default function ContractGenerationScreen() {
             cpf: Yup.string(),
             rg: Yup.string(),
             nationality: Yup.string().required(t('nationalityRequired')),
-            maitalStatus: Yup.string(),
+            maritalStatus: Yup.string(),
             birthplace: Yup.string(),
             guarantorName: hasGuarantorLocal ? Yup.string().required(t('guarantorNameRequired')) : Yup.string(),
             guarantorCpf: hasGuarantorLocal ? Yup.string() : Yup.string(),
@@ -295,7 +295,7 @@ export default function ContractGenerationScreen() {
             const tenantData: PersonData = {
               name: values.name,
               nationality: values.nationality,
-              maitalStatus: values.maitalStatus,
+              maritalStatus: values.maritalStatus,
               rg: values.rg,
               cpf: values.cpf,
               birthplace: values.birthplace,
@@ -306,7 +306,7 @@ export default function ContractGenerationScreen() {
               nationality: values.guarantorNationality,
               rg: values.guarantorRg,
               cpf: values.guarantorCpf,
-              maitalStatus: values.guarantorMaritalStatus,
+              maritalStatus: values.guarantorMaritalStatus,
               birthplace: values.guarantorBirthplace,
             } : undefined;
 
@@ -365,11 +365,11 @@ export default function ContractGenerationScreen() {
                   <View style={styles.formField}>
                     <Text style={styles.label}>{t('maritalStatus')}</Text>
                     <MaritalStatusPicker
-                      value={values.maitalStatus}
-                      onValueChange={(text) => setFieldValue('maitalStatus', text)}
+                      value={values.maritalStatus}
+                      onValueChange={(text) => setFieldValue('maritalStatus', text)}
                     />
-                    {touched.maitalStatus && errors.maitalStatus && (
-                      <Text style={styles.errorText}>{errors.maitalStatus}</Text>
+                    {touched.maritalStatus && errors.maritalStatus && (
+                      <Text style={styles.errorText}>{errors.maritalStatus}</Text>
                     )}
                   </View>
                   <View style={styles.formField}>

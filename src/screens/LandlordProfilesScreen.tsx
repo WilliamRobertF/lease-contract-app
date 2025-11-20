@@ -37,7 +37,7 @@ function generateId(): string {
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Name is required'),
   nationality: Yup.string().required('Nationality is required'),
-  maitalStatus: Yup.string(),
+  maritalStatus: Yup.string(),
   rg: Yup.string(),
   cpf: Yup.string(),
   birthplace: Yup.string(),
@@ -46,7 +46,7 @@ const validationSchema = Yup.object().shape({
 const initialValues: PersonData = {
   name: '',
   nationality: '',
-  maitalStatus: '',
+  maritalStatus: '',
   rg: '',
   cpf: '',
   birthplace: '',
@@ -211,11 +211,11 @@ export default function LandlordProfilesScreen() {
                 <View style={styles.section}>
                   <Text style={styles.label}>{t('maritalStatus')}</Text>
                   <MaritalStatusPicker
-                    value={values.maitalStatus}
-                    onValueChange={handleChange('maitalStatus')}
+                    value={values.maritalStatus}
+                    onValueChange={handleChange('maritalStatus')}
                   />
-                  {touched.maitalStatus && errors.maitalStatus && (
-                    <Text style={styles.errorText}>{errors.maitalStatus}</Text>
+                  {touched.maritalStatus && errors.maritalStatus && (
+                    <Text style={styles.errorText}>{errors.maritalStatus}</Text>
                   )}
                 </View>
 

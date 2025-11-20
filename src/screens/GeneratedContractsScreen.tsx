@@ -70,7 +70,7 @@ export default function GeneratedContractsScreen() {
             template: {
               id: contract.templateId,
               name: '',
-              clauseIds: [], // Empty, will use only obligatory clauses
+              clauseIds: [],
               hasGuarantor: false,
               createdAt: new Date(),
             },

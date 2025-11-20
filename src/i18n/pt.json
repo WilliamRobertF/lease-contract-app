@@ -103,8 +103,7 @@
   "noLandlordsYetInGeneration": "Nenhum proprietário",
   "fillTenantDataSubtitle": "Preencha as informações do inquilino",
   "useVariableNames": "Use nomes de variáveis como: PROPRIEDADE, PROPRIETARIO, INQUILINO, ALUGUEL, DIA_VENCIMENTO",
-  "mandatoryCl": "Cláusula Obrigatória",
-  "optionalCl": "Cláusula Opcional",
+
   "clauseTitle": "Título da Cláusula",
   "overview": "Visão Geral",
   "activeLandlords": "Proprietários Ativos",
@@ -154,7 +153,7 @@
   "single": "Solteiro(a)",
   "married": "Casado(a)",
   "selectMaritalStatus": "Selecionar Estado Civil",
-  "optionalFields": "Campos Opcionais",
+
   "showRGField": "Mostrar campo RG",
   "showCPFField": "Mostrar campo CPF",
   "showBirthplaceField": "Mostrar campo Local de Nascimento",

@@ -10,8 +10,6 @@ import {
   TextInput,
   Platform,
   KeyboardAvoidingView,
-  Keyboard,
-  Pressable,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -66,7 +64,6 @@ export default function ContractGenerationScreen() {
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
   const [hasGuarantorLocal, setHasGuarantorLocal] = useState(false);
   const [guarantorFormVisible, setGuarantorFormVisible] = useState(false);
-  const [focusedInputOffset, setFocusedInputOffset] = useState(0);
   const scrollViewRef = useRef<ScrollView>(null);
   const [contractData, setContractData] = useState<Partial<ContractGenerationState>>({
     startDate: new Date(),

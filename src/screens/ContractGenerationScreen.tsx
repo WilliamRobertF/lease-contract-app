@@ -946,16 +946,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginHorizontal: 6,
   },
-  docxButton: {
-    flex: 1,
-    flexDirection: 'row',
-    backgroundColor: '#2196f3',
-    borderRadius: 6,
-    paddingVertical: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginHorizontal: 6,
-  },
   submitButton: {
     flex: 1,
     flexDirection: 'row',

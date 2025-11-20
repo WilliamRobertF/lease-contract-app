@@ -9,6 +9,7 @@ import {
   StyleProp,
   ViewStyle,
   ScrollView,
+  Animated,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -35,6 +36,24 @@ export default function AutocompleteInput({
 }: AutocompleteInputProps) {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
+  const blurTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  const fadeAnim = React.useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (showSuggestions && filteredSuggestions.length > 0) {
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 150,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [showSuggestions, filteredSuggestions.length]);
 
   useEffect(() => {
     if (value.trim().length > 0) {
@@ -49,6 +68,14 @@ export default function AutocompleteInput({
     }
   }, [value, suggestions, maxSuggestions]);
 
+  useEffect(() => {
+    return () => {
+      if (blurTimeoutRef.current) {
+        clearTimeout(blurTimeoutRef.current);
+      }
+    };
+  }, []);
+
   return (
     <View style={[styles.container, style]}>
       <View style={styles.inputContainer}>
@@ -58,13 +85,17 @@ export default function AutocompleteInput({
           onChangeText={onChangeText}
           placeholder={placeholder}
           onFocus={() => {
-            if (value.trim().length > 0) {
-              setShowSuggestions(true);
+            if (blurTimeoutRef.current) {
+              clearTimeout(blurTimeoutRef.current);
+              blurTimeoutRef.current = null;
             }
+            setShowSuggestions(true);
             onFocus?.();
           }}
           onBlur={() => {
-            setShowSuggestions(false);
+            blurTimeoutRef.current = setTimeout(() => {
+              setShowSuggestions(false);
+            }, 200);
           }}
         />
         {value.length > 0 && (
@@ -81,19 +112,27 @@ export default function AutocompleteInput({
       </View>
 
       {showSuggestions && filteredSuggestions.length > 0 && (
-        <View style={styles.suggestionsContainer}>
+        <Animated.View 
+          style={[styles.suggestionsContainer, { opacity: fadeAnim }]}
+        >
           <ScrollView 
             keyboardShouldPersistTaps="always"
             nestedScrollEnabled={true}
+            scrollEnabled={filteredSuggestions.length > 3}
           >
             {filteredSuggestions.map((item, index) => (
               <TouchableOpacity
                 key={`${item}-${index}`}
                 style={styles.suggestionItem}
                 onPress={() => {
+                  if (blurTimeoutRef.current) {
+                    clearTimeout(blurTimeoutRef.current);
+                    blurTimeoutRef.current = null;
+                  }
                   onChangeText(item);
                   setShowSuggestions(false);
                 }}
+                activeOpacity={0.7}
               >
                 <MaterialCommunityIcons
                   name="magnify"
@@ -105,7 +144,7 @@ export default function AutocompleteInput({
               </TouchableOpacity>
             ))}
           </ScrollView>
-        </View>
+        </Animated.View>
       )}
     </View>
   );
@@ -135,10 +174,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   suggestionsContainer: {
-    position: 'absolute',
-    top: '100%',
-    left: 0,
-    right: 0,
     backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: '#ddd',
@@ -146,7 +181,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 6,
     borderBottomRightRadius: 6,
     maxHeight: 200,
-    zIndex: 9999,
+    marginTop: -6,
     ...Platform.select({
       ios: {
         shadowColor: '#000',

@@ -1,10 +1,20 @@
 # Lease Contract App
 
-A React Native mobile application for creating and managing residential lease agreements, designed to work 100% locally and offline.
+A React Native mobile application for creating and managing residential lease agreements in Brazil, designed to work 100% locally and offline.
 
 ## 📱 About
 
-This project was created to solve a real-world problem and serves as a learning and study project. The app enables users to generate, customize, and manage lease contracts directly on their mobile devices without requiring internet connectivity.
+This project was created to solve a real-world problem and serves as a learning and study project. The app enables users to generate, customize, and manage lease contracts (contratos de locação) directly on their mobile devices without requiring internet connectivity.
+
+## ✨ Features
+
+- Create and manage landlord profiles
+- Register property details
+- Generate customizable lease contracts with templates
+- Support for guarantor information
+- PDF export for contracts
+- Bilingual support (Portuguese/English)
+- All data stored locally (AsyncStorage)
 
 ## 🎯 Purpose
 
@@ -22,11 +32,13 @@ The app is designed to run **100% locally and offline**:
 
 ## 🚀 Tech Stack
 
-- React Native 0.81.5
-- Expo SDK 54.0.24
+- React Native
+- Expo SDK
 - TypeScript
-- EAS Build
+- React Navigation
+- AsyncStorage (local data persistence)
+- EAS Build & Update
 
 ## 📄 License
 
-Feel free to use this project however you want. It's provided as-is for learning and practical use.
+MIT License - Feel free to use this project for learning and practical purposes.

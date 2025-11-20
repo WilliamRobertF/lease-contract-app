@@ -136,6 +136,7 @@
   "guarantorName": "Nome do Fiador",
   "guarantorNameRequired": "Nome do fiador é obrigatório",
   "details": "Detalhes",
+  "guarantorDetails": "Detalhes do Fiador",
   "next": "Próximo",
   "contractLocation": "Cidade/Local do Contrato",
   "manageContracts": "Gerencie seus contratos de locação com eficiência",

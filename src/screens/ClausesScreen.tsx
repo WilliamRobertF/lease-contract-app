@@ -46,6 +46,12 @@ export default function ClausesScreen() {
   const handleUpdateClause = async () => {
     if (!editingClause) return;
     await updateClause(editingClause.id, editingClause);
+    
+    // Update the selected clause to reflect changes immediately
+    if (selectedClause && selectedClause.id === editingClause.id) {
+      setSelectedClause(editingClause);
+    }
+    
     setShowEditModal(false);
     setEditingClause(null);
     loadClauses();

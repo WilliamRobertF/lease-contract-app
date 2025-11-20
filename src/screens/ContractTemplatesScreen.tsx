@@ -282,10 +282,7 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 2,
   },
-  clauseCheckCategory: {
-    fontSize: 12,
-    color: '#999',
-  },
+
   createButton: {
     backgroundColor: '#1976d2',
     paddingHorizontal: 16,
@@ -373,12 +370,7 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 4,
   },
-  templateClauseCategory: {
-    fontSize: 12,
-    color: '#1976d2',
-    fontWeight: '500',
-    marginBottom: 8,
-  },
+
   templateClauseContent: {
     fontSize: 14,
     lineHeight: 22,

@@ -51,7 +51,6 @@ export interface Clause {
     id: string;
     title: string;
     content: string;
-    category?: 'obligatory' | 'optional';
 }
 
 export interface ContractTemplate {

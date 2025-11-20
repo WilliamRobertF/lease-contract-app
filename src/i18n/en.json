@@ -103,8 +103,7 @@
   "noLandlordsYetInGeneration": "No landlords yet",
   "fillTenantDataSubtitle": "Fill out tenant information",
   "useVariableNames": "Use variable names like: PROPERTY, LANDLORD, TENANT, RENT, DUE_DAY",
-  "mandatoryCl": "Mandatory Clause",
-  "optionalCl": "Optional Clause",
+
   "clauseTitle": "Clause Title",
   "overview": "Overview",
   "activeLandlords": "Active Landlords",
@@ -153,7 +152,7 @@
   "single": "Single",
   "married": "Married",
   "selectMaritalStatus": "Select Marital Status",
-  "optionalFields": "Optional Fields",
+
   "showRGField": "Show RG field",
   "showCPFField": "Show CPF field",
   "showBirthplaceField": "Show Birthplace field",

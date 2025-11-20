@@ -4,13 +4,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { NavigationProp } from '../types/navigationTypes';
 import { GeneratedContract } from '../types/contractTypes';
 import { getGeneratedContracts } from '../utils/storageManager';
 import { formatDate } from 'date-fns';
 
 export default function HomeScreen() {
   const { t } = useTranslation();
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp>();
   const [expiringContracts, setExpiringContracts] = useState<GeneratedContract[]>([]);
 
   useFocusEffect(
@@ -84,25 +85,25 @@ export default function HomeScreen() {
               icon="account-plus"
               label={t('addLandlord')}
               color="#4caf50"
-              onPress={() => navigation.navigate('Home', { screen: 'LandlordProfiles' } as never)}
+              onPress={() => navigation.navigate('LandlordProfiles')}
             />
             <QuickActionButton
               icon="home-plus"
               label={t('addProperty')}
               color="#ff9800"
-              onPress={() => navigation.navigate('Home', { screen: 'PropertyProfiles' } as never)}
+              onPress={() => navigation.navigate('PropertyProfiles')}
             />
             <QuickActionButton
               icon="file-document-plus"
               label={t('newContract')}
               color="#1976d2"
-              onPress={() => navigation.navigate('Home', { screen: 'ContractGeneration' } as never)}
+              onPress={() => navigation.navigate('ContractGeneration')}
             />
             <QuickActionButton
               icon="file-check"
               label={t('viewMyContracts')}
               color="#9c27b0"
-              onPress={() => navigation.navigate('Home', { screen: 'GeneratedContracts' } as never)}
+              onPress={() => navigation.navigate('GeneratedContracts')}
             />
           </View>
         </View>

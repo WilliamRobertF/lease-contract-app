@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   View,
   ScrollView,
@@ -16,13 +16,13 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { NavigationProp } from '../types/navigationTypes';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { formatDate } from 'date-fns';
 import { LandlordProfile, PropertyProfile, ContractTemplate, PersonData, GeneratedContract, Clause, ContractData } from '../types/contractTypes';
 import { getLandlords, getProperties, getTemplates, getClauses, saveGeneratedContract } from '../utils/storageManager';
 import { formatContract, removeClauseTitles } from '../utils/contractFormatter';
-import { exportToPDF } from '../utils/pdfExporter';
 import AutocompleteInput from '../components/AutocompleteInput';
 import MaritalStatusPicker from '../components/MaritalStatusPicker';
 import {
@@ -49,11 +49,9 @@ interface ContractGenerationState {
   contractLocation: string;
 }
 
-
-
 export default function ContractGenerationScreen() {
   const { t, i18n } = useTranslation();
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp>();
   const [step, setStep] = useState<Step>('landlord');
   const [landlords, setLandlords] = useState<LandlordProfile[]>([]);
   const [properties, setProperties] = useState<PropertyProfile[]>([]);
@@ -74,8 +72,8 @@ export default function ContractGenerationScreen() {
     hasGuarantor: false,
   });
 
-  const nationalities = i18n.language === 'pt' ? NATIONALITIES_PT : NATIONALITIES_EN;
-  const birthplaces = i18n.language === 'pt' ? ALL_BIRTHPLACES_PT : ALL_BIRTHPLACES_EN;
+  const nationalities = useMemo(() => i18n.language === 'pt' ? NATIONALITIES_PT : NATIONALITIES_EN, [i18n.language]);
+  const birthplaces = useMemo(() => i18n.language === 'pt' ? ALL_BIRTHPLACES_PT : ALL_BIRTHPLACES_EN, [i18n.language]);
 
   useEffect(() => {
     loadData();

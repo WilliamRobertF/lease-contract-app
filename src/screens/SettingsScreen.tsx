@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { NavigationProp } from '../types/navigationTypes';
 import Collapsible from 'react-native-collapsible';
 import { DEFAULT_CLAUSES } from '../utils/defaultClauses';
 import { saveClauses } from '../utils/storageManager';
@@ -20,7 +21,7 @@ import { saveLanguage } from '../i18n/i18n';
 
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp>();
   const [showLanguageSelector, setShowLanguageSelector] = useState(false);
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
 
@@ -161,7 +162,7 @@ export default function SettingsScreen() {
             title={t('clauses')}
             description="Manage and create clauses"
             onPress={() =>
-              (navigation as any).navigate('Clauses')
+              navigation.navigate('Clauses')
             }
           />
 
@@ -170,7 +171,7 @@ export default function SettingsScreen() {
             title={t('templates')}
             description="Manage contract templates"
             onPress={() =>
-              (navigation as any).navigate('Templates')
+              navigation.navigate('Templates')
             }
           />
         </View>

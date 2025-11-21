@@ -5,8 +5,8 @@ export type RootStackParamList = {
   ContractForm: undefined;
   ContractGeneration: undefined;
   GeneratedContracts: undefined;
-  LandlordProfiles: undefined;
-  PropertyProfiles: undefined;
+  LandlordProfiles: { returnTo?: keyof RootStackParamList } | undefined;
+  PropertyProfiles: { returnTo?: keyof RootStackParamList } | undefined;
   Settings: undefined;
   Clauses: undefined;
   Templates: undefined;

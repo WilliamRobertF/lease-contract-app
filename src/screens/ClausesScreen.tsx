@@ -27,7 +27,6 @@ export default function ClausesScreen() {
   const [showCreateClauseModal, setShowCreateClauseModal] = useState(false);
   const [newClauseTitle, setNewClauseTitle] = useState('');
   const [newClauseContent, setNewClauseContent] = useState('');
-  const [newClauseCategory, setNewClauseCategory] = useState<'obligatory' | 'optional'>('optional');
 
   useEffect(() => {
     loadClauses();
@@ -75,7 +74,6 @@ export default function ClausesScreen() {
       id: Date.now().toString(),
       title: newClauseTitle,
       content: newClauseContent,
-      category: newClauseCategory,
     };
 
     const updated = [...clauses, newClause];
@@ -84,7 +82,7 @@ export default function ClausesScreen() {
     setShowCreateClauseModal(false);
     setNewClauseTitle('');
     setNewClauseContent('');
-    setNewClauseCategory('optional');
+
   };
 
   const renderClauseItem = ({ item }: { item: Clause }) => (
@@ -94,9 +92,6 @@ export default function ClausesScreen() {
     >
       <View style={styles.clauseItemContent}>
         <Text style={styles.clauseTitle}>{item.title}</Text>
-        <Text style={styles.clauseCategory}>
-          {item.category === 'obligatory' ? t('mandatoryCl') : t('optionalCl')}
-        </Text>
       </View>
       <MaterialCommunityIcons name="chevron-right" size={20} color="#ccc" />
     </TouchableOpacity>
@@ -201,49 +196,7 @@ export default function ClausesScreen() {
                 }
               />
 
-              <Text style={styles.label}>{t('mandatoryCl')}</Text>
-              <View style={styles.categoryButtons}>
-                <TouchableOpacity
-                  style={[
-                    styles.categoryButton,
-                    editingClause?.category === 'obligatory' && styles.categoryButtonActive,
-                  ]}
-                  onPress={() =>
-                    setEditingClause(
-                      editingClause ? { ...editingClause, category: 'obligatory' } : null
-                    )
-                  }
-                >
-                  <Text
-                    style={[
-                      styles.categoryButtonText,
-                      editingClause?.category === 'obligatory' && styles.categoryButtonTextActive,
-                    ]}
-                  >
-                    {t('mandatoryCl')}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.categoryButton,
-                    editingClause?.category === 'optional' && styles.categoryButtonActive,
-                  ]}
-                  onPress={() =>
-                    setEditingClause(
-                      editingClause ? { ...editingClause, category: 'optional' } : null
-                    )
-                  }
-                >
-                  <Text
-                    style={[
-                      styles.categoryButtonText,
-                      editingClause?.category === 'optional' && styles.categoryButtonTextActive,
-                    ]}
-                  >
-                    {t('optionalCl')}
-                  </Text>
-                </TouchableOpacity>
-              </View>
+
 
               <View style={styles.buttonGroup}>
                 <TouchableOpacity
@@ -310,41 +263,7 @@ export default function ClausesScreen() {
                 onChangeText={setNewClauseContent}
               />
 
-              <Text style={styles.label}>{t('mandatoryCl')}</Text>
-              <View style={styles.categoryButtons}>
-                <TouchableOpacity
-                  style={[
-                    styles.categoryButton,
-                    newClauseCategory === 'obligatory' && styles.categoryButtonActive,
-                  ]}
-                  onPress={() => setNewClauseCategory('obligatory')}
-                >
-                  <Text
-                    style={[
-                      styles.categoryButtonText,
-                      newClauseCategory === 'obligatory' && styles.categoryButtonTextActive,
-                    ]}
-                  >
-                    {t('mandatoryCl')}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.categoryButton,
-                    newClauseCategory === 'optional' && styles.categoryButtonActive,
-                  ]}
-                  onPress={() => setNewClauseCategory('optional')}
-                >
-                  <Text
-                    style={[
-                      styles.categoryButtonText,
-                      newClauseCategory === 'optional' && styles.categoryButtonTextActive,
-                    ]}
-                  >
-                    {t('optionalCl')}
-                  </Text>
-                </TouchableOpacity>
-              </View>
+
 
               <TouchableOpacity style={styles.createButton} onPress={handleCreateClause}>
                 <MaterialCommunityIcons name="plus" size={20} color="#fff" />

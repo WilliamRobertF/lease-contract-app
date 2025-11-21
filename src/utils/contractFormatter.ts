@@ -30,31 +30,34 @@ function getMaritalStatusText(status: string): string {
   return status;
 }
 
-// Convert number to Portuguese ordinal in words
+// Convert number to Portuguese ordinal in words (feminine)
 export function numberToPortugueseOrdinal(n: number): string {
-  const ordinals: { [key: number]: string } = {
-    1: 'PRIMEIRA',
-    2: 'SEGUNDA',
-    3: 'TERCEIRA',
-    4: 'QUARTA',
-    5: 'QUINTA',
-    6: 'SEXTA',
-    7: 'SÉTIMA',
-    8: 'OITAVA',
-    9: 'NONA',
-    10: 'DÉCIMA',
-    11: 'DÉCIMA PRIMEIRA',
-    12: 'DÉCIMA SEGUNDA',
-    13: 'DÉCIMA TERCEIRA',
-    14: 'DÉCIMA QUARTA',
-    15: 'DÉCIMA QUINTA',
-    16: 'DÉCIMA SEXTA',
-    17: 'DÉCIMA SÉTIMA',
-    18: 'DÉCIMA OITAVA',
-    19: 'DÉCIMA NONA',
-    20: 'VIGÉSIMA',
-  };
-  return ordinals[n] || `${n}ª`;
+  if (n < 1 || n > 999) return `${n}ª`; // Fallback for out of range
+
+  const units = [
+    '', 'PRIMEIRA', 'SEGUNDA', 'TERCEIRA', 'QUARTA', 'QUINTA', 
+    'SEXTA', 'SÉTIMA', 'OITAVA', 'NONA'
+  ];
+  const tens = [
+    '', 'DÉCIMA', 'VIGÉSIMA', 'TRIGÉSIMA', 'QUADRAGÉSIMA', 
+    'QUINQUAGÉSIMA', 'SEXAGÉSIMA', 'SEPTUAGÉSIMA', 'OCTOGÉSIMA', 'NONAGÉSIMA'
+  ];
+  const hundreds = [
+    '', 'CENTÉSIMA', 'DUCENTÉSIMA', 'TRECENTÉSIMA', 'QUADRIGENTÉSIMA', 
+    'QUINGENTÉSIMA', 'SEXCENTÉSIMA', 'SEPTINGENTÉSIMA', 'OCTINGENTÉSIMA', 'NONINGENTÉSIMA'
+  ];
+
+  const parts: string[] = [];
+
+  const h = Math.floor(n / 100);
+  const t = Math.floor((n % 100) / 10);
+  const u = n % 10;
+
+  if (h > 0) parts.push(hundreds[h]);
+  if (t > 0) parts.push(tens[t]);
+  if (u > 0) parts.push(units[u]);
+
+  return parts.join(' ');
 }
 
 export function formatContract(data: ContractDataForFormat, allClauses: Clause[]): string {

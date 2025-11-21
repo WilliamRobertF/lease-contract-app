@@ -28,7 +28,7 @@ const DEFAULT_TEMPLATES: ContractTemplate[] = [
       'clause-1', 'clause-2', 'clause-3', 'clause-4', 'clause-5',
       'clause-6', 'clause-7', 'clause-8', 'clause-9', 'clause-10',
       'clause-11', 'clause-12', 'clause-13', 'clause-14', 'clause-15',
-      'clause-16', 'clause-17'
+      'clause-16', 'clause-18'
     ],
     hasGuarantor: false,
     createdAt: new Date(),
@@ -73,7 +73,17 @@ export async function deleteLandlord(id: string): Promise<void> {
 export async function getClauses(): Promise<Clause[]> {
   try {
     const data = await AsyncStorage.getItem(CLAUSES_KEY);
-    return data ? JSON.parse(data) : DEFAULT_CLAUSES;
+    if (data) {
+      const clauses = JSON.parse(data);
+      const clause16 = clauses.find((c: Clause) => c.id === 'clause-16');
+      if (clause16 && (clause16.title.includes('Foro') || clause16.title.includes('Competente'))) {
+        console.log('Migrating clauses to new default order...');
+        await AsyncStorage.setItem(CLAUSES_KEY, JSON.stringify(DEFAULT_CLAUSES));
+        return DEFAULT_CLAUSES;
+      }
+      return clauses;
+    }
+    return DEFAULT_CLAUSES;
   } catch (error) {
     console.error('Error getting clauses:', error);
     return DEFAULT_CLAUSES;

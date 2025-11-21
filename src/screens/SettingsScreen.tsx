@@ -19,10 +19,12 @@ import Collapsible from 'react-native-collapsible';
 import { DEFAULT_CLAUSES } from '../utils/defaultClauses';
 import { saveClauses } from '../utils/storageManager';
 import { saveLanguage } from '../i18n/i18n';
+import { useOnboarding } from '../context/OnboardingContext';
 
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
   const navigation = useNavigation<NavigationProp>();
+  const { resetOnboarding } = useOnboarding();
   const [showLanguageSelector, setShowLanguageSelector] = useState(false);
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
 
@@ -36,20 +38,8 @@ export default function SettingsScreen() {
           text: t('resetToFactoryDefaults'),
           onPress: async () => {
             try {
-              const { resetAllData } = await import('../utils/storageManager');
-              await resetAllData();
-              Alert.alert(
-                'Sucesso', 
-                'Todos os dados foram apagados.\n\nO app será fechado.',
-                [
-                  {
-                    text: 'OK',
-                    onPress: () => {
-                      setTimeout(() => BackHandler.exitApp(), 300);
-                    },
-                  },
-                ]
-              );
+              await resetOnboarding();
+              // No need to exit app, the context change will trigger re-render to Onboarding
             } catch (error) {
               Alert.alert('Erro', t('resetError'));
             }
@@ -173,7 +163,7 @@ export default function SettingsScreen() {
           <SettingItem
             icon="file-document"
             title={t('clauses')}
-            description="Manage and create clauses"
+            description={t('manageClausesDescription')}
             onPress={() =>
               navigation.navigate('Clauses')
             }
@@ -182,7 +172,7 @@ export default function SettingsScreen() {
           <SettingItem
             icon="file-multiple"
             title={t('templates')}
-            description="Manage contract templates"
+            description={t('manageTemplatesDescription')}
             onPress={() =>
               navigation.navigate('Templates')
             }

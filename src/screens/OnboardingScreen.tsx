@@ -12,7 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
-import { setHasSeenOnboarding } from '../utils/storageManager';
+import { useOnboarding } from '../context/OnboardingContext';
 import { NavigationProp } from '../types/navigationTypes';
 
 const { width } = Dimensions.get('window');
@@ -79,12 +79,11 @@ export default function OnboardingScreen() {
     }
   };
 
+  const { completeOnboarding } = useOnboarding();
+
   const handleGetStarted = async () => {
-    await setHasSeenOnboarding();
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'MainTabs' as any }],
-    });
+    await completeOnboarding();
+    // No need to navigate manually, the context change will trigger re-render to MainTabs
   };
 
   const isLastSlide = currentIndex === slides.length - 1;

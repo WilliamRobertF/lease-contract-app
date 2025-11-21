@@ -164,5 +164,26 @@
   "update": "Atualizar",
   "later": "Depois",
   "manageClausesDescription": "Gerenciar e criar cláusulas",
-  "manageTemplatesDescription": "Gerenciar modelos de contrato"
+  "manageTemplatesDescription": "Gerenciar modelos de contrato",
+  "onboarding": {
+    "welcome": {
+      "title": "Bem-vindo!",
+      "description": "Criar contratos de locação agora é simples e rápido. Siga o passo a passo!"
+    },
+    "profiles": {
+      "title": "1. Cadastre os Dados",
+      "description": "Primeiro, vá em \"Proprietários\" e \"Residências\" para cadastrar os dados. Você só precisa fazer isso uma vez!"
+    },
+    "customization": {
+      "title": "2. Personalize (Opcional)",
+      "description": "Nas configurações, você pode editar cláusulas e criar modelos personalizados para diferentes situações."
+    },
+    "generate": {
+      "title": "3. Crie o Contrato",
+      "description": "Clique em \"Novo Contrato\", selecione o proprietário e residência, preencha os dados do inquilino e pronto!"
+    },
+    "skip": "Pular",
+    "next": "Próximo",
+    "getStarted": "Começar"
+  }
 }

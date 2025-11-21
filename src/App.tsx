@@ -19,6 +19,8 @@ import SettingsScreen from './screens/SettingsScreen';
 import GeneratedContractsScreen from './screens/GeneratedContractsScreen';
 import ClausesScreen from './screens/ClausesScreen';
 import ContractTemplatesScreen from './screens/ContractTemplatesScreen';
+import OnboardingScreen from './screens/OnboardingScreen';
+import { OnboardingProvider, useOnboarding } from './context/OnboardingContext';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -167,8 +169,6 @@ function HomeStack() {
   );
 }
 
-
-
 function RootBottomTabNavigator() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
@@ -184,7 +184,7 @@ function RootBottomTabNavigator() {
           borderTopColor: '#eee',
           paddingBottom: insets.bottom > 0 ? insets.bottom : 8,
           paddingTop: 8,
-          height: 60 + (insets.bottom > 0 ? insets.bottom : 0),
+          height: 55 + (insets.bottom > 0 ? insets.bottom : 0),
         },
         tabBarLabelStyle: {
           fontSize: 12,
@@ -259,6 +259,7 @@ function RootBottomTabNavigator() {
 
 function AppContent() {
   const { t } = useTranslation();
+  const { hasSeenOnboarding, isLoading } = useOnboarding();
 
   React.useEffect(() => {
     async function checkForUpdates() {
@@ -300,10 +301,20 @@ function AppContent() {
     checkForUpdates();
   }, [t]);
 
+  if (isLoading) {
+    return null; // Or a loading spinner
+  }
+
   return (
     <SafeAreaProvider>
       <NavigationContainer>
-        <RootBottomTabNavigator />
+        {hasSeenOnboarding ? (
+          <RootBottomTabNavigator />
+        ) : (
+          <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+          </Stack.Navigator>
+        )}
       </NavigationContainer>
     </SafeAreaProvider>
   );
@@ -312,7 +323,9 @@ function AppContent() {
 export default function App() {
   return (
     <I18nextProvider i18n={i18n}>
-      <AppContent />
+      <OnboardingProvider>
+        <AppContent />
+      </OnboardingProvider>
     </I18nextProvider>
   );
 }

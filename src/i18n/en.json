@@ -160,5 +160,7 @@
   "updateAvailable": "Update Available",
   "updateMessage": "A new version of the app is available. Would you like to update now?",
   "update": "Update",
-  "later": "Later"
+  "later": "Later",
+  "manageClausesDescription": "Manage and create clauses",
+  "manageTemplatesDescription": "Manage contract templates"
 }

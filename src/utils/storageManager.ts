@@ -7,6 +7,7 @@ const PROPERTIES_KEY = '@lease_app_properties';
 const CLAUSES_KEY = '@lease_app_clauses';
 const TEMPLATES_KEY = '@lease_app_templates';
 const GENERATED_CONTRACTS_KEY = '@lease_app_generated_contracts';
+const ONBOARDING_KEY = '@lease_app_has_seen_onboarding';
 
 const DEFAULT_TEMPLATES: ContractTemplate[] = [
   {
@@ -105,7 +106,7 @@ export async function getTemplates(): Promise<ContractTemplate[]> {
       return DEFAULT_TEMPLATES;
     }
     const customTemplates = JSON.parse(data);
-    // Mescla templates padrão com templates customizados
+
     const allTemplates = [...DEFAULT_TEMPLATES];
     customTemplates.forEach((ct: ContractTemplate) => {
       if (!allTemplates.find(t => t.id === ct.id)) {
@@ -136,14 +137,14 @@ export async function saveTemplate(template: ContractTemplate): Promise<void> {
 
 export async function deleteTemplate(id: string): Promise<void> {
   try {
-    // Não permite deletar templates padrão
+
     if (id.startsWith('template-default-')) {
       console.warn('Cannot delete default templates');
       return;
     }
     const templates = await getTemplates();
     const filtered = templates.filter(t => t.id !== id);
-    // Salva apenas templates customizados
+
     const customTemplates = filtered.filter(t => !t.id.startsWith('template-default-'));
     await AsyncStorage.setItem(TEMPLATES_KEY, JSON.stringify(customTemplates));
   } catch (error) {
@@ -238,5 +239,23 @@ export async function deleteGeneratedContract(id: string): Promise<void> {
     await AsyncStorage.setItem(GENERATED_CONTRACTS_KEY, JSON.stringify(filtered));
   } catch (error) {
     console.error('Error deleting generated contract:', error);
+  }
+}
+
+export async function getHasSeenOnboarding(): Promise<boolean> {
+  try {
+    const value = await AsyncStorage.getItem(ONBOARDING_KEY);
+    return value === 'true';
+  } catch (error) {
+    console.error('Error getting onboarding status:', error);
+    return false;
+  }
+}
+
+export async function setHasSeenOnboarding(): Promise<void> {
+  try {
+    await AsyncStorage.setItem(ONBOARDING_KEY, 'true');
+  } catch (error) {
+    console.error('Error setting onboarding status:', error);
   }
 }

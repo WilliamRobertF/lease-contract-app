@@ -263,7 +263,6 @@ function AppContent() {
   React.useEffect(() => {
     async function checkForUpdates() {
       if (__DEV__) {
-        // Não verifica updates em desenvolvimento
         return;
       }
 

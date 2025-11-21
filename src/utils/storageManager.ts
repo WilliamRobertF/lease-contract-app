@@ -259,3 +259,27 @@ export async function setHasSeenOnboarding(): Promise<void> {
     console.error('Error setting onboarding status:', error);
   }
 }
+
+export async function clearOnboarding(): Promise<void> {
+  try {
+    await AsyncStorage.removeItem(ONBOARDING_KEY);
+  } catch (error) {
+    console.error('Error clearing onboarding status:', error);
+  }
+}
+
+export async function resetAllData(): Promise<void> {
+  try {
+    await AsyncStorage.multiRemove([
+      LANDLORDS_KEY,
+      PROPERTIES_KEY,
+      TEMPLATES_KEY,
+      GENERATED_CONTRACTS_KEY,
+      ONBOARDING_KEY,
+    ]);
+    await saveClauses(DEFAULT_CLAUSES);
+  } catch (error) {
+    console.error('Error resetting all data:', error);
+    throw error;
+  }
+}

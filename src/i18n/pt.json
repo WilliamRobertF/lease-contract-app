@@ -162,5 +162,7 @@
   "updateAvailable": "Atualização Disponível",
   "updateMessage": "Uma nova versão do app está disponível. Deseja atualizar agora?",
   "update": "Atualizar",
-  "later": "Depois"
+  "later": "Depois",
+  "manageClausesDescription": "Gerenciar e criar cláusulas",
+  "manageTemplatesDescription": "Gerenciar modelos de contrato"
 }

@@ -8,6 +8,7 @@ import {
   Alert,
   TextInput,
   Animated,
+  BackHandler,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -35,8 +36,20 @@ export default function SettingsScreen() {
           text: t('resetToFactoryDefaults'),
           onPress: async () => {
             try {
-              await saveClauses(DEFAULT_CLAUSES);
-              Alert.alert('Sucesso', t('resetSuccess'));
+              const { resetAllData } = await import('../utils/storageManager');
+              await resetAllData();
+              Alert.alert(
+                'Sucesso', 
+                'Todos os dados foram apagados.\n\nO app será fechado.',
+                [
+                  {
+                    text: 'OK',
+                    onPress: () => {
+                      setTimeout(() => BackHandler.exitApp(), 300);
+                    },
+                  },
+                ]
+              );
             } catch (error) {
               Alert.alert('Erro', t('resetError'));
             }

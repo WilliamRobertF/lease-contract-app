@@ -2,7 +2,7 @@
   "expo": {
     "name": "lease-contract-app",
     "slug": "lease-contract-app",
-    "version": "1.0.0-rc.1",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",

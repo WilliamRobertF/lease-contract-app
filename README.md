@@ -4,7 +4,7 @@ A React Native mobile application for creating and managing residential lease ag
 
 ## 📱 About
 
-This project was created to solve a real-world problem and serves as a learning and study project. The app enables users to generate, customize, and manage lease contracts (contratos de locação) directly on their mobile devices without requiring internet connectivity.
+This project was created to solve a real-world problem and serves as a learning and study project. The app enables users to generate, customize, and manage lease contracts directly on their mobile devices without requiring internet connectivity.
 
 ## ✨ Features
 
@@ -35,9 +35,6 @@ The app is designed to run **100% locally and offline**:
 - React Native
 - Expo SDK
 - TypeScript
-- React Navigation
-- AsyncStorage (local data persistence)
-- EAS Build & Update
 
 ## 📄 License
 

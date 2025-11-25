@@ -19,7 +19,7 @@ export const DEFAULT_CLAUSES: Clause[] = [
   {
     id: 'clause-4',
     title: 'Multa e Juros Moratórios',
-    content: `Em caso de mora no pagamento do aluguel, aplicar-se-á uma multa de 2% (dois por cento) sobre o valor devido e juros mensais de 1% (um por cento) do montante devido. FICARÁ POR CONTA DO LOCATÁRIO TODOS OS DÉBITOS DE ÁGUA E LUZ.`,
+    content: `Em caso de mora no pagamento do aluguel, aplicar-se-á uma multa de 2% (dois por cento) sobre o valor devido e juros mensais de 1% (um por cento) do montante devido. Ficará por conta do locatário todos os débitos de água e luz.`,
   },
   {
     id: 'clause-5',

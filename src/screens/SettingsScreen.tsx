@@ -51,21 +51,13 @@ export default function SettingsScreen() {
   };
 
   const handleExport = async () => {
-    const success = await exportData(t);
-    if (success) {
-      Alert.alert(t('success'), t('exportSuccess'));
-    }
+    await exportData(t);
   };
 
   const handleImport = async () => {
     const success = await importData(t);
-    if (success) {
-      // Reload app or data? The importData function already alerts success.
-      // We might need to trigger a re-render or context update if we had one for data.
-      // Since we read directly from storage in screens, navigating away and back usually refreshes.
-      // But for global state like clauses/templates, we might need to refresh.
-      // For now, let's assume the user will navigate.
-    }
+    // if (success) {
+    // }
   };
 
   const SettingItem = ({
@@ -114,7 +106,7 @@ export default function SettingsScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView style={styles.content}>
         <View style={styles.section}>
 
@@ -246,7 +238,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   section: {
-    marginBottom: 24,
+    marginBottom: 12,
   },
   sectionTitle: {
     fontSize: 16,
@@ -268,9 +260,8 @@ const styles = StyleSheet.create({
   },
   collapsibleContent: {
     backgroundColor: '#f5f5f5',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    marginBottom: 12,
+    paddingTop: 12,
+    paddingHorizontal: 16
   },
   separator: {
     height: 1,

@@ -100,29 +100,23 @@ export default function PropertyProfilesScreen() {
   }, [editingData]);
 
   const handleSave = async (values: PropertyData) => {
-    if (editingId) {
-      const profile: PropertyProfile = {
-        id: editingId,
-        createdAt: new Date(),
-        data: values,
-      };
-      await saveProperty(profile);
-      setEditingId(null);
-      setEditingData(null);
-      setCityStateValue('');
-    } else {
-      const profile: PropertyProfile = {
-        id: generateId(),
-        createdAt: new Date(),
-        data: values,
-      };
-      await saveProperty(profile);
-      setCityStateValue('');
-    }
-    loadProperties();
+    const id = (editingId && editingId !== 'new') ? editingId : generateId();
+
+    const profile: PropertyProfile = {
+      id,
+      createdAt: new Date(),
+      data: values,
+    };
+    
+    await saveProperty(profile);
+    await loadProperties();
 
     if (route.params?.returnTo) {
       navigation.goBack();
+    } else {
+      setEditingId(null);
+      setEditingData(null);
+      setCityStateValue('');
     }
   };
 

@@ -107,27 +107,22 @@ export default function LandlordProfilesScreen() {
   };
 
   const handleSave = async (values: PersonData) => {
-    if (editingId) {
-      const profile: LandlordProfile = {
-        id: editingId,
-        createdAt: new Date(),
-        data: values,
-      };
-      await saveLandlord(profile);
-      setEditingId(null);
-      setEditingData(null);
-    } else {
-      const profile: LandlordProfile = {
-        id: generateId(),
-        createdAt: new Date(),
-        data: values,
-      };
-      await saveLandlord(profile);
-    }
-    loadLandlords();
+    const id = (editingId && editingId !== 'new') ? editingId : generateId();
+    
+    const profile: LandlordProfile = {
+      id,
+      createdAt: new Date(),
+      data: values,
+    };
+    
+    await saveLandlord(profile);
+    await loadLandlords();
     
     if (route.params?.returnTo) {
       navigation.goBack();
+    } else {
+      setEditingId(null);
+      setEditingData(null);
     }
   };
 

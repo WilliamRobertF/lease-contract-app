@@ -45,6 +45,12 @@ export default function ClausesScreen() {
   const handleUpdateClause = async () => {
     if (!editingClause) return;
     await updateClause(editingClause.id, editingClause);
+    
+    // Update the selected clause to reflect changes immediately
+    if (selectedClause && selectedClause.id === editingClause.id) {
+      setSelectedClause(editingClause);
+    }
+    
     setShowEditModal(false);
     setEditingClause(null);
     loadClauses();
@@ -331,10 +337,7 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 4,
   },
-  clauseCategory: {
-    fontSize: 12,
-    color: '#999',
-  },
+
   modalContainer: {
     flex: 1,
     backgroundColor: '#fff',
@@ -397,31 +400,7 @@ const styles = StyleSheet.create({
     height: 120,
     textAlignVertical: 'top',
   },
-  categoryButtons: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 16,
-  },
-  categoryButton: {
-    flex: 1,
-    borderWidth: 2,
-    borderColor: '#ddd',
-    borderRadius: 6,
-    paddingVertical: 10,
-    alignItems: 'center',
-  },
-  categoryButtonActive: {
-    borderColor: '#1976d2',
-    backgroundColor: '#f0f7ff',
-  },
-  categoryButtonText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#999',
-  },
-  categoryButtonTextActive: {
-    color: '#1976d2',
-  },
+
   buttonGroup: {
     flexDirection: 'row',
     gap: 12,

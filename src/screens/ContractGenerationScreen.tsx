@@ -47,6 +47,7 @@ interface ContractGenerationState {
   monthlyRent: string;
   dueDay: string;
   contractLocation: string;
+  contractDate: Date;
 }
 
 export default function ContractGenerationScreen() {
@@ -60,6 +61,7 @@ export default function ContractGenerationScreen() {
   const [formattedContract, setFormattedContract] = useState<string>('');
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
+  const [showContractDatePicker, setShowContractDatePicker] = useState(false);
   const [hasGuarantorLocal, setHasGuarantorLocal] = useState(false);
   const [guarantorFormVisible, setGuarantorFormVisible] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
@@ -80,6 +82,7 @@ export default function ContractGenerationScreen() {
     monthlyRent: '',
     dueDay: '01',
     contractLocation: 'Salvador, BA',
+    contractDate: new Date(),
     hasGuarantor: false,
   });
 
@@ -146,6 +149,39 @@ export default function ContractGenerationScreen() {
     setStep('preview');
   };
 
+  const handleDueDayChange = (text: string) => {
+    const cleaned = text.replace(/[^0-9]/g, '');
+    
+    if (cleaned === '') {
+      setContractData({ ...contractData, dueDay: '' });
+      return;
+    }
+
+    let candidate = cleaned.slice(-2);
+    let num = parseInt(candidate, 10);
+
+    if (num > 31 || num === 0) {
+        candidate = cleaned.slice(-1);
+        num = parseInt(candidate, 10);
+    }
+    
+    if (num > 31) return;
+
+    setContractData({ ...contractData, dueDay: candidate });
+  };
+
+  const handleDueDayBlur = () => {
+    const current = contractData.dueDay || '';
+    if (current === '' || parseInt(current, 10) === 0) {
+        setContractData({ ...contractData, dueDay: '01' });
+        return;
+    }
+    
+    if (current.length === 1) {
+        setContractData({ ...contractData, dueDay: '0' + current });
+    }
+  };
+
   const handleGenerateContract = async () => {
     if (!contractData.landlord || !contractData.property || !contractData.tenant || !contractData.template) {
       Alert.alert('Error', 'Missing contract data');
@@ -165,6 +201,7 @@ export default function ContractGenerationScreen() {
         monthlyRent: String(contractData.monthlyRent || ''),
         dueDay: contractData.dueDay || '01',
         contractLocation: contractData.contractLocation || '',
+        contractDate: contractData.contractDate || new Date(),
         guaranteeInstallments: 0,
         lateFeePercentage: 0,
         monthlyInterestPercentage: 0,
@@ -528,17 +565,11 @@ export default function ContractGenerationScreen() {
                   <FormField
                     label={t('dueDay') || 'Vencimento do Aluguel'}
                     value={contractData.dueDay || ''}
-                    onChangeText={(text) => {
-                      if (text === '' || parseInt(text, 10) <= 31) {
-                        setContractData({
-                          ...contractData,
-                          dueDay: text,
-                        });
-                      }
-                    }}
+                    onChangeText={handleDueDayChange}
                     keyboardType="number-pad"
                     placeholder="01"
                     onFocus={() => handleFocus('dueDay')}
+                    onBlur={handleDueDayBlur}
                   />
                 </View>
 
@@ -560,6 +591,37 @@ export default function ContractGenerationScreen() {
                     allowCustom={true}
                     onFocus={() => handleFocus('contractLocation')}
                   />
+                </View>
+
+                <View style={styles.formField}>
+                  <Text style={styles.label}>{t('contractDate')}</Text>
+                  <TouchableOpacity
+                    style={styles.dateButton}
+                    onPress={() => setShowContractDatePicker(true)}
+                  >
+                    <MaterialCommunityIcons name="calendar" size={20} color="#1976d2" />
+                    <Text style={styles.dateButtonText}>
+                      {formatDate(contractData.contractDate || new Date(), 'dd/MM/yyyy')}
+                    </Text>
+                  </TouchableOpacity>
+                  {showContractDatePicker && (
+                    <DateTimePicker
+                      value={contractData.contractDate || new Date()}
+                      mode="date"
+                      display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                      onChange={(event, selectedDate) => {
+                        if (Platform.OS === 'android') {
+                          setShowContractDatePicker(false);
+                        }
+                        if (selectedDate) {
+                          setContractData({
+                            ...contractData,
+                            contractDate: selectedDate,
+                          });
+                        }
+                      }}
+                    />
+                  )}
                 </View>
 
                 {/* Fiador Section */}
@@ -799,6 +861,7 @@ interface FormFieldProps {
   keyboardType?: 'default' | 'decimal-pad' | 'email-address' | 'phone-pad' | 'number-pad' | 'numeric';
   onFocus?: () => void;
   placeholder?: string;
+  onBlur?: () => void;
 }
 
 function FormField({
@@ -809,6 +872,7 @@ function FormField({
   keyboardType = 'default',
   onFocus,
   placeholder,
+  onBlur,
 }: FormFieldProps) {
   const inputRef = useRef<TextInput>(null);
   
@@ -825,6 +889,7 @@ function FormField({
         onFocus={() => {
           onFocus?.();
         }}
+        onBlur={onBlur}
       />
       {error && <Text style={styles.errorText}>{error}</Text>}
     </View>

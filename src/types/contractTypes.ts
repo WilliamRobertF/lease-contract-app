@@ -36,6 +36,7 @@ export interface ContractData {
     monthlyRent: string;
     dueDay: string;
     contractLocation: string;
+    contractDate?: Date;
     guaranteeInstallments: number;
     lateFeePercentage: number;
     monthlyInterestPercentage: number;
@@ -73,6 +74,7 @@ export interface GeneratedContract {
     monthlyRent: string;
     dueDay: string;
     contractLocation: string;
+    contractDate?: Date;
     guaranteeInstallments: number;
     lateFeePercentage: number;
     monthlyInterestPercentage: number;

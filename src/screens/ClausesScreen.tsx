@@ -28,7 +28,6 @@ export default function ClausesScreen() {
   const [newClauseTitle, setNewClauseTitle] = useState('');
   const [newClauseContent, setNewClauseContent] = useState('');
 
-
   useEffect(() => {
     loadClauses();
   }, []);
@@ -89,6 +88,7 @@ export default function ClausesScreen() {
     setShowCreateClauseModal(false);
     setNewClauseTitle('');
     setNewClauseContent('');
+
   };
 
   const renderClauseItem = ({ item }: { item: Clause }) => (

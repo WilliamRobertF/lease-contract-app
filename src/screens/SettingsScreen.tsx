@@ -8,6 +8,7 @@ import {
   Alert,
   TextInput,
   Animated,
+  BackHandler,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -18,10 +19,13 @@ import Collapsible from 'react-native-collapsible';
 import { DEFAULT_CLAUSES } from '../utils/defaultClauses';
 import { saveClauses } from '../utils/storageManager';
 import { saveLanguage } from '../i18n/i18n';
+import { useOnboarding } from '../context/OnboardingContext';
+import { exportData, importData } from '../utils/backupManager';
 
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
   const navigation = useNavigation<NavigationProp>();
+  const { resetOnboarding } = useOnboarding();
   const [showLanguageSelector, setShowLanguageSelector] = useState(false);
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
 
@@ -35,8 +39,7 @@ export default function SettingsScreen() {
           text: t('resetToFactoryDefaults'),
           onPress: async () => {
             try {
-              await saveClauses(DEFAULT_CLAUSES);
-              Alert.alert('Sucesso', t('resetSuccess'));
+              await resetOnboarding();
             } catch (error) {
               Alert.alert('Erro', t('resetError'));
             }
@@ -45,6 +48,24 @@ export default function SettingsScreen() {
         },
       ]
     );
+  };
+
+  const handleExport = async () => {
+    const success = await exportData(t);
+    if (success) {
+      Alert.alert(t('success'), t('exportSuccess'));
+    }
+  };
+
+  const handleImport = async () => {
+    const success = await importData(t);
+    if (success) {
+      // Reload app or data? The importData function already alerts success.
+      // We might need to trigger a re-render or context update if we had one for data.
+      // Since we read directly from storage in screens, navigating away and back usually refreshes.
+      // But for global state like clauses/templates, we might need to refresh.
+      // For now, let's assume the user will navigate.
+    }
   };
 
   const SettingItem = ({
@@ -160,7 +181,7 @@ export default function SettingsScreen() {
           <SettingItem
             icon="file-document"
             title={t('clauses')}
-            description="Manage and create clauses"
+            description={t('manageClausesDescription')}
             onPress={() =>
               navigation.navigate('Clauses')
             }
@@ -169,7 +190,7 @@ export default function SettingsScreen() {
           <SettingItem
             icon="file-multiple"
             title={t('templates')}
-            description="Manage contract templates"
+            description={t('manageTemplatesDescription')}
             onPress={() =>
               navigation.navigate('Templates')
             }
@@ -186,6 +207,19 @@ export default function SettingsScreen() {
 
           <Collapsible collapsed={!showAdvancedSettings} duration={300}>
             <View style={styles.collapsibleContent}>
+              <SettingItem
+                icon="download"
+                title={t('importData')}
+                description={t('importDescription')}
+                onPress={handleImport}
+              />
+              <SettingItem
+                icon="upload"
+                title={t('exportData')}
+                description={t('exportDescription')}
+                onPress={handleExport}
+              />
+              <View style={styles.separator} />
               <SettingItem
                 icon="refresh"
                 title={t('resetToFactoryDefaults')}
@@ -234,9 +268,14 @@ const styles = StyleSheet.create({
   },
   collapsibleContent: {
     backgroundColor: '#f5f5f5',
-    paddingVertical: 8,
+    paddingVertical: 12,
     paddingHorizontal: 16,
     marginBottom: 12,
+  },
+  separator: {
+    height: 1,
+    backgroundColor: '#e0e0e0',
+    marginVertical: 8,
   },
   advancedItem: {
     paddingHorizontal: 0,

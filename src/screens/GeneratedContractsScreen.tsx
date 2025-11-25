@@ -45,7 +45,6 @@ export default function GeneratedContractsScreen() {
     setSelectedContract(contract);
     setLoading(true);
     try {
-      // Se tem formattedContent salvo, usa; senão tenta formatar novamente
       if (contract.formattedContent) {
         setFormattedText(contract.formattedContent);
       } else {

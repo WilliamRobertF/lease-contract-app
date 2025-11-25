@@ -44,7 +44,6 @@
   "addLandlord": "Adicionar Proprietário",
   "addProperty": "Adicionar Residência",
   "newContract": "Novo Contrato",
-  "properties": "Propriedades",
   "propertyProfiles": "Residências",
   "street": "Rua",
   "number": "Número",
@@ -63,6 +62,7 @@
   "edit": "Editar",
   "delete": "Deletar",
   "save": "Salvar",
+  "success": "Sucesso",
   "cancel": "Cancelar",
   "back": "Voltar",
   "close": "Fechar",
@@ -122,6 +122,8 @@
   "addClause": "Adicionar Cláusula",
   "createClause": "Criar Cláusula",
   "quickActions": "Ações Rápidas",
+  "landlords": "Proprietários",
+  "properties": "Residências",
   "profiles": "Perfis",
   "tips": "Dicas",
   "alerts": "alertas importantes",
@@ -137,7 +139,24 @@
   "details": "Detalhes",
   "guarantorDetails": "Detalhes do Fiador",
   "next": "Próximo",
-  "contractLocation": "Cidade/Local do Contrato",
+  "contractLocation": "Local do Contrato",
+  "contractDate": "Data do Contrato",
+  "backupRestore": "Backup e Restauração",
+  "exportData": "Exportar Dados",
+  "importData": "Importar Dados",
+  "exportDescription": "Salvar cópia de segurança",
+  "exportSuccess": "Dados exportados com sucesso!",
+  "importDescription": "Restaurar dados de arquivo",
+  "shareNotAvailable": "Compartilhamento não está disponível neste dispositivo",
+  "exportError": "Falha ao exportar dados",
+  "invalidFile": "Arquivo inválido",
+  "invalidFileMessage": "O arquivo selecionado não é um JSON válido.",
+  "invalidBackupFormat": "Formato de backup inválido",
+  "confirmImportTitle": "Confirmar Importação",
+  "confirmImportMessage": "Isso irá mesclar os dados do backup com os dados atuais. Itens com o mesmo ID serão atualizados. Deseja continuar?",
+  "importSuccess": "Dados importados com sucesso!",
+  "importError": "Falha ao importar dados",
+  "import": "Importar",
   "manageContracts": "Gerencie seus contratos de locação com eficiência",
   "advancedSettings": "Configurações Avançadas",
   "resetToFactoryDefaults": "Resetar para Padrões de Fábrica",
@@ -160,5 +179,28 @@
   "updateAvailable": "Atualização Disponível",
   "updateMessage": "Uma nova versão do app está disponível. Deseja atualizar agora?",
   "update": "Atualizar",
-  "later": "Depois"
+  "later": "Depois",
+  "manageClausesDescription": "Gerenciar e criar cláusulas",
+  "manageTemplatesDescription": "Gerenciar modelos de contrato",
+  "onboarding": {
+    "welcome": {
+      "title": "Bem-vindo!",
+      "description": "Criar contratos de locação agora é simples e rápido. Siga o passo a passo!"
+    },
+    "profiles": {
+      "title": "1. Cadastre os Dados",
+      "description": "Primeiro, vá em \"Proprietários\" e \"Residências\" para cadastrar os dados. Você só precisa fazer isso uma vez!"
+    },
+    "customization": {
+      "title": "2. Personalize (Opcional)",
+      "description": "Nas configurações, você pode editar cláusulas e criar modelos personalizados para diferentes situações."
+    },
+    "generate": {
+      "title": "3. Crie o Contrato",
+      "description": "Clique em \"Novo Contrato\", selecione o proprietário e residência, preencha os dados do inquilino e pronto!"
+    },
+    "skip": "Pular",
+    "next": "Próximo",
+    "getStarted": "Começar"
+  }
 }

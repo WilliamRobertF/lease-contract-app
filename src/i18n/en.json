@@ -63,6 +63,7 @@
   "edit": "Edit",
   "delete": "Delete",
   "save": "Save",
+  "success": "Success",
   "cancel": "Cancel",
   "back": "Back",
   "close": "Close",
@@ -137,6 +138,23 @@
   "details": "Details",
   "next": "Next",
   "contractLocation": "Contract City/Location",
+  "contractDate": "Contract Date",
+  "backupRestore": "Backup & Restore",
+  "exportData": "Export Data",
+  "importData": "Import Data",
+  "exportDescription": "Save backup copy",
+  "exportSuccess": "Data exported successfully!",
+  "importDescription": "Restore data from file",
+  "shareNotAvailable": "Sharing is not available on this device",
+  "exportError": "Failed to export data",
+  "invalidFile": "Invalid File",
+  "invalidFileMessage": "The selected file is not a valid JSON.",
+  "invalidBackupFormat": "Invalid backup format",
+  "confirmImportTitle": "Confirm Import",
+  "confirmImportMessage": "This will merge backup data with current data. Items with the same ID will be updated. Do you wish to continue?",
+  "importSuccess": "Data imported successfully!",
+  "importError": "Failed to import data",
+  "import": "Import",
   "manageContracts": "Manage your rental contracts efficiently",
   "advancedSettings": "Advanced Settings",
     "resetToFactoryDefaults": "Reset to Factory Defaults",
@@ -159,5 +177,28 @@
   "updateAvailable": "Update Available",
   "updateMessage": "A new version of the app is available. Would you like to update now?",
   "update": "Update",
-  "later": "Later"
+  "later": "Later",
+  "manageClausesDescription": "Manage and create clauses",
+  "manageTemplatesDescription": "Manage contract templates",
+  "onboarding": {
+    "welcome": {
+      "title": "Welcome!",
+      "description": "Creating rental contracts is now simple and fast. Follow the steps!"
+    },
+    "profiles": {
+      "title": "1. Register Data",
+      "description": "First, go to \"Landlords\" and \"Properties\" to register the data. You only need to do this once!"
+    },
+    "customization": {
+      "title": "2. Customize (Optional)",
+      "description": "In settings, you can edit clauses and create custom templates for different situations."
+    },
+    "generate": {
+      "title": "3. Create Contract",
+      "description": "Click on \"New Contract\", select the landlord and property, fill in the tenant data and you're done!"
+    },
+    "skip": "Skip",
+    "next": "Next",
+    "getStarted": "Get Started"
+  }
 }

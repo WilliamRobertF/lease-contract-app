@@ -61,6 +61,7 @@ function generateContractHTML(
   const guarantorCPF = contractData?.guarantor?.cpf || "";
 
   const contractLocation = contractData?.contractLocation || "";
+  const contractDate = contractData?.contractDate ? new Date(contractData.contractDate) : new Date();
   const propertyDescription = contractData?.property?.data?.description || "";
 
   // Contract financial and date information
@@ -194,7 +195,7 @@ function generateContractHTML(
 ${contractHtml}
 
 <div class="date-location">
-  <strong>${contractLocation.toUpperCase()}, _____ de _________________ de ${year}</strong>
+  <strong>${contractLocation.toUpperCase()}, ${formatBrazilianDate(contractDate)}</strong>
 </div>
 
 <div class="signature-section">

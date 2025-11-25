@@ -26,7 +26,7 @@ export default function HomeScreen() {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       
-      // Contratos que vencem nos próximos 30 dias
+
       const thirtyDaysLater = new Date(today);
       thirtyDaysLater.setDate(thirtyDaysLater.getDate() + 30);
       
@@ -46,7 +46,7 @@ export default function HomeScreen() {
     if (expiringContracts.length > 0) {
       return expiringContracts[0];
     }
-    // Se não há contratos vencendo em 30 dias, busca o próximo a vencer
+
     return null;
   };
 
@@ -83,13 +83,13 @@ export default function HomeScreen() {
           <View style={styles.actionGrid}>
             <QuickActionButton
               icon="account-plus"
-              label={t('addLandlord')}
+              label={t('landlords')}
               color="#4caf50"
               onPress={() => navigation.navigate('LandlordProfiles')}
             />
             <QuickActionButton
               icon="home-plus"
-              label={t('addProperty')}
+              label={t('properties')}
               color="#ff9800"
               onPress={() => navigation.navigate('PropertyProfiles')}
             />

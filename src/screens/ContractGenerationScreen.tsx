@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import {
   View,
   ScrollView,
@@ -14,7 +14,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTranslation } from 'react-i18next';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { NavigationProp } from '../types/navigationTypes';
 import { Formik } from 'formik';
@@ -47,6 +47,7 @@ interface ContractGenerationState {
   monthlyRent: string;
   dueDay: string;
   contractLocation: string;
+  contractDate: Date;
 }
 
 export default function ContractGenerationScreen() {
@@ -60,24 +61,39 @@ export default function ContractGenerationScreen() {
   const [formattedContract, setFormattedContract] = useState<string>('');
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
+  const [showContractDatePicker, setShowContractDatePicker] = useState(false);
   const [hasGuarantorLocal, setHasGuarantorLocal] = useState(false);
   const [guarantorFormVisible, setGuarantorFormVisible] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
+  const sectionY = useRef<{ [key: string]: number }>({});
+
+  const handleFocus = (section: string) => {
+    const y = sectionY.current[section] || 0;
+    setTimeout(() => {
+      scrollViewRef.current?.scrollTo({
+        y: Math.max(0, y - 20),
+        animated: true,
+      });
+    }, 100);
+  };
   const [contractData, setContractData] = useState<Partial<ContractGenerationState>>({
     startDate: new Date(),
     endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
     monthlyRent: '',
     dueDay: '01',
     contractLocation: 'Salvador, BA',
+    contractDate: new Date(),
     hasGuarantor: false,
   });
 
   const nationalities = useMemo(() => i18n.language === 'pt' ? NATIONALITIES_PT : NATIONALITIES_EN, [i18n.language]);
   const birthplaces = useMemo(() => i18n.language === 'pt' ? ALL_BIRTHPLACES_PT : ALL_BIRTHPLACES_EN, [i18n.language]);
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadData();
+    }, [])
+  );
 
   useEffect(() => {
     if (step !== 'tenant') return;
@@ -133,6 +149,39 @@ export default function ContractGenerationScreen() {
     setStep('preview');
   };
 
+  const handleDueDayChange = (text: string) => {
+    const cleaned = text.replace(/[^0-9]/g, '');
+    
+    if (cleaned === '') {
+      setContractData({ ...contractData, dueDay: '' });
+      return;
+    }
+
+    let candidate = cleaned.slice(-2);
+    let num = parseInt(candidate, 10);
+
+    if (num > 31 || num === 0) {
+        candidate = cleaned.slice(-1);
+        num = parseInt(candidate, 10);
+    }
+    
+    if (num > 31) return;
+
+    setContractData({ ...contractData, dueDay: candidate });
+  };
+
+  const handleDueDayBlur = () => {
+    const current = contractData.dueDay || '';
+    if (current === '' || parseInt(current, 10) === 0) {
+        setContractData({ ...contractData, dueDay: '01' });
+        return;
+    }
+    
+    if (current.length === 1) {
+        setContractData({ ...contractData, dueDay: '0' + current });
+    }
+  };
+
   const handleGenerateContract = async () => {
     if (!contractData.landlord || !contractData.property || !contractData.tenant || !contractData.template) {
       Alert.alert('Error', 'Missing contract data');
@@ -152,6 +201,7 @@ export default function ContractGenerationScreen() {
         monthlyRent: String(contractData.monthlyRent || ''),
         dueDay: contractData.dueDay || '01',
         contractLocation: contractData.contractLocation || '',
+        contractDate: contractData.contractDate || new Date(),
         guaranteeInstallments: 0,
         lateFeePercentage: 0,
         monthlyInterestPercentage: 0,
@@ -194,6 +244,13 @@ export default function ContractGenerationScreen() {
         <View style={styles.emptyState}>
           <MaterialCommunityIcons name="inbox" size={48} color="#999" />
           <Text style={styles.emptyText}>{t('noLandlordsYet')}</Text>
+          <TouchableOpacity
+            style={[styles.submitButton, { marginTop: 20, flex: 0, width: '100%' }]}
+            onPress={() => navigation.navigate('LandlordProfiles', { returnTo: 'ContractGeneration' })}
+          >
+            <MaterialCommunityIcons name="plus" size={20} color="#fff" />
+            <Text style={styles.submitButtonText}>{t('createLandlord', { defaultValue: 'Cadastrar Proprietário' })}</Text>
+          </TouchableOpacity>
         </View>
       ) : (
         <FlatList
@@ -226,6 +283,13 @@ export default function ContractGenerationScreen() {
         <View style={styles.emptyState}>
           <MaterialCommunityIcons name="home-outline" size={48} color="#999" />
           <Text style={styles.emptyText}>{t('noPropertiesYet')}</Text>
+          <TouchableOpacity
+            style={[styles.submitButton, { marginTop: 20, flex: 0, width: '100%' }]}
+            onPress={() => navigation.navigate('PropertyProfiles', { returnTo: 'ContractGeneration' })}
+          >
+            <MaterialCommunityIcons name="plus" size={20} color="#fff" />
+            <Text style={styles.submitButtonText}>{t('createProperty', { defaultValue: 'Cadastrar Imóvel' })}</Text>
+          </TouchableOpacity>
         </View>
       ) : (
         <FlatList
@@ -311,146 +375,175 @@ export default function ContractGenerationScreen() {
             handleTenantSubmit(tenantData, hasGuarantorLocal, guarantorData);
           }}
         >
-          {({ values, errors, touched, setFieldValue, handleSubmit, isValid }) => (
+          {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue, isValid }) => (
             <>
               <ScrollView
-                  ref={scrollViewRef}
-                  style={styles.formContainer}
-                  contentContainerStyle={{ paddingBottom: 120 }}
-                  keyboardShouldPersistTaps="handled"
-                  showsVerticalScrollIndicator={true}
-                  keyboardDismissMode="on-drag"
+                ref={scrollViewRef}
+                style={styles.formContainer}
+                contentContainerStyle={{ paddingBottom: 120 }}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={true}
+                keyboardDismissMode="on-drag"
+              >
+                <Text style={[styles.stepTitle, { marginBottom: 20, marginTop: 0, textAlign: 'center' }]}>{t('fillTenantData')}</Text>
+                
+                <View 
+                  style={styles.formField}
+                  onLayout={(e) => sectionY.current['name'] = e.nativeEvent.layout.y}
                 >
-                  <Text style={[styles.stepTitle, { marginBottom: 20, marginTop: 0, textAlign: 'center' }]}>{t('fillTenantData')}</Text>
-                  <View style={{ marginTop: 0 }}>
                   <FormField
                     label={t('tenantName')}
                     value={values.name}
                     onChangeText={(text) => setFieldValue('name', text)}
                     error={touched.name && errors.name}
+                    onFocus={() => handleFocus('name')}
                   />
-                  </View>
+                </View>
+
+                <View 
+                  style={styles.formField}
+                  onLayout={(e) => sectionY.current['cpf'] = e.nativeEvent.layout.y}
+                >
                   <FormField
                     label={t('cpf')}
                     value={values.cpf}
                     onChangeText={(text) => setFieldValue('cpf', text)}
                     error={touched.cpf && errors.cpf}
+                    onFocus={() => handleFocus('cpf')}
                   />
+                </View>
+
+                <View 
+                  style={styles.formField}
+                  onLayout={(e) => sectionY.current['rg'] = e.nativeEvent.layout.y}
+                >
                   <FormField
                     label={t('rg')}
                     value={values.rg}
                     onChangeText={(text) => setFieldValue('rg', text)}
                     error={touched.rg && errors.rg}
+                    onFocus={() => handleFocus('rg')}
                   />
-                  <View style={styles.formField}>
-                    <Text style={styles.label}>{t('nationality')}</Text>
-                    <AutocompleteInput
-                      value={values.nationality}
-                      onChangeText={(text) => setFieldValue('nationality', text)}
-                      placeholder={t('nationality')}
-                      suggestions={nationalities}
-                      allowCustom={true}
-                      onFocus={() => {
-                        setTimeout(() => {
-                          scrollViewRef.current?.scrollTo({ y: 230, animated: true });
-                        }, 100);
+                </View>
+
+                <View 
+                  style={styles.formField}
+                  onLayout={(e) => sectionY.current['nationality'] = e.nativeEvent.layout.y}
+                >
+                  <Text style={styles.label}>{t('nationality')}</Text>
+                  <AutocompleteInput
+                    value={values.nationality}
+                    onChangeText={(text) => setFieldValue('nationality', text)}
+                    placeholder={t('nationality')}
+                    suggestions={nationalities}
+                    allowCustom={true}
+                    onFocus={() => handleFocus('nationality')}
+                  />
+                  {touched.nationality && errors.nationality && (
+                    <Text style={styles.errorText}>{errors.nationality}</Text>
+                  )}
+                </View>
+
+                <View 
+                  style={styles.formField}
+                  onLayout={(e) => sectionY.current['maritalStatus'] = e.nativeEvent.layout.y}
+                >
+                  <Text style={styles.label}>{t('maritalStatus')}</Text>
+                  <MaritalStatusPicker
+                    value={values.maritalStatus}
+                    onValueChange={(text) => setFieldValue('maritalStatus', text)}
+                  />
+                  {touched.maritalStatus && errors.maritalStatus && (
+                    <Text style={styles.errorText}>{errors.maritalStatus}</Text>
+                  )}
+                </View>
+
+
+
+                <View 
+                  style={styles.formField}
+                  onLayout={(e) => sectionY.current['birthplace'] = e.nativeEvent.layout.y}
+                >
+                  <Text style={styles.label}>{t('birthplace')}</Text>
+                  <AutocompleteInput
+                    value={values.birthplace}
+                    onChangeText={(text) => setFieldValue('birthplace', text)}
+                    placeholder={t('birthplace')}
+                    suggestions={birthplaces}
+                    allowCustom={true}
+                    onFocus={() => handleFocus('birthplace')}
+                  />
+                  {touched.birthplace && errors.birthplace && (
+                    <Text style={styles.errorText}>{errors.birthplace}</Text>
+                  )}
+                </View>
+
+                <View style={styles.formField}>
+                  <Text style={styles.label}>{t('startDate')}</Text>
+                  <TouchableOpacity
+                    style={styles.dateButton}
+                    onPress={() => setShowStartDatePicker(true)}
+                  >
+                    <MaterialCommunityIcons name="calendar" size={20} color="#1976d2" />
+                    <Text style={styles.dateButtonText}>
+                      {formatDate(contractData.startDate || new Date(), 'dd/MM/yyyy')}
+                    </Text>
+                  </TouchableOpacity>
+                  {showStartDatePicker && (
+                    <DateTimePicker
+                      value={contractData.startDate || new Date()}
+                      mode="date"
+                      display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                      onChange={(event, selectedDate) => {
+                        if (Platform.OS === 'android') {
+                          setShowStartDatePicker(false);
+                        }
+                        if (selectedDate) {
+                          setContractData({
+                            ...contractData,
+                            startDate: selectedDate,
+                          });
+                        }
                       }}
                     />
-                    {touched.nationality && errors.nationality && (
-                      <Text style={styles.errorText}>{errors.nationality}</Text>
-                    )}
-                  </View>
-                  <View style={styles.formField}>
-                    <Text style={styles.label}>{t('maritalStatus')}</Text>
-                    <MaritalStatusPicker
-                      value={values.maritalStatus}
-                      onValueChange={(text) => setFieldValue('maritalStatus', text)}
-                    />
-                    {touched.maritalStatus && errors.maritalStatus && (
-                      <Text style={styles.errorText}>{errors.maritalStatus}</Text>
-                    )}
-                  </View>
-                  <View style={styles.formField}>
-                    <Text style={styles.label}>{t('birthplace')}</Text>
-                    <AutocompleteInput
-                      value={values.birthplace}
-                      onChangeText={(text) => setFieldValue('birthplace', text)}
-                      placeholder={t('birthplace')}
-                      suggestions={birthplaces}
-                      allowCustom={true}
-                      onFocus={() => {
-                        setTimeout(() => {
-                          scrollViewRef.current?.scrollTo({ y: 350, animated: true });
-                        }, 100);
+                  )}
+                </View>
+
+                <View style={styles.formField}>
+                  <Text style={styles.label}>{t('endDate')}</Text>
+                  <TouchableOpacity
+                    style={styles.dateButton}
+                    onPress={() => setShowEndDatePicker(true)}
+                  >
+                    <MaterialCommunityIcons name="calendar" size={20} color="#1976d2" />
+                    <Text style={styles.dateButtonText}>
+                      {formatDate(contractData.endDate || new Date(), 'dd/MM/yyyy')}
+                    </Text>
+                  </TouchableOpacity>
+                  {showEndDatePicker && (
+                    <DateTimePicker
+                      value={contractData.endDate || new Date()}
+                      mode="date"
+                      display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                      onChange={(event, selectedDate) => {
+                        if (Platform.OS === 'android') {
+                          setShowEndDatePicker(false);
+                        }
+                        if (selectedDate) {
+                          setContractData({
+                            ...contractData,
+                            endDate: selectedDate,
+                          });
+                        }
                       }}
                     />
-                    {touched.birthplace && errors.birthplace && (
-                      <Text style={styles.errorText}>{errors.birthplace}</Text>
-                    )}
-                  </View>
+                  )}
+                </View>
 
-                  <View style={styles.formField}>
-                    <Text style={styles.label}>{t('startDate')}</Text>
-                    <TouchableOpacity
-                      style={styles.dateButton}
-                      onPress={() => setShowStartDatePicker(true)}
-                    >
-                      <MaterialCommunityIcons name="calendar" size={20} color="#1976d2" />
-                      <Text style={styles.dateButtonText}>
-                        {formatDate(contractData.startDate || new Date(), 'dd/MM/yyyy')}
-                      </Text>
-                    </TouchableOpacity>
-                    {showStartDatePicker && (
-                      <DateTimePicker
-                        value={contractData.startDate || new Date()}
-                        mode="date"
-                        display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                        onChange={(event, selectedDate) => {
-                          if (Platform.OS === 'android') {
-                            setShowStartDatePicker(false);
-                          }
-                          if (selectedDate) {
-                            setContractData({
-                              ...contractData,
-                              startDate: selectedDate,
-                            });
-                          }
-                        }}
-                      />
-                    )}
-                  </View>
-
-                  <View style={styles.formField}>
-                    <Text style={styles.label}>{t('endDate')}</Text>
-                    <TouchableOpacity
-                      style={styles.dateButton}
-                      onPress={() => setShowEndDatePicker(true)}
-                    >
-                      <MaterialCommunityIcons name="calendar" size={20} color="#1976d2" />
-                      <Text style={styles.dateButtonText}>
-                        {formatDate(contractData.endDate || new Date(), 'dd/MM/yyyy')}
-                      </Text>
-                    </TouchableOpacity>
-                    {showEndDatePicker && (
-                      <DateTimePicker
-                        value={contractData.endDate || new Date()}
-                        mode="date"
-                        display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                        onChange={(event, selectedDate) => {
-                          if (Platform.OS === 'android') {
-                            setShowEndDatePicker(false);
-                          }
-                          if (selectedDate) {
-                            setContractData({
-                              ...contractData,
-                              endDate: selectedDate,
-                            });
-                          }
-                        }}
-                      />
-                    )}
-                  </View>
-
+                <View 
+                  style={styles.formField}
+                  onLayout={(e) => sectionY.current['monthlyRent'] = e.nativeEvent.layout.y}
+                >
                   <FormField
                     label={t('monthlyRent')}
                     value={String(contractData.monthlyRent || '')}
@@ -461,126 +554,180 @@ export default function ContractGenerationScreen() {
                       })
                     }
                     keyboardType="default"
+                    onFocus={() => handleFocus('monthlyRent')}
                   />
+                </View>
 
+                <View 
+                  style={styles.formField}
+                  onLayout={(e) => sectionY.current['dueDay'] = e.nativeEvent.layout.y}
+                >
                   <FormField
                     label={t('dueDay') || 'Vencimento do Aluguel'}
                     value={contractData.dueDay || ''}
-                    onChangeText={(text) => {
-                      if (text === '' || parseInt(text, 10) <= 31) {
-                        setContractData({
-                          ...contractData,
-                          dueDay: text,
-                        });
-                      }
-                    }}
+                    onChangeText={handleDueDayChange}
                     keyboardType="number-pad"
                     placeholder="01"
+                    onFocus={() => handleFocus('dueDay')}
+                    onBlur={handleDueDayBlur}
                   />
+                </View>
 
-                  <View style={styles.formField}>
-                    <Text style={styles.label}>{t('contractLocation')}</Text>
-                    <AutocompleteInput
-                      value={String(contractData.contractLocation || '')}
-                      onChangeText={(text) =>
-                        setContractData({
-                          ...contractData,
-                          contractLocation: text,
-                        })
-                      }
-                      placeholder="Ex: Salvador, BA"
-                      suggestions={BRAZILIAN_CITIES}
-                      allowCustom={true}
-                      onFocus={() => {
-                        setTimeout(() => {
-                          scrollViewRef.current?.scrollTo({ y: 530, animated: true });
-                        }, 100);
+                <View 
+                  style={styles.formField}
+                  onLayout={(e) => sectionY.current['contractLocation'] = e.nativeEvent.layout.y}
+                >
+                  <Text style={styles.label}>{t('contractLocation')}</Text>
+                  <AutocompleteInput
+                    value={String(contractData.contractLocation || '')}
+                    onChangeText={(text) =>
+                      setContractData({
+                        ...contractData,
+                        contractLocation: text,
+                      })
+                    }
+                    placeholder="Ex: Salvador, BA"
+                    suggestions={BRAZILIAN_CITIES}
+                    allowCustom={true}
+                    onFocus={() => handleFocus('contractLocation')}
+                  />
+                </View>
+
+                <View style={styles.formField}>
+                  <Text style={styles.label}>{t('contractDate')}</Text>
+                  <TouchableOpacity
+                    style={styles.dateButton}
+                    onPress={() => setShowContractDatePicker(true)}
+                  >
+                    <MaterialCommunityIcons name="calendar" size={20} color="#1976d2" />
+                    <Text style={styles.dateButtonText}>
+                      {formatDate(contractData.contractDate || new Date(), 'dd/MM/yyyy')}
+                    </Text>
+                  </TouchableOpacity>
+                  {showContractDatePicker && (
+                    <DateTimePicker
+                      value={contractData.contractDate || new Date()}
+                      mode="date"
+                      display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                      onChange={(event, selectedDate) => {
+                        if (Platform.OS === 'android') {
+                          setShowContractDatePicker(false);
+                        }
+                        if (selectedDate) {
+                          setContractData({
+                            ...contractData,
+                            contractDate: selectedDate,
+                          });
+                        }
                       }}
                     />
-                  </View>
+                  )}
+                </View>
 
-                  {/* Fiador Section */}
-                  <View style={styles.separatorContainer}>
-                    <TouchableOpacity
-                      style={[styles.button, hasGuarantorLocal && styles.buttonActive]}
-                      onPress={() => {
-                        setHasGuarantorLocal(!hasGuarantorLocal);
-                        setGuarantorFormVisible(!hasGuarantorLocal);
-                      }}
+                {/* Fiador Section */}
+                <View style={styles.separatorContainer}>
+                  <TouchableOpacity
+                    style={[styles.button, hasGuarantorLocal && styles.buttonActive]}
+                    onPress={() => {
+                      setHasGuarantorLocal(!hasGuarantorLocal);
+                      setGuarantorFormVisible(!hasGuarantorLocal);
+                    }}
+                  >
+                    <MaterialCommunityIcons
+                      name={hasGuarantorLocal ? 'checkbox-marked' : 'checkbox-blank-outline'}
+                      size={24}
+                      color={hasGuarantorLocal ? '#1976d2' : '#999'}
+                    />
+                    <Text style={styles.buttonText}>{t('hasGuarantor')}</Text>
+                  </TouchableOpacity>
+                </View>
+
+                {guarantorFormVisible && (
+                  <View style={styles.guarantorFormContainer}>
+                    <Text style={styles.guarantorFormTitle}>{t('guarantorDetails', { defaultValue: 'Detalhes do Fiador' })}</Text>
+
+                    <View 
+                      style={styles.formField}
+                      onLayout={(e) => sectionY.current['guarantorName'] = e.nativeEvent.layout.y}
                     >
-                      <MaterialCommunityIcons
-                        name={hasGuarantorLocal ? 'checkbox-marked' : 'checkbox-blank-outline'}
-                        size={24}
-                        color={hasGuarantorLocal ? '#1976d2' : '#999'}
-                      />
-                      <Text style={styles.buttonText}>{t('hasGuarantor')}</Text>
-                    </TouchableOpacity>
-                  </View>
-
-                  {guarantorFormVisible && (
-                    <View style={styles.guarantorFormContainer}>
-                      <Text style={styles.guarantorFormTitle}>{t('guarantorDetails', { defaultValue: 'Detalhes do Fiador' })}</Text>
-
                       <FormField
                         label={t('guarantorName')}
                         value={values.guarantorName}
                         onChangeText={(text) => setFieldValue('guarantorName', text)}
                         error={touched.guarantorName && errors.guarantorName}
+                        onFocus={() => handleFocus('guarantorName')}
                       />
+                    </View>
+                    <View 
+                      style={styles.formField}
+                      onLayout={(e) => sectionY.current['guarantorCpf'] = e.nativeEvent.layout.y}
+                    >
                       <FormField
                         label={t('cpf')}
                         value={values.guarantorCpf}
                         onChangeText={(text) => setFieldValue('guarantorCpf', text)}
                         error={touched.guarantorCpf && errors.guarantorCpf}
+                        onFocus={() => handleFocus('guarantorCpf')}
                       />
+                    </View>
+                    <View 
+                      style={styles.formField}
+                      onLayout={(e) => sectionY.current['guarantorRg'] = e.nativeEvent.layout.y}
+                    >
                       <FormField
                         label={t('rg')}
                         value={values.guarantorRg}
                         onChangeText={(text) => setFieldValue('guarantorRg', text)}
                         error={touched.guarantorRg && errors.guarantorRg}
+                        onFocus={() => handleFocus('guarantorRg')}
                       />
-                      <View style={styles.formField}>
-                        <Text style={styles.label}>{t('nationality')}</Text>
-                        <AutocompleteInput
-                          value={values.guarantorNationality}
-                          onChangeText={(text) => setFieldValue('guarantorNationality', text)}
-                          placeholder={t('nationality')}
-                          suggestions={nationalities}
-                          allowCustom={true}
-                          onFocus={() => {
-                            setTimeout(() => {
-                              scrollViewRef.current?.scrollTo({ y: 1130, animated: true });
-                            }, 100);
-                          }}
-                        />
-                      </View>
-                      <View style={styles.formField}>
-                        <Text style={styles.label}>{t('maritalStatus')}</Text>
-                        <MaritalStatusPicker
-                          value={values.guarantorMaritalStatus}
-                          onValueChange={(text) => setFieldValue('guarantorMaritalStatus', text)}
-                        />
-                      </View>
-                      <View style={styles.formField}>
-                        <Text style={styles.label}>{t('birthplace')}</Text>
-                        <AutocompleteInput
-                          value={values.guarantorBirthplace}
-                          onChangeText={(text) => setFieldValue('guarantorBirthplace', text)}
-                          placeholder={t('birthplace')}
-                          suggestions={birthplaces}
-                          allowCustom={true}
-                          onFocus={() => {
-                            setTimeout(() => {
-                              scrollViewRef.current?.scrollTo({ y: 1330, animated: true });
-                            }, 100);
-                          }}
-                        />
-                      </View>
                     </View>
-                  )}
-                </ScrollView>
+                    <View 
+                      style={styles.formField}
+                      onLayout={(e) => sectionY.current['guarantorNationality'] = e.nativeEvent.layout.y}
+                    >
+                      <Text style={styles.label}>{t('nationality')}</Text>
+                      <AutocompleteInput
+                        value={values.guarantorNationality}
+                        onChangeText={(text) => setFieldValue('guarantorNationality', text)}
+                        placeholder={t('nationality')}
+                        suggestions={nationalities}
+                        allowCustom={true}
+                        onFocus={() => handleFocus('guarantorNationality')}
+                      />
+                    </View>
+                    <View style={styles.formField}>
+                      <Text style={styles.label}>{t('maritalStatus')}</Text>
+                      <MaritalStatusPicker
+                        value={values.guarantorMaritalStatus}
+                        onValueChange={(text) => setFieldValue('guarantorMaritalStatus', text)}
+                      />
+                    </View>
+                    <View 
+                      style={styles.formField}
+                      onLayout={(e) => sectionY.current['guarantorBirthplace'] = e.nativeEvent.layout.y}
+                    >
+                      <Text style={styles.label}>{t('birthplace')}</Text>
+                      <AutocompleteInput
+                        value={values.guarantorBirthplace}
+                        onChangeText={(text) => setFieldValue('guarantorBirthplace', text)}
+                        placeholder={t('birthplace')}
+                        suggestions={birthplaces}
+                        allowCustom={true}
+                        onFocus={() => handleFocus('guarantorBirthplace')}
+                      />
+                    </View>
+                  </View>
+                )}
+              </ScrollView>
 
               <View style={styles.fixedBottomButton}>
+                <TouchableOpacity
+                  style={styles.backButton}
+                  onPress={() => setStep('property')}
+                >
+                  <Text style={styles.backButtonText}>{t('back')}</Text>
+                </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.submitButton, !isValid && styles.submitButtonDisabled]}
                   onPress={() => handleSubmit()}
@@ -714,6 +861,7 @@ interface FormFieldProps {
   keyboardType?: 'default' | 'decimal-pad' | 'email-address' | 'phone-pad' | 'number-pad' | 'numeric';
   onFocus?: () => void;
   placeholder?: string;
+  onBlur?: () => void;
 }
 
 function FormField({
@@ -724,6 +872,7 @@ function FormField({
   keyboardType = 'default',
   onFocus,
   placeholder,
+  onBlur,
 }: FormFieldProps) {
   const inputRef = useRef<TextInput>(null);
   
@@ -738,10 +887,9 @@ function FormField({
         keyboardType={keyboardType}
         placeholder={placeholder}
         onFocus={() => {
-          inputRef.current?.measure((x, y, width, height, pageX, pageY) => {
-            onFocus?.();
-          });
+          onFocus?.();
         }}
+        onBlur={onBlur}
       />
       {error && <Text style={styles.errorText}>{error}</Text>}
     </View>

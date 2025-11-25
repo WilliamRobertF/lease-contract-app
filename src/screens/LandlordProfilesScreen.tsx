@@ -16,9 +16,11 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { useTranslation } from 'react-i18next';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LandlordProfile, PersonData } from '../types/contractTypes';
 import { getLandlords, saveLandlord, deleteLandlord } from '../utils/storageManager';
+import { RootStackParamList, NavigationProp } from '../types/navigationTypes';
 import PrimaryButton from '../components/PrimaryButton';
 import SecondaryButton from '../components/SecondaryButton';
 import AutocompleteInput from '../components/AutocompleteInput';
@@ -54,6 +56,8 @@ const initialValues: PersonData = {
 
 export default function LandlordProfilesScreen() {
   const { t, i18n } = useTranslation();
+  const navigation = useNavigation<NavigationProp>();
+  const route = useRoute<RouteProp<RootStackParamList, 'LandlordProfiles'>>();
   const insets = useSafeAreaInsets();
   const [landlords, setLandlords] = useState<LandlordProfile[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -92,7 +96,10 @@ export default function LandlordProfilesScreen() {
 
   useEffect(() => {
     loadLandlords();
-  }, []);
+    if (route.params?.returnTo) {
+      setEditingId('new');
+    }
+  }, [route.params?.returnTo]);
 
   const loadLandlords = async () => {
     const data = await getLandlords();
@@ -118,6 +125,10 @@ export default function LandlordProfilesScreen() {
       await saveLandlord(profile);
     }
     loadLandlords();
+    
+    if (route.params?.returnTo) {
+      navigation.goBack();
+    }
   };
 
   const handleDelete = (id: string) => {

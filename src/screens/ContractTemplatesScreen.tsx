@@ -49,11 +49,11 @@ export default function ContractTemplatesScreen() {
 
   const handleCreateTemplate = async () => {
     if (!newTemplateName.trim()) {
-      Alert.alert('Error', t('errorTemplateNameRequired'));
+      Alert.alert(t('error'), t('errorTemplateNameRequired'));
       return;
     }
     if (selectedClauses.length === 0) {
-      Alert.alert('Error', t('errorSelectAtLeastOneClause'));
+      Alert.alert(t('error'), t('errorSelectAtLeastOneClause'));
       return;
     }
 

@@ -21,6 +21,7 @@ import { saveClauses } from '../utils/storageManager';
 import { saveLanguage } from '../i18n/i18n';
 import { useOnboarding } from '../context/OnboardingContext';
 import { exportData, importData } from '../utils/backupManager';
+import * as Updates from 'expo-updates';
 
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
@@ -58,6 +59,42 @@ export default function SettingsScreen() {
     const success = await importData(t);
     // if (success) {
     // }
+  };
+
+  const handleCheckUpdates = async () => {
+    try {
+      const update = await Updates.checkForUpdateAsync();
+      
+      if (update.isAvailable) {
+        Alert.alert(
+          t('updateAvailable'),
+          t('updateMessage'),
+          [
+            {
+              text: t('later'),
+              style: 'cancel',
+            },
+            {
+              text: t('update'),
+              onPress: async () => {
+                try {
+                  await Updates.fetchUpdateAsync();
+                  await Updates.reloadAsync();
+                } catch (e) {
+                  console.error('Error downloading update:', e);
+                  Alert.alert(t('error'), t('updateError'));
+                }
+              },
+            },
+          ]
+        );
+      } else {
+        Alert.alert(t('success'), t('noUpdatesAvailable'));
+      }
+    } catch (e) {
+      console.error('Error checking for updates:', e);
+      Alert.alert(t('error'), t('updateCheckError'));
+    }
   };
 
   const SettingItem = ({
@@ -210,6 +247,12 @@ export default function SettingsScreen() {
                 title={t('exportData')}
                 description={t('exportDescription')}
                 onPress={handleExport}
+              />
+              <SettingItem
+                icon="update"
+                title={t('checkForUpdates')}
+                description={t('checkForUpdatesDescription')}
+                onPress={handleCheckUpdates}
               />
               <View style={styles.separator} />
               <SettingItem
